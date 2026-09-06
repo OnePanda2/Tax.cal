@@ -1,0 +1,11 @@
+# dependencies
+node_modules/
+
+# OS / editor junk
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+
+# Third-party material — not ours to republish in a public repo.
+dissectmac-international-users-playbook.pdf

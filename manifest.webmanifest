@@ -1,0 +1,18 @@
+{
+  "name": "Tax.cal — See the tax you really pay",
+  "short_name": "Tax.cal",
+  "description": "See the total tax you really pay — income tax, social contributions, VAT/sales tax and fuel duty — as one honest number and one shareable card. Covers the UK, USA, Germany, France, Netherlands and Ireland. All estimates, nothing stored.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "categories": ["finance", "productivity", "utilities"],
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

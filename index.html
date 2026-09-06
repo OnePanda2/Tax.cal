@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Tax.cal — the tax you really pay</title>
+  <meta name="description" content="See the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty in one number — and how much you could save. Free and private, covering 10 countries incl. the UK, USA, Canada and Australia. 2026 rates.">
+  <link rel="canonical" href="https://taxcal.siddheshthapa.com/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tax.cal">
+  <meta property="og:title" content="See the tax you really pay">
+  <meta property="og:description" content="Your payslip is only half the story. Add up income tax, social contributions, VAT/sales tax and fuel duty to see your real effective tax rate. Free & private.">
+  <meta property="og:url" content="https://taxcal.siddheshthapa.com/">
+  <meta property="og:image" content="https://taxcal.siddheshthapa.com/icons/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="See the tax you really pay">
+  <meta name="twitter:description" content="Income tax is only part of it. See the real share of your income that becomes tax — free and private.">
+  <meta name="twitter:image" content="https://taxcal.siddheshthapa.com/icons/og-image.png">
+
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <!-- PWA:start -->
+  <meta name="theme-color" content="#0b1220">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- PWA:end -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Structured data: helps Google, Bing and AI search understand the tool -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Tax.cal",
+    "url": "https://taxcal.siddheshthapa.com/",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any (web)",
+    "description": "Estimate the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty combined — plus how much you could save, for 10 countries: the UK, USA, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["Real effective tax rate", "Hidden vs visible tax", "Cross-country comparison", "Shareable Tax Wrapped card", "No sign-up, no data stored"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "How much tax do I really pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your payslip shows income tax and social contributions, but that is only part of it. You also pay VAT or sales tax on almost everything you buy and heavy duties on fuel. Adding these together, most people's real effective tax rate is meaningfully higher than the figure on their payslip." } },
+      { "@type": "Question", "name": "What taxes does Tax.cal include?", "acceptedAnswer": { "@type": "Answer", "text": "Income tax, social contributions (National Insurance, FICA, USC/PRSI, and national social security), US state income tax, VAT or sales tax on your spending, and fuel duties." } },
+      { "@type": "Question", "name": "Which countries and tax year are supported?", "acceptedAnswer": { "@type": "Answer", "text": "Ten countries on 2026 tax-year rates: the United Kingdom, the United States (all 50 states plus DC), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy." } },
+      { "@type": "Question", "name": "Are the numbers exact?", "acceptedAnswer": { "@type": "Answer", "text": "No. They are transparent estimates based on published 2026 rates and reasonable assumptions about how spending is taxed. Tax.cal is not personalised tax advice." } },
+      { "@type": "Question", "name": "How is the \"you could keep up to\" figure worked out?", "acceptedAnswer": { "@type": "Answer", "text": "It is a typical-case model, not a personal finding. Tax.cal measures the marginal rate on your income, then applies it to the legal tax-advantaged contribution limits available in your country, such as a pension, 401(k), RRSP or superannuation. It shows the upper end of that range. Because Tax.cal does not know what you already contribute or claim, some or none of it may apply to you." } },
+      { "@type": "Question", "name": "Is my data stored?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything is calculated in your browser. No salary or spending data is sent to a server or saved anywhere." } }
+    ]
+  }
+  </script>
+</head>
+<body>
+<script>/* apply saved theme before paint to avoid a flash */try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+
+<header class="site-head">
+  <div class="wrap">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#0694A2"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/><g fill="none" stroke-width="7.4" stroke-linecap="round"><circle cx="32" cy="32" r="15.5" stroke="#fff"/><path d="M32 16.5 A15.5 15.5 0 0 1 45.4 40.2" stroke="#F59E0B"/></g></svg>
+      Tax<span class="dot">.cal</span>
+    </span>
+    <span class="head-spacer"></span>
+    <span class="pill"><span class="blip"></span>Estimates</span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme"></button>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <p class="eyebrow">Your real tax rate</p>
+    <h1>See the tax you <span class="u">really</span> pay.</h1>
+    <p class="lede">Your payslip shows income tax and social contributions — but that's only half the story. You also pay <strong>VAT or sales tax</strong> on nearly everything you buy, plus heavy <strong>fuel duties</strong>. Tax.cal adds it all up. <strong>Free, private, nothing stored.</strong></p>
+  </section>
+
+  <!-- TOOL -->
+  <section class="wrap tool">
+    <div class="card pad stack">
+      <div class="grid-2">
+        <div class="field">
+          <label for="country">Country</label>
+          <div class="control select-ctl"><select id="country" aria-label="Country"></select></div>
+        </div>
+        <div class="field">
+          <label for="salary">Gross salary <span class="hint">· per year, before tax</span></label>
+          <div class="control"><span class="cur" id="curSalary">£</span><input id="salary" type="number" inputmode="numeric" min="0" step="1000" placeholder="45,000"></div>
+        </div>
+      </div>
+
+      <div id="regionFields" class="grid-2 hidden">
+        <div class="field" id="filingField">
+          <label for="filing">Filing status</label>
+          <div class="control select-ctl"><select id="filing"><option value="single">Single</option><option value="mfj">Married, filing jointly</option></select></div>
+        </div>
+        <div class="field" id="regionField">
+          <label for="region" id="regionLabel">State</label>
+          <div class="control select-ctl"><select id="region" aria-label="Region"></select></div>
+        </div>
+      </div>
+
+      <p class="hint" id="regionNote"></p>
+
+      <div>
+        <div class="sub-head"><h3>What you spend each month</h3><span class="note">we pre-fill typical amounts — edit freely</span></div>
+        <div class="spend-grid" id="spendGrid">
+          <div class="spend-item field"><label for="spend_groceries"><span class="em">🛒</span> Groceries</label><div class="control"><span class="cur" id="cur_groceries">£</span><input id="spend_groceries" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_dining"><span class="em">🍽️</span> Eating out</label><div class="control"><span class="cur" id="cur_dining">£</span><input id="spend_dining" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_fuel"><span class="em">⛽</span> Fuel / petrol</label><div class="control"><span class="cur" id="cur_fuel">£</span><input id="spend_fuel" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_shopping"><span class="em">🛍️</span> Shopping</label><div class="control"><span class="cur" id="cur_shopping">£</span><input id="spend_shopping" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_utilities"><span class="em">💡</span> Utilities & bills</label><div class="control"><span class="cur" id="cur_utilities">£</span><input id="spend_utilities" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_entertainment"><span class="em">🎬</span> Subscriptions & fun</label><div class="control"><span class="cur" id="cur_entertainment">£</span><input id="spend_entertainment" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+        </div>
+      </div>
+
+      <button class="btn" id="revealBtn" type="button">Show my real tax rate
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="wrap section" id="results">
+    <div class="card reveal-card">
+      <div class="reveal-top">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" fill="none" style="stroke:var(--brand);opacity:.16" stroke-width="14"></circle>
+            <circle id="ringTax" cx="60" cy="60" r="52" fill="none" stroke="url(#tg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+            <defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F59E0B"></stop><stop offset="1" stop-color="#F97316"></stop></linearGradient></defs>
+          </svg>
+          <div class="ring-center"><div class="pct" id="ringPct">0%</div><div class="cap">real tax rate</div></div>
+        </div>
+        <div class="reveal-head">
+          <div class="k">You pay an estimated</div>
+          <div class="big" id="heroBig">—</div>
+          <div class="sub" id="heroSub"></div>
+          <div class="sub" id="netLine" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <div class="example-flag" id="exampleFlag">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        Example numbers — change the salary and spending above to see your own.
+      </div>
+    </div>
+
+    <div class="save-card" id="saveCard">
+      <div class="save-inner">
+        <div class="save-top">
+          <span class="save-eyebrow">The number that actually matters</span>
+          <span class="save-pill">Upper estimate</span>
+        </div>
+        <div class="save-big">You could keep up to <span class="save-amt" id="saveHigh">—</span> <span class="save-per">a year</span></div>
+        <div class="save-sub" id="saveSub"></div>
+        <a class="btn save-cta" id="saveCta" href="#notify">See what applies to me
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <div class="save-fine" id="saveFine"></div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">The split</span><h2>What you see vs what you don't</h2></div></div>
+      <div class="splitbar"><div class="seen" id="splitSeen"></div><div class="unseen" id="splitUnseen"></div></div>
+      <div class="split-legend">
+        <span class="li"><span class="sw" style="background:var(--brand)"></span><span id="legendSeen"></span></span>
+        <span class="li"><span class="sw" style="background:var(--tax)"></span><span id="legendUnseen"></span></span>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Where it goes</span><h2>Your tax, by type</h2></div></div>
+      <div class="rows" id="typeRows"></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title" style="justify-content:space-between"><div><span class="kicker">Hidden in spending</span><h2>Tax buried in what you buy</h2></div></div>
+      <div id="catRows"></div>
+      <div class="row" style="border-top:1px solid var(--line-strong);margin-top:6px"><div class="lhs"><span class="name">Total hidden tax</span></div><div class="amt tnum" id="catTotal">—</div></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">The same salary elsewhere</span><h2>How your country compares</h2></div></div>
+      <p class="hint" style="margin:-6px 0 14px">Direct tax (income + social + state) on the equivalent salary, converted at approximate exchange rates.</p>
+      <div class="cmp" id="cmpBars"></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Tax freedom day</span><h2>When you start working for yourself</h2></div></div>
+      <div class="tfd">
+        <div class="cal"><div class="m" id="tfdMonth">APR</div><div class="d" id="tfdDay">1</div></div>
+        <div class="txt" id="tfdText"></div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Legal ways to keep more</span><h2>Could you pay less in <span id="tipsCountry">the UK</span>?</h2></div></div>
+      <div class="tips" id="tips"></div>
+      <p class="hint" style="margin-top:12px">General information, not personal tax advice. Rules have limits and conditions — check with a qualified adviser before acting.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Share it</span><h2>Your Tax Wrapped</h2></div></div>
+      <div class="share-card-frame"><canvas id="shareCanvas" width="1080" height="1350" role="img" aria-label="Shareable Tax Wrapped card"></canvas></div>
+      <div class="share-actions">
+        <button class="btn" id="shareBtn" type="button">Share
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
+        <button class="btn ghost" id="dlBtn" type="button">Download image</button>
+      </div>
+    </div>
+
+    <div class="card pad" id="notify" style="margin-top:16px;scroll-margin-top:70px">
+      <div class="sec-title"><div><span class="kicker">Tax.cal Plus · in development</span><h2>Find out what you can actually claim</h2></div></div>
+      <p class="hint" style="margin:-6px 0 6px" id="notifyPitch">The figure above is what's <i>typically</i> possible at your income. Tax.cal Plus asks you a short set of questions about your real situation, then tells you which of it you can actually use. In development — join the early-access list.</p>
+      <form class="notify" id="notifyForm">
+        <div class="control"><input id="email" type="email" required placeholder="you@email.com" aria-label="Email address"></div>
+        <button class="btn" type="submit">Join the early-access list</button>
+      </form>
+      <p class="notify-ok hidden" id="notifyOk">You're on the list — we'll email you when Tax.cal Plus opens. (Your address, nothing else.)</p>
+      <p class="hint" style="margin-top:10px;font-size:12px;opacity:.75">Tax.cal Plus is not yet available and no payment is being taken. Tax.cal provides general information, not personal tax, legal or financial advice.</p>
+    </div>
+  </section>
+
+  <!-- SEO / trust content -->
+  <section class="wrap section">
+    <div class="sec-title"><div><span class="kicker">Good to know</span><h2>How Tax.cal works</h2></div></div>
+    <p class="lead-answer">Most people only ever see <b>income tax and social contributions</b> on their payslip. But you also pay <b>VAT or sales tax</b> on almost everything you buy, and a large share of every fuel purchase is <b>duty</b>. Tax.cal combines all of these into one honest, effective rate — the real percentage of your income that becomes tax. It uses published 2026 rates, runs entirely in your browser, and stores nothing.</p>
+
+    <details class="acc"><summary>What's included, and how we estimate it <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body">
+        <p><strong>Direct tax</strong> (income tax, social contributions, and US state tax) uses each country's real 2026 brackets and thresholds — these are the figures on your payslip, and we compute them precisely for a single earner.</p>
+        <p><strong>Indirect tax</strong> (VAT/sales tax and fuel duty) is genuinely an estimate: a shop receipt mixes items taxed at different rates, so we apply a reasonable effective rate to each spending category rather than pretending to know your exact basket. Each line is labelled <em>known rate</em>, <em>estimate</em> or <em>rough</em> so you can see how much to trust it.</p>
+        <ul>
+          <li><strong>Fuel</strong> is taxed heavily and varies by country and state — treat it as a ballpark.</li>
+          <li><strong>Groceries</strong> are often zero-rated or reduced, so their hidden tax is small.</li>
+          <li>The country comparison converts your salary at <strong>approximate exchange rates</strong> and shows direct tax only.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="acc"><summary>Is this tax advice? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>No. Tax.cal is an educational estimate to show your total tax burden at a glance. It doesn't know your full circumstances — deductions, allowances, other income, regional quirks — and it is <strong>not a substitute for a qualified tax adviser</strong>. The "ways to keep more" tips are general information, not recommendations.</p></div>
+    </details>
+    <details class="acc"><summary>How is the “you could keep up to” figure worked out? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>It's a <strong>typical-case model, not a personal finding</strong>. Tax.cal measures the marginal rate on your income — the rate you pay on your next pound or dollar earned — then applies it to the legal tax-advantaged contribution limits available in your country (a pension, 401(k), RRSP, superannuation and so on). We show the <strong>upper end</strong> of that range, so treat it as a ceiling rather than a forecast.</p>
+      <p>Because Tax.cal doesn't know what you already contribute or claim, <strong>some or none of it may apply to you</strong>. If you already max out your pension, your realistic figure is near zero. It's there to show the size of the prize, not to tell you what you personally are missing.</p></div>
+    </details>
+    <details class="acc"><summary>Where does my data go? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>Nowhere. Every calculation happens in your browser. Your salary and spending are never sent to a server and nothing is saved except an optional theme preference. Close the tab and it's gone.</p></div>
+    </details>
+    <details class="acc"><summary>Which countries and tax year? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>Ten countries, all on <strong>2026 tax-year</strong> rates (verified September 2026): the UK (England, Wales &amp; NI bands), the USA (all 50 states + DC, federal + state + FICA), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.</p></div>
+    </details>
+  </section>
+
+  <footer class="foot wrap">
+    <div class="disc"><strong>Estimates only.</strong> Tax.cal gives an approximate, educational view of your total tax burden using 2026 rates. It is not tax, financial or legal advice, and figures may differ from your actual liability. Always confirm with a qualified professional before making decisions.</div>
+    <div class="row2">
+      <span>© 2026 Tax.cal</span>
+      <span>·</span>
+      <span>UK · USA · Canada · Australia · Ireland · Germany · France · Netherlands · Spain · Italy</span>
+    </div>
+  </footer>
+</main>
+
+<script src="assets/tax-data.js"></script>
+<script src="assets/tax-engine.js"></script>
+<script src="assets/app.js"></script>
+<!-- PWA:start -->
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
+<!-- PWA:end -->
+</body>
+</html>
