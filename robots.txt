@@ -1,5 +1,5 @@
 # Tax.cal — allow everything, point crawlers (and AI search) at the sitemap.
-# NOTE: replace https://taxcal.siddheshthapa.com with your real domain before launch.
+# Live at https://taxcal.siddheshthapa.com
 User-agent: *
 Allow: /
 
