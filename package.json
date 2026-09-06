@@ -1,0 +1,14 @@
+{
+  "name": "taxcal",
+  "version": "1.0.0",
+  "description": "See the tax you really pay — total tax-burden estimator (income tax + social + VAT/sales tax + fuel) for the UK, USA, Germany, France, Netherlands and Ireland. 2026 rates.",
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "build": "node build-artifact.mjs",
+    "build:countries": "node build-country-pages.mjs"
+  },
+  "keywords": ["tax", "calculator", "effective-tax-rate", "vat", "pwa", "uk", "usa", "germany", "france", "netherlands", "ireland"],
+  "license": "MIT",
+  "private": true
+}

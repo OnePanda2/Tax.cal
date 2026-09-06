@@ -1,0 +1,1660 @@
+<title>Tax.cal</title>
+  <meta name="description" content="See the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty in one number — and how much you could save. Free and private, covering 10 countries incl. the UK, USA, Canada and Australia. 2026 rates.">
+  <link rel="canonical" href="https://taxcal.siddheshthapa.com/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tax.cal">
+  <meta property="og:title" content="See the tax you really pay">
+  <meta property="og:description" content="Your payslip is only half the story. Add up income tax, social contributions, VAT/sales tax and fuel duty to see your real effective tax rate. Free & private.">
+  <meta property="og:url" content="https://taxcal.siddheshthapa.com/">
+  <meta property="og:image" content="https://taxcal.siddheshthapa.com/icons/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="See the tax you really pay">
+  <meta name="twitter:description" content="Income tax is only part of it. See the real share of your income that becomes tax — free and private.">
+  <meta name="twitter:image" content="https://taxcal.siddheshthapa.com/icons/og-image.png">
+
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <style>
+/* ============================================================================
+   Tax.cal — styles
+   Concept: "the hidden slice, made visible." Teal/emerald = money you keep,
+   amber = tax revealed. Cool teal-biased neutrals. Theme-aware (3 states).
+   ========================================================================== */
+
+/* ---- Tokens: light (bare :root defines the COMPLETE palette) ------------- */
+:root {
+  --ground:      #F6F9F8;
+  --surface:     #FFFFFF;
+  --surface-2:   #EEF4F2;
+  --ink:         #0B1B24;
+  --muted:       #566A70;
+  --faint:       #87999D;
+  --line:        #E2EAE7;
+  --line-strong: #CFDAD6;
+
+  --brand:       #0E9F6E;   /* emerald — money you keep */
+  --brand-2:     #0694A2;   /* teal */
+  --brand-ink:   #06584A;
+  --brand-wash:  #E7F5EF;
+
+  --tax:         #F59E0B;   /* amber — the tax reveal */
+  --tax-strong:  #E4690B;   /* hotter amber for "hidden" emphasis */
+  --tax-ink:     #7A4300;
+  --tax-wash:    #FDF1DD;
+
+  --crit:        #E5484D;
+
+  --shadow-sm: 0 1px 2px rgba(11,27,36,.06), 0 1px 1px rgba(11,27,36,.04);
+  --shadow-md: 0 6px 24px -10px rgba(11,27,36,.22), 0 2px 6px -2px rgba(11,27,36,.10);
+  --shadow-lg: 0 24px 60px -24px rgba(11,27,36,.32);
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-pill: 999px;
+
+  --maxw: 660px;
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  color-scheme: light;
+}
+
+/* ---- Tokens: dark via OS (only when no explicit light choice) ------------ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0A1116;
+    --surface:     #101B22;
+    --surface-2:   #16232C;
+    --ink:         #EAF2F1;
+    --muted:       #9CB0B4;
+    --faint:       #6E8388;
+    --line:        #1F313A;
+    --line-strong: #2A3F49;
+
+    --brand:       #19BD8C;
+    --brand-2:     #22C0CE;
+    --brand-ink:   #8FE7CE;
+    --brand-wash:  #0E2A26;
+
+    --tax:         #FBBF24;
+    --tax-strong:  #FB8C3B;
+    --tax-ink:     #FBD38D;
+    --tax-wash:    #2A2011;
+
+    --crit:        #FF6169;
+
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+    --shadow-md: 0 8px 28px -12px rgba(0,0,0,.6);
+    --shadow-lg: 0 28px 64px -24px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+
+/* ---- Tokens: dark via explicit toggle (wins in both directions) ---------- */
+:root[data-theme="dark"] {
+  --ground:      #0A1116;
+  --surface:     #101B22;
+  --surface-2:   #16232C;
+  --ink:         #EAF2F1;
+  --muted:       #9CB0B4;
+  --faint:       #6E8388;
+  --line:        #1F313A;
+  --line-strong: #2A3F49;
+  --brand:       #19BD8C;
+  --brand-2:     #22C0CE;
+  --brand-ink:   #8FE7CE;
+  --brand-wash:  #0E2A26;
+  --tax:         #FBBF24;
+  --tax-strong:  #FB8C3B;
+  --tax-ink:     #FBD38D;
+  --tax-wash:    #2A2011;
+  --crit:        #FF6169;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md: 0 8px 28px -12px rgba(0,0,0,.6);
+  --shadow-lg: 0 28px 64px -24px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+
+/* ---- Base --------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.08; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: var(--brand-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+:focus-visible { outline: 2.5px solid var(--brand-2); outline-offset: 2px; border-radius: 6px; }
+
+.wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 18px; }
+.tnum { font-variant-numeric: tabular-nums; }
+.section { padding: 34px 0; }
+
+/* ---- Header ------------------------------------------------------------- */
+.site-head {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.site-head .wrap { display: flex; align-items: center; gap: 12px; height: 58px; }
+.brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.02em; color: var(--ink); }
+.brand svg { width: 26px; height: 26px; display: block; }
+.brand .dot { color: var(--brand); }
+.head-spacer { flex: 1; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  padding: 4px 10px; border-radius: var(--r-pill);
+  background: var(--tax-wash); color: var(--tax-ink);
+  border: 1px solid color-mix(in srgb, var(--tax) 35%, transparent);
+}
+.pill .blip { width: 6px; height: 6px; border-radius: 50%; background: var(--tax-strong); }
+.icon-btn {
+  display: inline-grid; place-items: center; width: 38px; height: 38px;
+  border-radius: var(--r-pill); border: 1px solid var(--line);
+  background: var(--surface); color: var(--muted);
+}
+.icon-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+.icon-btn svg { width: 18px; height: 18px; }
+.theme-moon { display: none; }
+:root[data-theme="dark"] .theme-sun,
+:root:not([data-theme="light"]) .theme-sun { }
+
+/* ---- Hero --------------------------------------------------------------- */
+.hero { padding-top: 30px; padding-bottom: 6px; }
+.eyebrow {
+  font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--brand-ink);
+}
+.hero h1 {
+  font-size: clamp(32px, 8vw, 46px); font-weight: 800; letter-spacing: -.025em;
+  margin: 10px 0 0;
+}
+.hero h1 .u {
+  background: linear-gradient(180deg, transparent 62%, color-mix(in srgb, var(--tax) 45%, transparent) 0);
+}
+.lede { margin-top: 14px; font-size: 17px; color: var(--muted); max-width: 52ch; }
+.lede strong { color: var(--ink); font-weight: 600; }
+
+/* ---- Card / panel ------------------------------------------------------- */
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-sm);
+}
+.card.pad { padding: 20px; }
+@media (min-width: 480px){ .card.pad { padding: 24px; } }
+
+/* ---- Form --------------------------------------------------------------- */
+.tool { margin-top: 22px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field > label { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.field .hint { font-size: 12.5px; color: var(--faint); font-weight: 400; }
+.control {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  border-radius: var(--r-md); padding: 0 14px; height: 52px;
+  transition: border-color .15s, background .15s;
+}
+.control:focus-within { border-color: var(--brand-2); background: var(--surface); }
+.control .cur { color: var(--muted); font-weight: 600; font-size: 17px; }
+.control input, .control select {
+  border: 0; background: transparent; color: var(--ink);
+  font: inherit; font-size: 17px; width: 100%; height: 100%; outline: none;
+  font-variant-numeric: tabular-nums;
+}
+.control select { cursor: pointer; -webkit-appearance: none; appearance: none; padding-right: 20px; }
+.control.select-ctl { position: relative; }
+.control.select-ctl::after {
+  content: ""; position: absolute; right: 15px; top: 50%; width: 9px; height: 9px;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  transform: translateY(-70%) rotate(45deg); pointer-events: none;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+@media (min-width: 480px){ .grid-2 { grid-template-columns: 1fr 1fr; } }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+
+.sub-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin: 4px 0 2px; }
+.sub-head h3 { font-size: 16px; letter-spacing: -.01em; }
+.sub-head .note { font-size: 12.5px; color: var(--faint); }
+
+.spend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.spend-item .control { height: 46px; padding: 0 12px; }
+.spend-item .control input { font-size: 16px; }
+.spend-item label { font-size: 12.5px; display:flex; align-items:center; gap:6px; }
+.spend-item label .em { font-size: 15px; }
+.per { font-size: 12px; color: var(--faint); white-space: nowrap; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  height: 54px; padding: 0 22px; width: 100%;
+  font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -.01em;
+  color: #fff; border: 0; border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: var(--shadow-md); transition: transform .12s, filter .15s;
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: translateY(1px) scale(.995); }
+.btn svg { width: 20px; height: 20px; }
+.btn.ghost {
+  background: var(--surface); color: var(--ink); box-shadow: none;
+  border: 1.5px solid var(--line-strong); height: 48px; font-size: 15px;
+}
+.btn.ghost:hover { background: var(--surface-2); filter: none; }
+
+/* ---- Results ------------------------------------------------------------ */
+#results { scroll-margin-top: 70px; }
+.reveal-card { overflow: hidden; position: relative; }
+.reveal-top {
+  display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: center;
+  padding: 22px;
+}
+@media (max-width: 440px){ .reveal-top { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+.ring-wrap { position: relative; width: 150px; height: 150px; }
+.ring-wrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-center {
+  position: absolute; inset: 0; display: grid; place-content: center; text-align: center;
+}
+.ring-center .pct { font-family: var(--font-display); font-weight: 800; font-size: 34px; letter-spacing: -.03em; line-height: 1; }
+.ring-center .cap { font-size: 10.5px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-top: 3px; }
+.reveal-head .k { font-size: 13px; color: var(--muted); font-weight: 600; }
+.reveal-head .big {
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -.03em;
+  font-size: clamp(30px, 9vw, 42px); line-height: 1.02; margin: 4px 0 2px; color: var(--ink);
+}
+.reveal-head .big .cur { color: var(--muted); font-size: .62em; font-weight: 700; }
+.reveal-head .sub { font-size: 14px; color: var(--muted); }
+.reveal-head .sub b { color: var(--tax-strong); }
+
+.example-flag {
+  display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--tax-ink);
+  background: var(--tax-wash); border-top: 1px solid color-mix(in srgb, var(--tax) 30%, transparent);
+  padding: 9px 16px;
+}
+.example-flag.hidden { display:none; }
+
+/* savings card — the value story, the star of the results */
+.save-card {
+  position: relative; overflow: hidden; margin-top: 16px;
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 120% at 85% 0%, color-mix(in srgb, var(--brand) 55%, #12d3a0) 0%, transparent 55%),
+    linear-gradient(135deg, var(--brand-ink), var(--brand-2));
+  box-shadow: var(--shadow-md);
+  border: 1px solid color-mix(in srgb, var(--brand) 40%, transparent);
+}
+:root[data-theme="dark"] .save-card,
+:root:not([data-theme="light"]) .save-card {
+  background:
+    radial-gradient(120% 120% at 85% 0%, color-mix(in srgb, var(--brand) 40%, transparent) 0%, transparent 55%),
+    linear-gradient(135deg, #0c3b34, #0e5a54);
+}
+.save-inner { position: relative; padding: 22px; }
+@media (min-width: 480px){ .save-inner { padding: 26px; } }
+.save-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.save-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.72); }
+.save-pill { font-size: 11px; font-weight: 700; letter-spacing: .03em; color: #08251f; background: #F7B54A; padding: 3px 9px; border-radius: var(--r-pill); }
+.save-big {
+  font-family: var(--font-display); font-weight: 800; color: #fff;
+  font-size: clamp(23px, 6vw, 30px); letter-spacing: -.02em; line-height: 1.12; text-wrap: balance;
+}
+.save-big .save-amt {
+  font-size: clamp(34px, 10vw, 52px); color: #FDE28A;
+  display: inline-block; letter-spacing: -.03em;
+}
+.save-big .save-per { color: rgba(255,255,255,.8); font-weight: 700; font-size: .5em; }
+.save-sub { color: rgba(255,255,255,.9); font-size: 14.5px; margin-top: 10px; max-width: 52ch; }
+.save-sub b { color: #FDE28A; }
+.save-cta {
+  margin-top: 18px; width: auto; align-self: flex-start; display: inline-flex;
+  background: #fff; color: var(--brand-ink); box-shadow: 0 8px 20px -8px rgba(0,0,0,.4);
+}
+.save-cta:hover { filter: none; background: #F4FFFB; }
+.save-fine { margin-top: 12px; font-size: 11.5px; color: rgba(255,255,255,.62); max-width: 60ch; }
+
+/* split bar: visible vs hidden */
+.splitbar { display:flex; height: 40px; border-radius: 12px; overflow: hidden; border:1px solid var(--line); }
+.splitbar > div { display:flex; align-items:center; justify-content:center; color:#fff; font-size:12.5px; font-weight:600; min-width: 2px; }
+.splitbar .seen { background: linear-gradient(135deg, var(--brand), var(--brand-2)); }
+.splitbar .unseen { background: linear-gradient(135deg, var(--tax), var(--tax-strong)); }
+.split-legend { display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; }
+.split-legend .li { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted); }
+.split-legend .sw { width:11px; height:11px; border-radius:3px; }
+.split-legend b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* breakdown rows */
+.rows { display:flex; flex-direction:column; }
+.row {
+  display:grid; grid-template-columns: 1fr auto; align-items:center; gap: 10px;
+  padding: 13px 2px; border-top: 1px solid var(--line);
+}
+.row:first-child { border-top: 0; }
+.row .lhs { display:flex; align-items:center; gap:11px; min-width:0; }
+.row .tick { width:9px; height:22px; border-radius:3px; flex:none; }
+.row .name { font-weight:600; font-size:14.5px; }
+.row .meta { font-size:12px; color:var(--faint); }
+.row .amt { font-weight:700; font-variant-numeric: tabular-nums; font-size:15px; }
+.row .amt .of { display:block; text-align:right; font-size:11.5px; color:var(--faint); font-weight:500; }
+.conf { font-size:10.5px; font-weight:600; padding:1px 7px; border-radius:var(--r-pill); letter-spacing:.02em; }
+.conf.high { background: var(--brand-wash); color: var(--brand-ink); }
+.conf.med  { background: var(--surface-2); color: var(--muted); }
+.conf.low  { background: var(--tax-wash); color: var(--tax-ink); }
+
+/* mini category bars */
+.cat { display:grid; grid-template-columns: 96px 1fr auto; gap:10px; align-items:center; padding:8px 0; }
+.cat .cname { font-size:13px; color:var(--ink); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cat .track { height:9px; border-radius:var(--r-pill); background:var(--surface-2); overflow:hidden; }
+.cat .fill { height:100%; border-radius:var(--r-pill); background:linear-gradient(90deg, var(--tax), var(--tax-strong)); }
+.cat .cval { font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--muted); }
+
+/* country comparison */
+.cmp { display:flex; flex-direction:column; gap:9px; }
+.cmp .bar { display:grid; grid-template-columns: 118px 1fr 52px; gap:10px; align-items:center; }
+.cmp .cty { font-size:13.5px; display:flex; align-items:center; gap:7px; }
+.cmp .cty .fl { font-size:16px; }
+.cmp .track { height:22px; border-radius:7px; background:var(--surface-2); overflow:hidden; }
+.cmp .fill { height:100%; border-radius:7px; background:linear-gradient(90deg, var(--brand-2), var(--brand)); opacity:.55; }
+.cmp .bar.me .fill { opacity:1; background:linear-gradient(90deg, var(--tax), var(--tax-strong)); }
+.cmp .bar.me .cty { font-weight:700; }
+.cmp .val { font-size:13px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
+
+/* tax freedom day */
+.tfd { display:flex; align-items:center; gap:16px; }
+.tfd .cal {
+  width:64px; height:66px; border-radius:12px; overflow:hidden; border:1px solid var(--line);
+  flex:none; text-align:center; background:var(--surface);
+}
+.tfd .cal .m { background:linear-gradient(135deg, var(--tax), var(--tax-strong)); color:#fff; font-size:11px; font-weight:700; padding:4px 0; letter-spacing:.05em; text-transform:uppercase; }
+.tfd .cal .d { font-family:var(--font-display); font-weight:800; font-size:26px; padding:6px 0; }
+.tfd .txt { font-size:14px; color:var(--muted); }
+.tfd .txt b { color:var(--ink); }
+
+/* tips */
+.tips { display:flex; flex-direction:column; gap:10px; }
+.tip { display:grid; grid-template-columns:auto 1fr; gap:12px; padding:14px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--line); }
+.tip .ti { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:var(--brand-wash); color:var(--brand-ink); flex:none; }
+.tip .ti svg { width:17px; height:17px; }
+.tip h4 { margin:0 0 2px; font-size:14.5px; font-family:var(--font-body); font-weight:700; }
+.tip p { font-size:13px; color:var(--muted); }
+
+/* share */
+.share-card-frame { border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-md); }
+#shareCanvas { width:100%; height:auto; display:block; }
+.share-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+@media (max-width:420px){ .share-actions{ grid-template-columns:1fr; } }
+
+/* email capture */
+.notify { display:flex; gap:10px; margin-top:8px; }
+.notify .control { flex:1; height:48px; }
+.notify .btn { width:auto; height:48px; padding:0 18px; font-size:15px; }
+.notify-ok { font-size:13.5px; color:var(--brand-ink); font-weight:600; margin-top:10px; }
+.notify-ok.hidden { display:none; }
+
+/* accordion (methodology / faq) */
+details.acc { border-top:1px solid var(--line); }
+details.acc:last-of-type { border-bottom:1px solid var(--line); }
+details.acc > summary {
+  list-style:none; cursor:pointer; padding:16px 2px; display:flex; align-items:center; gap:12px;
+  font-weight:600; font-size:15px;
+}
+details.acc > summary::-webkit-details-marker { display:none; }
+details.acc > summary .chev { margin-left:auto; width:16px; height:16px; color:var(--muted); transition:transform .2s; }
+details.acc[open] > summary .chev { transform:rotate(180deg); }
+details.acc .body { padding:0 2px 18px; color:var(--muted); font-size:14.5px; display:flex; flex-direction:column; gap:10px; }
+details.acc .body strong { color:var(--ink); }
+details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; }
+
+/* section titles */
+.sec-title { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.sec-title h2 { font-size:22px; letter-spacing:-.02em; }
+.sec-title .kicker { font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
+.lead-answer { font-size:15px; color:var(--muted); margin-bottom:16px; max-width:62ch; }
+.lead-answer b { color:var(--ink); font-weight:600; }
+
+/* footer */
+.foot { margin-top:20px; padding:26px 0 40px; border-top:1px solid var(--line); color:var(--faint); font-size:12.5px; }
+.foot .disc { background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r-md); padding:14px; margin-bottom:16px; color:var(--muted); }
+.foot a { color:var(--muted); text-decoration:underline; }
+.foot .row2 { display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+
+.hidden { display:none !important; }
+
+@media (prefers-reduced-motion: reduce){
+  * { animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
+}
+
+</style>
+
+  <!-- Structured data: helps Google, Bing and AI search understand the tool -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Tax.cal",
+    "url": "https://taxcal.siddheshthapa.com/",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any (web)",
+    "description": "Estimate the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty combined — plus how much you could save, for 10 countries: the UK, USA, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["Real effective tax rate", "Hidden vs visible tax", "Cross-country comparison", "Shareable Tax Wrapped card", "No sign-up, no data stored"]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "How much tax do I really pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your payslip shows income tax and social contributions, but that is only part of it. You also pay VAT or sales tax on almost everything you buy and heavy duties on fuel. Adding these together, most people's real effective tax rate is meaningfully higher than the figure on their payslip." } },
+      { "@type": "Question", "name": "What taxes does Tax.cal include?", "acceptedAnswer": { "@type": "Answer", "text": "Income tax, social contributions (National Insurance, FICA, USC/PRSI, and national social security), US state income tax, VAT or sales tax on your spending, and fuel duties." } },
+      { "@type": "Question", "name": "Which countries and tax year are supported?", "acceptedAnswer": { "@type": "Answer", "text": "Ten countries on 2026 tax-year rates: the United Kingdom, the United States (all 50 states plus DC), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy." } },
+      { "@type": "Question", "name": "Are the numbers exact?", "acceptedAnswer": { "@type": "Answer", "text": "No. They are transparent estimates based on published 2026 rates and reasonable assumptions about how spending is taxed. Tax.cal is not personalised tax advice." } },
+      { "@type": "Question", "name": "How is the \"you could keep up to\" figure worked out?", "acceptedAnswer": { "@type": "Answer", "text": "It is a typical-case model, not a personal finding. Tax.cal measures the marginal rate on your income, then applies it to the legal tax-advantaged contribution limits available in your country, such as a pension, 401(k), RRSP or superannuation. It shows the upper end of that range. Because Tax.cal does not know what you already contribute or claim, some or none of it may apply to you." } },
+      { "@type": "Question", "name": "Is my data stored?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything is calculated in your browser. No salary or spending data is sent to a server or saved anywhere." } }
+    ]
+  }
+  </script>
+
+
+<script>/* apply saved theme before paint to avoid a flash */try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+
+<header class="site-head">
+  <div class="wrap">
+    <span class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#0694A2"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/><g fill="none" stroke-width="7.4" stroke-linecap="round"><circle cx="32" cy="32" r="15.5" stroke="#fff"/><path d="M32 16.5 A15.5 15.5 0 0 1 45.4 40.2" stroke="#F59E0B"/></g></svg>
+      Tax<span class="dot">.cal</span>
+    </span>
+    <span class="head-spacer"></span>
+    <span class="pill"><span class="blip"></span>Estimates</span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme"></button>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <p class="eyebrow">Your real tax rate</p>
+    <h1>See the tax you <span class="u">really</span> pay.</h1>
+    <p class="lede">Your payslip shows income tax and social contributions — but that's only half the story. You also pay <strong>VAT or sales tax</strong> on nearly everything you buy, plus heavy <strong>fuel duties</strong>. Tax.cal adds it all up. <strong>Free, private, nothing stored.</strong></p>
+  </section>
+
+  <!-- TOOL -->
+  <section class="wrap tool">
+    <div class="card pad stack">
+      <div class="grid-2">
+        <div class="field">
+          <label for="country">Country</label>
+          <div class="control select-ctl"><select id="country" aria-label="Country"></select></div>
+        </div>
+        <div class="field">
+          <label for="salary">Gross salary <span class="hint">· per year, before tax</span></label>
+          <div class="control"><span class="cur" id="curSalary">£</span><input id="salary" type="number" inputmode="numeric" min="0" step="1000" placeholder="45,000"></div>
+        </div>
+      </div>
+
+      <div id="regionFields" class="grid-2 hidden">
+        <div class="field" id="filingField">
+          <label for="filing">Filing status</label>
+          <div class="control select-ctl"><select id="filing"><option value="single">Single</option><option value="mfj">Married, filing jointly</option></select></div>
+        </div>
+        <div class="field" id="regionField">
+          <label for="region" id="regionLabel">State</label>
+          <div class="control select-ctl"><select id="region" aria-label="Region"></select></div>
+        </div>
+      </div>
+
+      <p class="hint" id="regionNote"></p>
+
+      <div>
+        <div class="sub-head"><h3>What you spend each month</h3><span class="note">we pre-fill typical amounts — edit freely</span></div>
+        <div class="spend-grid" id="spendGrid">
+          <div class="spend-item field"><label for="spend_groceries"><span class="em">🛒</span> Groceries</label><div class="control"><span class="cur" id="cur_groceries">£</span><input id="spend_groceries" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_dining"><span class="em">🍽️</span> Eating out</label><div class="control"><span class="cur" id="cur_dining">£</span><input id="spend_dining" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_fuel"><span class="em">⛽</span> Fuel / petrol</label><div class="control"><span class="cur" id="cur_fuel">£</span><input id="spend_fuel" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_shopping"><span class="em">🛍️</span> Shopping</label><div class="control"><span class="cur" id="cur_shopping">£</span><input id="spend_shopping" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_utilities"><span class="em">💡</span> Utilities & bills</label><div class="control"><span class="cur" id="cur_utilities">£</span><input id="spend_utilities" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+          <div class="spend-item field"><label for="spend_entertainment"><span class="em">🎬</span> Subscriptions & fun</label><div class="control"><span class="cur" id="cur_entertainment">£</span><input id="spend_entertainment" type="number" inputmode="numeric" min="0" placeholder="0"></div></div>
+        </div>
+      </div>
+
+      <button class="btn" id="revealBtn" type="button">Show my real tax rate
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="wrap section" id="results">
+    <div class="card reveal-card">
+      <div class="reveal-top">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" fill="none" style="stroke:var(--brand);opacity:.16" stroke-width="14"></circle>
+            <circle id="ringTax" cx="60" cy="60" r="52" fill="none" stroke="url(#tg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+            <defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F59E0B"></stop><stop offset="1" stop-color="#F97316"></stop></linearGradient></defs>
+          </svg>
+          <div class="ring-center"><div class="pct" id="ringPct">0%</div><div class="cap">real tax rate</div></div>
+        </div>
+        <div class="reveal-head">
+          <div class="k">You pay an estimated</div>
+          <div class="big" id="heroBig">—</div>
+          <div class="sub" id="heroSub"></div>
+          <div class="sub" id="netLine" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <div class="example-flag" id="exampleFlag">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        Example numbers — change the salary and spending above to see your own.
+      </div>
+    </div>
+
+    <div class="save-card" id="saveCard">
+      <div class="save-inner">
+        <div class="save-top">
+          <span class="save-eyebrow">The number that actually matters</span>
+          <span class="save-pill">Upper estimate</span>
+        </div>
+        <div class="save-big">You could keep up to <span class="save-amt" id="saveHigh">—</span> <span class="save-per">a year</span></div>
+        <div class="save-sub" id="saveSub"></div>
+        <a class="btn save-cta" id="saveCta" href="#notify">See what applies to me
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <div class="save-fine" id="saveFine"></div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">The split</span><h2>What you see vs what you don't</h2></div></div>
+      <div class="splitbar"><div class="seen" id="splitSeen"></div><div class="unseen" id="splitUnseen"></div></div>
+      <div class="split-legend">
+        <span class="li"><span class="sw" style="background:var(--brand)"></span><span id="legendSeen"></span></span>
+        <span class="li"><span class="sw" style="background:var(--tax)"></span><span id="legendUnseen"></span></span>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Where it goes</span><h2>Your tax, by type</h2></div></div>
+      <div class="rows" id="typeRows"></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title" style="justify-content:space-between"><div><span class="kicker">Hidden in spending</span><h2>Tax buried in what you buy</h2></div></div>
+      <div id="catRows"></div>
+      <div class="row" style="border-top:1px solid var(--line-strong);margin-top:6px"><div class="lhs"><span class="name">Total hidden tax</span></div><div class="amt tnum" id="catTotal">—</div></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">The same salary elsewhere</span><h2>How your country compares</h2></div></div>
+      <p class="hint" style="margin:-6px 0 14px">Direct tax (income + social + state) on the equivalent salary, converted at approximate exchange rates.</p>
+      <div class="cmp" id="cmpBars"></div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Tax freedom day</span><h2>When you start working for yourself</h2></div></div>
+      <div class="tfd">
+        <div class="cal"><div class="m" id="tfdMonth">APR</div><div class="d" id="tfdDay">1</div></div>
+        <div class="txt" id="tfdText"></div>
+      </div>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Legal ways to keep more</span><h2>Could you pay less in <span id="tipsCountry">the UK</span>?</h2></div></div>
+      <div class="tips" id="tips"></div>
+      <p class="hint" style="margin-top:12px">General information, not personal tax advice. Rules have limits and conditions — check with a qualified adviser before acting.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Share it</span><h2>Your Tax Wrapped</h2></div></div>
+      <div class="share-card-frame"><canvas id="shareCanvas" width="1080" height="1350" role="img" aria-label="Shareable Tax Wrapped card"></canvas></div>
+      <div class="share-actions">
+        <button class="btn" id="shareBtn" type="button">Share
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
+        <button class="btn ghost" id="dlBtn" type="button">Download image</button>
+      </div>
+    </div>
+
+    <div class="card pad" id="notify" style="margin-top:16px;scroll-margin-top:70px">
+      <div class="sec-title"><div><span class="kicker">Tax.cal Plus · in development</span><h2>Find out what you can actually claim</h2></div></div>
+      <p class="hint" style="margin:-6px 0 6px" id="notifyPitch">The figure above is what's <i>typically</i> possible at your income. Tax.cal Plus asks you a short set of questions about your real situation, then tells you which of it you can actually use. In development — join the early-access list.</p>
+      <form class="notify" id="notifyForm">
+        <div class="control"><input id="email" type="email" required placeholder="you@email.com" aria-label="Email address"></div>
+        <button class="btn" type="submit">Join the early-access list</button>
+      </form>
+      <p class="notify-ok hidden" id="notifyOk">You're on the list — we'll email you when Tax.cal Plus opens. (Your address, nothing else.)</p>
+      <p class="hint" style="margin-top:10px;font-size:12px;opacity:.75">Tax.cal Plus is not yet available and no payment is being taken. Tax.cal provides general information, not personal tax, legal or financial advice.</p>
+    </div>
+  </section>
+
+  <!-- SEO / trust content -->
+  <section class="wrap section">
+    <div class="sec-title"><div><span class="kicker">Good to know</span><h2>How Tax.cal works</h2></div></div>
+    <p class="lead-answer">Most people only ever see <b>income tax and social contributions</b> on their payslip. But you also pay <b>VAT or sales tax</b> on almost everything you buy, and a large share of every fuel purchase is <b>duty</b>. Tax.cal combines all of these into one honest, effective rate — the real percentage of your income that becomes tax. It uses published 2026 rates, runs entirely in your browser, and stores nothing.</p>
+
+    <details class="acc"><summary>What's included, and how we estimate it <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body">
+        <p><strong>Direct tax</strong> (income tax, social contributions, and US state tax) uses each country's real 2026 brackets and thresholds — these are the figures on your payslip, and we compute them precisely for a single earner.</p>
+        <p><strong>Indirect tax</strong> (VAT/sales tax and fuel duty) is genuinely an estimate: a shop receipt mixes items taxed at different rates, so we apply a reasonable effective rate to each spending category rather than pretending to know your exact basket. Each line is labelled <em>known rate</em>, <em>estimate</em> or <em>rough</em> so you can see how much to trust it.</p>
+        <ul>
+          <li><strong>Fuel</strong> is taxed heavily and varies by country and state — treat it as a ballpark.</li>
+          <li><strong>Groceries</strong> are often zero-rated or reduced, so their hidden tax is small.</li>
+          <li>The country comparison converts your salary at <strong>approximate exchange rates</strong> and shows direct tax only.</li>
+        </ul>
+      </div>
+    </details>
+    <details class="acc"><summary>Is this tax advice? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>No. Tax.cal is an educational estimate to show your total tax burden at a glance. It doesn't know your full circumstances — deductions, allowances, other income, regional quirks — and it is <strong>not a substitute for a qualified tax adviser</strong>. The "ways to keep more" tips are general information, not recommendations.</p></div>
+    </details>
+    <details class="acc"><summary>How is the “you could keep up to” figure worked out? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>It's a <strong>typical-case model, not a personal finding</strong>. Tax.cal measures the marginal rate on your income — the rate you pay on your next pound or dollar earned — then applies it to the legal tax-advantaged contribution limits available in your country (a pension, 401(k), RRSP, superannuation and so on). We show the <strong>upper end</strong> of that range, so treat it as a ceiling rather than a forecast.</p>
+      <p>Because Tax.cal doesn't know what you already contribute or claim, <strong>some or none of it may apply to you</strong>. If you already max out your pension, your realistic figure is near zero. It's there to show the size of the prize, not to tell you what you personally are missing.</p></div>
+    </details>
+    <details class="acc"><summary>Where does my data go? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>Nowhere. Every calculation happens in your browser. Your salary and spending are never sent to a server and nothing is saved except an optional theme preference. Close the tab and it's gone.</p></div>
+    </details>
+    <details class="acc"><summary>Which countries and tax year? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="body"><p>Ten countries, all on <strong>2026 tax-year</strong> rates (verified September 2026): the UK (England, Wales &amp; NI bands), the USA (all 50 states + DC, federal + state + FICA), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.</p></div>
+    </details>
+  </section>
+
+  <footer class="foot wrap">
+    <div class="disc"><strong>Estimates only.</strong> Tax.cal gives an approximate, educational view of your total tax burden using 2026 rates. It is not tax, financial or legal advice, and figures may differ from your actual liability. Always confirm with a qualified professional before making decisions.</div>
+    <div class="row2">
+      <span>© 2026 Tax.cal</span>
+      <span>·</span>
+      <span>UK · USA · Canada · Australia · Ireland · Germany · France · Netherlands · Spain · Italy</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* ============================================================================
+   Tax.cal — tax data  (tax year 2026, verified September 2026)
+   ----------------------------------------------------------------------------
+   EVERYTHING here is a planning ESTIMATE. Rates are national-headline figures,
+   not personalised tax advice. To update for a new tax year, edit the numbers
+   in this file only — the engine and UI read from here.
+
+   Sources (Sept 2026): UK HoC Library / GOV.UK · IRS & Tax Foundation 2026 ·
+   Germany Grundfreibetrag 2026 · France barème 2026 · Netherlands Belastingplan
+   2026 · Ireland Budget 2026 (KPMG/Revenue).
+   ========================================================================== */
+window.TAXCAL_DATA = (function () {
+  const INF = Infinity;
+
+  /* Approx FX — USD per 1 unit of currency (for the cross-country comparison
+     only). Clearly labelled "approx" in the UI. Update anytime. */
+  const FX_USD = { GBP: 1.27, USD: 1.00, EUR: 1.08 };
+
+  /* Spending categories. `def` = default monthly spend as a fraction of MONTHLY
+     gross, used to pre-fill the form so a result shows instantly. */
+  const CATEGORIES = [
+    { id: 'groceries',     label: 'Groceries',            emoji: '🛒', def: 0.055 },
+    { id: 'dining',        label: 'Eating out & takeaway', emoji: '🍽️', def: 0.035 },
+    { id: 'fuel',          label: 'Fuel / petrol',        emoji: '⛽', def: 0.030 },
+    { id: 'shopping',      label: 'Shopping & clothing',  emoji: '🛍️', def: 0.045 },
+    { id: 'utilities',     label: 'Utilities & bills',    emoji: '💡', def: 0.040 },
+    { id: 'entertainment', label: 'Subscriptions & fun',  emoji: '🎬', def: 0.020 }
+  ];
+
+  /* ---- Countries -------------------------------------------------------- */
+  const COUNTRIES = {
+    UK: {
+      name: 'United Kingdom', flag: '🇬🇧', model: 'uk', taxYear: '2026/27',
+      currency: { code: 'GBP', symbol: '£', locale: 'en-GB' },
+      incomeName: 'Income tax', socialName: 'National Insurance',
+      consumptionName: 'VAT', vatStandard: 0.20,
+      note: 'Bands shown are for England, Wales & Northern Ireland. Scotland uses different income-tax bands.',
+      /* effective tax as a fraction of the amount spent, per category */
+      cat: { groceries: 0.033, dining: 0.1667, fuel: 0.55, shopping: 0.158, utilities: 0.10, entertainment: 0.1667 },
+      catConf: { groceries: 'low', dining: 'high', fuel: 'med', shopping: 'med', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Pay your pension by salary sacrifice', 'Contributions come out before both Income Tax and National Insurance — a rare double saving most employers offer.'],
+        ['Use your £20,000 ISA allowance', 'Not a deduction, but everything inside grows and pays out completely tax-free, for life.'],
+        ['Higher-rate earner? Reclaim the 40%', 'Pension contributions and Gift Aid let you claim back higher-rate relief through your tax return.']
+      ]
+    },
+
+    US: {
+      name: 'United States', flag: '🇺🇸', model: 'us', taxYear: '2026',
+      currency: { code: 'USD', symbol: '
+
+
+
+, locale: 'en-US' },
+      incomeName: 'Federal income tax', socialName: 'Social Security + Medicare (FICA)',
+      consumptionName: 'Sales tax', vatStandard: 0.0753,
+      note: 'State income tax and state + local sales tax vary by the state you pick. Local city taxes (e.g. NYC) are not included.',
+      /* US categories are computed from the chosen state\'s sales-tax rate ×
+         a taxable share (many states exempt groceries; services often untaxed).
+         Fuel is excise-based, roughly fixed. */
+      catShare: { groceries: 0.25, dining: 1.0, fuel: null, shopping: 0.95, utilities: 0.40, entertainment: 0.70 },
+      fuelFraction: 0.16,
+      catConf: { groceries: 'low', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'med' },
+      tips: [
+        ['Max your 401(k)', 'Traditional contributions cut your federal — and usually state — taxable income, up to the yearly IRS limit.'],
+        ['Open an HSA if you can', 'With an HSA-eligible health plan it is triple tax-free: deductible in, grows tax-free, tax-free out for medical costs.'],
+        ['Your state is doing a lot of this', 'Nine states take no income tax at all. Check the country comparison — the same salary in TX or FL keeps much more.']
+      ]
+    },
+
+    DE: {
+      name: 'Germany', flag: '🇩🇪', model: 'de', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'de-DE' },
+      incomeName: 'Income tax (Einkommensteuer)', socialName: 'Social contributions',
+      consumptionName: 'VAT (MwSt)', vatStandard: 0.19,
+      note: 'Income tax is approximated from Germany’s continuous 2026 formula. Church tax and the solidarity surcharge (high earners) are not included.',
+      cat: { groceries: 0.06, dining: 0.1597, fuel: 0.50, shopping: 0.1597, utilities: 0.13, entertainment: 0.1597 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Check your tax class (Steuerklasse)', 'If you are married, the wrong class combination quietly overpays tax all year — a free switch can fix it.'],
+        ['Company & private pensions', 'bAV, Riester and Rürup contributions lower taxable income and often come with employer or state top-ups.'],
+        ['Claim more than the lump sum', 'Commute, home office and work equipment (Werbungskosten) are deductible above the €1,230 automatic allowance.']
+      ]
+    },
+
+    FR: {
+      name: 'France', flag: '🇫🇷', model: 'fr', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'fr-FR' },
+      incomeName: 'Income tax (impôt sur le revenu)', socialName: 'Social charges (cotisations, CSG/CRDS)',
+      consumptionName: 'VAT (TVA)', vatStandard: 0.20,
+      note: 'Single person, one tax part (no quotient familial). Income tax uses the 2026 barème after the 10% employment allowance.',
+      cat: { groceries: 0.05, dining: 0.0909, fuel: 0.55, shopping: 0.1667, utilities: 0.12, entertainment: 0.1667 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Feed a PER (retirement plan)', 'Payments are deducted straight from your taxable income, within your yearly ceiling — the main legal lever here.'],
+        ['Home help = 50% credit', 'Childcare, cleaning and tutoring at home give a 50% tax credit on what you spend.'],
+        ['Check your at-source rate', 'A wrong prélèvement à la source rate means you overpay every month and wait a year for the refund.']
+      ]
+    },
+
+    NL: {
+      name: 'Netherlands', flag: '🇳🇱', model: 'nl', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'nl-NL' },
+      incomeName: 'Income tax + national insurance (Box 1)', socialName: null,
+      consumptionName: 'VAT (BTW)', vatStandard: 0.21,
+      note: 'Box 1 rates already include national insurance. The general and labour tax credits (heffingskortingen) are applied for a working-age employee.',
+      cat: { groceries: 0.07, dining: 0.0826, fuel: 0.55, shopping: 0.1736, utilities: 0.15, entertainment: 0.1736 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['The 30% ruling', 'If you qualify as an incoming employee, up to 30% of your salary can be paid tax-free — worth thousands a year.'],
+        ['Mortgage interest is deductible', 'Interest on the loan for your own home reduces your Box 1 income (hypotheekrenteaftrek).'],
+        ['Don’t leave credits unclaimed', 'Make sure your employer applies the loonheffingskorting so your tax credits are actually used.']
+      ]
+    },
+
+    IE: {
+      name: 'Ireland', flag: '🇮🇪', model: 'ie', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'en-IE' },
+      incomeName: 'Income tax (PAYE)', socialName: 'USC + PRSI',
+      consumptionName: 'VAT', vatStandard: 0.23,
+      note: 'Single PAYE employee, standard personal + employee tax credits (€4,000). USC and PRSI (4.35% from Oct 2026) included.',
+      cat: { groceries: 0.04, dining: 0.1189, fuel: 0.52, shopping: 0.1870, utilities: 0.14, entertainment: 0.1870 },
+      catConf: { groceries: 'low', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Pension relief at your top rate', 'Contributions get relief at 40% for higher earners, within age-based limits — the single biggest legal lever.'],
+        ['Claim the credits you forget', 'The €1,000 Rent Tax Credit and 20% medical-expense relief go unclaimed by most people every year.'],
+        ['Split bands if married', 'A couple can often move part of the 20% band to the lower earner and cut the total bill.']
+      ]
+    },
+
+    CA: {
+      name: 'Canada', flag: '🇨🇦', model: 'ca', taxYear: '2026',
+      currency: { code: 'CAD', symbol: '
+
+</body>
+</html>
+, locale: 'en-CA' },
+      incomeName: 'Income tax (federal + provincial)', socialName: 'CPP + EI',
+      consumptionName: 'Sales tax', vatStandard: 0.05,
+      regionType: 'province', regionLabel: 'Province', regionDefault: 'ON',
+      note: 'Provincial income tax and combined GST/HST/PST vary by the province you pick. Quebec residents pay QPP instead of CPP (approximated here).',
+      catShare: { groceries: 0.15, dining: 1.0, fuel: null, shopping: 0.95, utilities: 0.45, entertainment: 0.70 },
+      fuelFraction: 0.30,
+      catConf: { groceries: 'low', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'med' },
+      tips: [
+        ['Max your RRSP', 'Contributions come straight off your taxable income at your marginal rate — the biggest legal lever in Canada.'],
+        ['Use a TFSA', 'Not a deduction, but everything inside grows and comes out completely tax-free, for life.'],
+        ['Open an FHSA', 'The First Home Savings Account is deductible going in and tax-free coming out — RRSP and TFSA benefits combined.']
+      ]
+    },
+
+    AU: {
+      name: 'Australia', flag: '🇦🇺', model: 'au', taxYear: '2026-27',
+      currency: { code: 'AUD', symbol: '
+
+</body>
+</html>
+, locale: 'en-AU' },
+      incomeName: 'Income tax', socialName: 'Medicare levy',
+      consumptionName: 'GST', vatStandard: 0.10,
+      note: 'Resident single, 2026-27 rates (the 15% bracket started 1 July 2026). Superannuation is paid by your employer on top, so it is not counted as your tax here.',
+      cat: { groceries: 0.023, dining: 0.0909, fuel: 0.30, shopping: 0.0909, utilities: 0.075, entertainment: 0.0909 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Salary-sacrifice into super', 'Concessional contributions are taxed at 15% instead of your marginal rate — often a large saving up to the yearly cap.'],
+        ['Claim your work deductions', 'Home office, tools, self-education and work travel come off your taxable income if you keep the receipts.'],
+        ['Right-size private health cover', 'The correct level of hospital cover removes the 1–1.5% Medicare Levy Surcharge for higher earners.']
+      ]
+    },
+
+    ES: {
+      name: 'Spain', flag: '🇪🇸', model: 'es', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'es-ES' },
+      incomeName: 'Income tax (IRPF)', socialName: 'Social security',
+      consumptionName: 'VAT (IVA)', vatStandard: 0.21,
+      note: 'Uses a representative combined state + regional IRPF scale; your exact rate depends on your autonomous community. Single earner.',
+      cat: { groceries: 0.04, dining: 0.0909, fuel: 0.48, shopping: 0.1736, utilities: 0.13, entertainment: 0.1736 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Pension plan contributions', 'Deductible from taxable income — the personal cap is low (€1,500/yr), but employer plans allow much more.'],
+        ['Regional deductions', 'Your autonomous community adds its own deductions — rent, education, family — that many people miss.'],
+        ['Check your retenciones', 'A wrong withholding rate on your nómina means you overpay every month and wait a year for the refund.']
+      ]
+    },
+
+    IT: {
+      name: 'Italy', flag: '🇮🇹', model: 'it', taxYear: '2026',
+      currency: { code: 'EUR', symbol: '€', locale: 'it-IT' },
+      incomeName: 'Income tax (IRPEF)', socialName: 'Social security (INPS)',
+      consumptionName: 'VAT (IVA)', vatStandard: 0.22,
+      note: 'Single employee. Includes a typical regional + municipal surcharge (addizionali ≈1.9%) and the standard employee work credit.',
+      cat: { groceries: 0.06, dining: 0.0909, fuel: 0.58, shopping: 0.1803, utilities: 0.13, entertainment: 0.1803 },
+      catConf: { groceries: 'med', dining: 'high', fuel: 'med', shopping: 'high', utilities: 'med', entertainment: 'high' },
+      tips: [
+        ['Fondo pensione (pension fund)', 'Contributions up to €5,164/yr come off your taxable income — the main personal lever in Italy.'],
+        ['Claim your detrazioni', 'Medical costs, renovations (bonus casa) and dependents all reduce IRPEF — keep every receipt.'],
+        ['Check your busta paga', 'Make sure your employer applies your work credits (detrazioni da lavoro) so you are not overtaxed each month.']
+      ]
+    }
+  };
+
+  /* ---- US states: income-tax model + combined avg sales-tax rate (%) -----
+     income: {t:'none'} | {t:'flat', r} | {t:'grad', b:[[rate,upTo],…]}       */
+  const US_STATES = {
+    AL: { name: 'Alabama',        sales: 9.46, income: { t: 'grad', b: [[.02,500],[.04,3000],[.05,INF]] } },
+    AK: { name: 'Alaska',         sales: 1.82, income: { t: 'none' } },
+    AZ: { name: 'Arizona',        sales: 8.54, income: { t: 'flat', r: .025 } },
+    AR: { name: 'Arkansas',       sales: 9.48, income: { t: 'grad', b: [[.02,4600],[.039,INF]] } },
+    CA: { name: 'California',      sales: 9.03, income: { t: 'grad', b: [[.01,11079],[.02,26264],[.04,41452],[.06,57542],[.08,72724],[.093,371479],[.103,445771],[.113,742953],[.123,1000000],[.133,INF]] } },
+    CO: { name: 'Colorado',       sales: 7.89, income: { t: 'flat', r: .044 } },
+    CT: { name: 'Connecticut',    sales: 6.35, income: { t: 'grad', b: [[.02,10000],[.045,50000],[.055,100000],[.06,200000],[.065,250000],[.069,500000],[.0699,INF]] } },
+    DE: { name: 'Delaware',       sales: 0.00, income: { t: 'grad', b: [[.022,5000],[.039,10000],[.048,20000],[.052,25000],[.0555,60000],[.066,INF]] } },
+    FL: { name: 'Florida',        sales: 6.98, income: { t: 'none' } },
+    GA: { name: 'Georgia',        sales: 7.56, income: { t: 'flat', r: .0519 } },
+    HI: { name: 'Hawaii',         sales: 4.50, income: { t: 'grad', b: [[.014,9600],[.032,14400],[.055,19200],[.064,24000],[.068,36000],[.072,48000],[.076,125000],[.079,175000],[.0825,225000],[.09,275000],[.10,325000],[.11,INF]] } },
+    ID: { name: 'Idaho',          sales: 6.03, income: { t: 'flat', r: .053 } },
+    IL: { name: 'Illinois',       sales: 8.98, income: { t: 'flat', r: .0495 } },
+    IN: { name: 'Indiana',        sales: 7.00, income: { t: 'flat', r: .0295 } },
+    IA: { name: 'Iowa',           sales: 6.94, income: { t: 'flat', r: .038 } },
+    KS: { name: 'Kansas',         sales: 8.71, income: { t: 'grad', b: [[.052,23000],[.0558,INF]] } },
+    KY: { name: 'Kentucky',       sales: 6.00, income: { t: 'flat', r: .035 } },
+    LA: { name: 'Louisiana',      sales: 10.13, income: { t: 'flat', r: .03 } },
+    ME: { name: 'Maine',          sales: 5.50, income: { t: 'grad', b: [[.058,27399],[.0675,64849],[.0715,INF]] } },
+    MD: { name: 'Maryland',       sales: 6.00, income: { t: 'grad', b: [[.02,1000],[.03,2000],[.04,3000],[.0475,100000],[.05,125000],[.0525,150000],[.055,250000],[.0575,500000],[.0625,1000000],[.065,INF]] } },
+    MA: { name: 'Massachusetts',  sales: 6.25, income: { t: 'grad', b: [[.05,1083150],[.09,INF]] } },
+    MI: { name: 'Michigan',       sales: 6.00, income: { t: 'flat', r: .0425 } },
+    MN: { name: 'Minnesota',      sales: 8.14, income: { t: 'grad', b: [[.0535,33310],[.068,109430],[.0785,203150],[.0985,INF]] } },
+    MS: { name: 'Mississippi',    sales: 7.06, income: { t: 'flat', r: .04 } },
+    MO: { name: 'Missouri',       sales: 8.44, income: { t: 'grad', b: [[.02,2696],[.025,4044],[.03,5392],[.035,6740],[.04,8088],[.045,9436],[.047,INF]] } },
+    MT: { name: 'Montana',        sales: 0.00, income: { t: 'grad', b: [[.047,47500],[.0565,INF]] } },
+    NE: { name: 'Nebraska',       sales: 6.98, income: { t: 'grad', b: [[.0246,4130],[.0351,24760],[.0455,INF]] } },
+    NV: { name: 'Nevada',         sales: 8.24, income: { t: 'none' } },
+    NH: { name: 'New Hampshire',  sales: 0.00, income: { t: 'none' } },  /* no tax on wages */
+    NJ: { name: 'New Jersey',     sales: 6.60, income: { t: 'grad', b: [[.014,20000],[.0175,35000],[.035,40000],[.0553,75000],[.0637,500000],[.0897,1000000],[.1075,INF]] } },
+    NM: { name: 'New Mexico',     sales: 7.68, income: { t: 'grad', b: [[.015,5500],[.032,16500],[.043,33500],[.047,66500],[.049,210000],[.059,INF]] } },
+    NY: { name: 'New York',       sales: 8.54, income: { t: 'grad', b: [[.039,8500],[.044,11700],[.0515,13900],[.054,80650],[.059,215400],[.0685,1077550],[.0965,5000000],[.103,25000000],[.109,INF]] } },
+    NC: { name: 'North Carolina', sales: 7.10, income: { t: 'flat', r: .0399 } },
+    ND: { name: 'North Dakota',   sales: 7.09, income: { t: 'grad', b: [[.0195,244825],[.025,INF]] } },
+    OH: { name: 'Ohio',           sales: 7.29, income: { t: 'flat', r: .0275 } },
+    OK: { name: 'Oklahoma',       sales: 9.06, income: { t: 'grad', b: [[.025,4900],[.035,7200],[.045,INF]] } },
+    OR: { name: 'Oregon',         sales: 0.00, income: { t: 'grad', b: [[.0475,4550],[.0675,11400],[.0875,125000],[.099,INF]] } },
+    PA: { name: 'Pennsylvania',   sales: 6.34, income: { t: 'flat', r: .0307 } },
+    RI: { name: 'Rhode Island',   sales: 7.00, income: { t: 'grad', b: [[.0375,82050],[.0475,186450],[.0599,INF]] } },
+    SC: { name: 'South Carolina', sales: 7.49, income: { t: 'grad', b: [[0,3640],[.03,18230],[.06,INF]] } },
+    SD: { name: 'South Dakota',   sales: 6.11, income: { t: 'none' } },
+    TN: { name: 'Tennessee',      sales: 9.61, income: { t: 'none' } },
+    TX: { name: 'Texas',          sales: 8.20, income: { t: 'none' } },
+    UT: { name: 'Utah',           sales: 7.42, income: { t: 'flat', r: .045 } },
+    VT: { name: 'Vermont',        sales: 6.43, income: { t: 'grad', b: [[.0335,49400],[.066,119700],[.076,249700],[.0875,INF]] } },
+    VA: { name: 'Virginia',       sales: 5.77, income: { t: 'grad', b: [[.02,3000],[.03,5000],[.05,17000],[.0575,INF]] } },
+    WA: { name: 'Washington',     sales: 9.57, income: { t: 'none' } },  /* 7% is capital-gains only, not wages */
+    WV: { name: 'West Virginia',  sales: 6.60, income: { t: 'grad', b: [[.0222,10000],[.0296,25000],[.0333,40000],[.0444,60000],[.0482,INF]] } },
+    WI: { name: 'Wisconsin',      sales: 5.72, income: { t: 'grad', b: [[.035,15110],[.044,51950],[.053,332720],[.0765,INF]] } },
+    WY: { name: 'Wyoming',        sales: 5.39, income: { t: 'none' } },
+    DC: { name: 'District of Columbia', sales: 6.00, income: { t: 'grad', b: [[.04,10000],[.06,40000],[.065,60000],[.085,250000],[.0925,500000],[.0975,1000000],[.1075,INF]] } }
+  };
+
+  /* ---- Canadian provinces: income brackets + BPA + combined sales-tax % --- */
+  const CA_PROV = {
+    AB: { name: 'Alberta',                   sales: 5,      bpa: 22769, income: { b: [[.08,61200],[.10,154259],[.12,185111],[.13,246813],[.14,370220],[.15,INF]] } },
+    BC: { name: 'British Columbia',          sales: 12,     bpa: 13216, income: { b: [[.056,50363],[.077,100728],[.105,115648],[.1229,140430],[.147,190405],[.168,265545],[.205,INF]] } },
+    MB: { name: 'Manitoba',                  sales: 12,     bpa: 15780, income: { b: [[.108,47000],[.1275,100000],[.174,INF]] } },
+    NB: { name: 'New Brunswick',             sales: 15,     bpa: 13664, income: { b: [[.094,52333],[.14,104666],[.16,193861],[.195,INF]] } },
+    NL: { name: 'Newfoundland and Labrador', sales: 15,     bpa: 13094, income: { b: [[.087,44678],[.145,89354],[.158,159528],[.178,223340],[.198,285319],[.208,570638],[.213,1141275],[.218,INF]] } },
+    NS: { name: 'Nova Scotia',               sales: 15,     bpa: 11932, income: { b: [[.0879,30995],[.1495,61991],[.1667,97417],[.175,157124],[.21,INF]] } },
+    NT: { name: 'Northwest Territories',     sales: 5,      bpa: 18198, income: { b: [[.059,53003],[.086,106009],[.122,172346],[.1405,INF]] } },
+    NU: { name: 'Nunavut',                   sales: 5,      bpa: 19659, income: { b: [[.04,55801],[.07,111602],[.09,181439],[.115,INF]] } },
+    ON: { name: 'Ontario',                   sales: 13,     bpa: 12989, income: { b: [[.0505,53891],[.0915,107785],[.1116,150000],[.1216,220000],[.1316,INF]] } },
+    PE: { name: 'Prince Edward Island',      sales: 15,     bpa: 15000, income: { b: [[.095,33928],[.1347,65820],[.166,106890],[.1762,142520],[.19,200000],[.20,INF]] } },
+    QC: { name: 'Quebec',                    sales: 14.975, bpa: 18952, income: { b: [[.14,54345],[.19,108680],[.24,132245],[.2575,INF]] } },
+    SK: { name: 'Saskatchewan',              sales: 11,     bpa: 20381, income: { b: [[.105,54532],[.125,155805],[.145,INF]] } },
+    YT: { name: 'Yukon',                     sales: 5,      bpa: 16452, income: { b: [[.064,58523],[.09,117045],[.109,181440],[.128,500000],[.15,INF]] } }
+  };
+
+  /* Annual tax-advantaged contribution cap per country (local currency),
+     used only for the "you could save up to" estimate. */
+  const SAVINGS_CAP = { UK: 60000, US: 23500, CA: 32000, AU: 30000, IE: 25000, DE: 28000, FR: 35000, NL: 15000, ES: 1500, IT: 5164 };
+
+  return {
+    meta: { updated: 'September 2026', taxYear: '2026' },
+    fxUSD: FX_USD,
+    categories: CATEGORIES,
+    countries: COUNTRIES,
+    order: ['UK', 'US', 'CA', 'AU', 'IE', 'DE', 'FR', 'NL', 'ES', 'IT'],
+    usStates: US_STATES,
+    caProvinces: CA_PROV,
+    regionTable: { US: US_STATES, CA: CA_PROV },
+    savingsCap: SAVINGS_CAP
+  };
+})();
+
+/* ============================================================================
+   Tax.cal — engine  (tax year 2026)
+   Pure functions. Reads rates from window.TAXCAL_DATA. Returns ESTIMATES.
+   Income-tax bracket tables live here (structural); consumption / state data
+   lives in tax-data.js. All validated against published take-home figures.
+   ========================================================================== */
+window.TaxEngine = (function (DATA) {
+  const INF = Infinity;
+
+  /* --- income-tax bracket tables (2026), absolute upper thresholds --------- */
+  const US_FED = {
+    single: { std: 16100, b: [[.10,12400],[.12,50400],[.22,105700],[.24,201775],[.32,256225],[.35,640600],[.37,INF]] },
+    mfj:    { std: 32200, b: [[.10,24800],[.12,100800],[.22,211400],[.24,403550],[.32,512450],[.35,768700],[.37,INF]] }
+  };
+  const DE_IT = [[.14,17000],[.20,25000],[.24,40000],[.33,55000],[.39,69878],[.42,277825],[.45,INF]]; // floor 12348
+  const FR_IT = [[.11,29579],[.30,84577],[.41,181917],[.45,INF]];                                     // floor 11600
+  const NL_B  = [[.3575,38883],[.3756,78426],[.4950,INF]];                                             // from 0
+  const IE_USC = [[.005,12012],[.02,28700],[.03,70044],[.08,INF]];
+  const CA_FED = [[.14,58523],[.205,117045],[.26,181440],[.29,258482],[.33,INF]];                      // + BPA credit
+  const CA_BPA = 16452;
+  const AU_IT = [[0,18200],[.15,45000],[.30,135000],[.37,190000],[.45,INF]];                            // 2026-27
+  const ES_IT = [[.19,12450],[.24,20200],[.30,35200],[.37,60000],[.45,300000],[.47,INF]];              // combined state+regional
+  const IT_IT = [[.23,28000],[.33,50000],[.43,INF]];
+
+  /* --- helpers ------------------------------------------------------------ */
+  // marginal tax over absolute thresholds, starting from `floor`
+  function brackets(x, b, floor) {
+    let tax = 0, prev = floor || 0;
+    for (let i = 0; i < b.length; i++) {
+      const rate = b[i][0], upTo = b[i][1];
+      if (x > prev) { tax += (Math.min(x, upTo) - prev) * rate; prev = upTo; }
+      else break;
+    }
+    return tax;
+  }
+
+  /* --- per-country direct tax (income + social + state) ------------------- */
+  function ukIncomeTax(y) {
+    let pa = 12570;
+    if (y > 100000) pa = Math.max(0, 12570 - (y - 100000) / 2);
+    const b20 = 50270, b40 = 125140;
+    const t20 = Math.max(0, Math.min(y, b20) - pa) * .20;
+    const t40 = Math.max(0, Math.min(y, b40) - b20) * .40;
+    const t45 = Math.max(0, y - b40) * .45;
+    return t20 + t40 + t45;
+  }
+  function ukNI(y) {
+    const pt = 12570, uel = 50270;
+    return Math.max(0, Math.min(y, uel) - pt) * .08 + Math.max(0, y - uel) * .02;
+  }
+
+  function usFica(y, status) {
+    const ss = Math.min(y, 184500) * .062;
+    const medicare = y * .0145;
+    const addlThresh = status === 'mfj' ? 250000 : 200000;
+    const addl = Math.max(0, y - addlThresh) * .009;
+    return ss + medicare + addl;
+  }
+  function usStateTax(y, stateKey, fedStd) {
+    const st = DATA.usStates[stateKey];
+    if (!st) return 0;
+    const inc = st.income;
+    if (inc.t === 'none') return 0;
+    const base = Math.max(0, y - fedStd); // proxy for state taxable income
+    if (inc.t === 'flat') return base * inc.r;
+    return brackets(base, inc.b, 0);
+  }
+
+  function deIncomeTax(y) { return y <= 12348 ? 0 : brackets(y, DE_IT, 12348); }
+  function deSocial(y) {
+    return Math.min(y, 66150) * .21 + Math.max(0, Math.min(y, 96600) - 66150) * .106;
+  }
+
+  function frIncomeTax(y) { return brackets(y * 0.90, FR_IT, 11600); }
+  function frSocial(y) { return y * 0.22; }
+
+  function nlTax(y) {
+    const gross = brackets(y, NL_B, 0);
+    let alg = y <= 29736 ? 3115 : (y <= 78426 ? Math.max(0, 3115 - 0.064 * (y - 29736)) : 0);
+    let arb = y <= 45592 ? 5685 * (y / 45592) : Math.max(0, 5685 - 0.0651 * (y - 45592));
+    return Math.max(0, gross - alg - arb);
+  }
+
+  function ieIncomeTax(y) {
+    const band = 44000;
+    const t = Math.min(y, band) * .20 + Math.max(0, y - band) * .40;
+    return Math.max(0, t - 4000); // personal + PAYE credits
+  }
+  function ieSocial(y) {
+    const usc = y <= 13000 ? 0 : brackets(y, IE_USC, 0);
+    const prsi = y * .0435;
+    return usc + prsi;
+  }
+
+  // Canada: federal + provincial income tax (each with a basic-personal-amount credit), CPP + EI
+  function caFedTax(y) { return Math.max(0, brackets(y, CA_FED, 0) - CA_BPA * 0.14); }
+  function caProvTax(y, prov) {
+    const p = DATA.caProvinces[prov]; if (!p) return 0;
+    return Math.max(0, brackets(y, p.income.b, 0) - p.bpa * p.income.b[0][0]);
+  }
+  function caSocial(y) {
+    const cpp = Math.min(Math.max(0, Math.min(y, 74600) - 3500) * .0595, 4230.45);
+    const cpp2 = Math.min(Math.max(0, Math.min(y, 85000) - 74600) * .04, 416);
+    const ei = Math.min(Math.min(y, 68900) * .0163, 1123.07);
+    return cpp + cpp2 + ei;
+  }
+
+  function auIncomeTax(y) { return brackets(y, AU_IT, 0); }
+  function auSocial(y) { return y * .02; } // Medicare levy
+
+  function esIncomeTax(y) { return Math.max(0, brackets(Math.max(0, y - 2000), ES_IT, 0) - 5550 * .19); }
+  function esSocial(y) { return Math.min(y, 59000) * .0645; }
+
+  function itIncomeTax(y) { return Math.max(0, brackets(y, IT_IT, 0) - 1900) + y * .019; } // + addizionali
+  function itSocial(y) { return Math.min(y, 122295) * .0919; }
+
+  /* Direct tax for any country. opts = {status, region}. */
+  function directTaxFor(key, y, opts) {
+    opts = opts || {};
+    let income = 0, social = 0, state = 0;
+    switch (key) {
+      case 'UK': income = ukIncomeTax(y); social = ukNI(y); break;
+      case 'US': {
+        const fed = US_FED[opts.status === 'mfj' ? 'mfj' : 'single'];
+        income = brackets(Math.max(0, y - fed.std), fed.b, 0);
+        social = usFica(y, opts.status);
+        state = opts.region ? usStateTax(y, opts.region, fed.std) : 0;
+        break;
+      }
+      case 'CA': income = caFedTax(y) + caProvTax(y, opts.region || 'ON'); social = caSocial(y); break;
+      case 'AU': income = auIncomeTax(y); social = auSocial(y); break;
+      case 'DE': income = deIncomeTax(y); social = deSocial(y); break;
+      case 'FR': income = frIncomeTax(y); social = frSocial(y); break;
+      case 'NL': income = nlTax(y); social = 0; break;
+      case 'IE': income = ieIncomeTax(y); social = ieSocial(y); break;
+      case 'ES': income = esIncomeTax(y); social = esSocial(y); break;
+      case 'IT': income = itIncomeTax(y); social = itSocial(y); break;
+    }
+    return { income, social, state, total: income + social + state };
+  }
+
+  /* --- indirect tax: effective fraction of spend, per category ------------ */
+  function catFraction(key, catId, region) {
+    const c = DATA.countries[key];
+    if (c.model === 'us' || c.model === 'ca') { // sales tax varies by state/province
+      if (catId === 'fuel') return c.fuelFraction;
+      const share = c.catShare[catId] || 0;
+      const tbl = DATA.regionTable[key] || {};
+      const r = (tbl[region] ? tbl[region].sales : 0) / 100;
+      return (r / (1 + r)) * share; // spend is tax-inclusive
+    }
+    return c.cat[catId] || 0;
+  }
+
+  /* --- FX convert (approx, for comparison only) --------------------------- */
+  function convert(amount, fromCur, toCur) {
+    const usd = amount * (DATA.fxUSD[fromCur] || 1);
+    return usd / (DATA.fxUSD[toCur] || 1);
+  }
+
+  // representative region used for "other country" comparison bars
+  function repRegion(k) { return k === 'CA' ? 'ON' : null; }
+
+  /* --- estimated potential saving (the value story) -----------------------
+     Grounded in a real lever: routing pre-tax money through the country's main
+     tax-advantaged account (pension/RRSP/super/…) at the user's marginal rate,
+     capped by that country's actual limit — plus a modest floor for the
+     allowances/credits people typically leave unclaimed. Presented as "up to".*/
+  function estimateSavings(key, y, opts) {
+    if (y <= 0) return { low: 0, high: 0, monthly: 0, marginalRate: 0 };
+    const step = 1000;
+    const d0 = directTaxFor(key, y, opts).total;
+    const d1 = directTaxFor(key, y + step, opts).total;
+    const mr = Math.min(0.62, Math.max(0, (d1 - d0) / step));
+    const cap = DATA.savingsCap[key] || 20000;
+    const round10 = (x) => Math.round(x / 10) * 10;
+    let high = round10(Math.max(Math.min(y * 0.15, cap) * mr, y * 0.02));
+    let low = round10(Math.min(Math.min(y * 0.06, cap) * mr, y * 0.008));
+    if (low >= high) low = round10(high * 0.5);
+    return { low: low, high: high, monthly: high / 12, marginalRate: mr };
+  }
+
+  /* --- main compute ------------------------------------------------------- */
+  function compute(input) {
+    const key = input.countryKey;
+    const c = DATA.countries[key];
+    const y = Math.max(0, Number(input.gross) || 0);
+    const status = input.filingStatus || 'single';
+    const region = c.regionType ? (input.region || c.regionDefault || (key === 'US' ? 'CA' : 'ON')) : null;
+    const opts = { status: status, region: region };
+
+    const direct = directTaxFor(key, y, opts);
+
+    // indirect, per category
+    let indirectTotal = 0, consumptionTax = 0, fuelTax = 0;
+    const byCat = DATA.categories.map(function (cat) {
+      const monthly = Math.max(0, Number(input.spend && input.spend[cat.id]) || 0);
+      const frac = catFraction(key, cat.id, region);
+      const annual = monthly * frac * 12;
+      indirectTotal += annual;
+      if (cat.id === 'fuel') fuelTax += annual; else consumptionTax += annual;
+      return {
+        id: cat.id, label: cat.label, emoji: cat.emoji,
+        monthly: monthly, fraction: frac, annual: annual,
+        conf: c.catConf[cat.id] || 'med'
+      };
+    });
+
+    const taxTotal = direct.total + indirectTotal;
+    const effRate = y > 0 ? taxTotal / y : 0;
+    const directRate = y > 0 ? direct.total / y : 0;
+    const netAnnual = y - direct.total;
+
+    // breakdown by type
+    const types = [];
+    types.push({ key: 'income', name: c.incomeName, amount: direct.income, tone: 'brand', conf: 'high' });
+    if (c.socialName) types.push({ key: 'social', name: c.socialName, amount: direct.social, tone: 'brand2', conf: 'high' });
+    if (key === 'US') types.push({ key: 'state', name: 'State income tax (' + region + ')', amount: direct.state, tone: 'brandink', conf: 'high' });
+    types.push({ key: 'vat', name: c.consumptionName + ' on spending', amount: consumptionTax, tone: 'tax', conf: 'med' });
+    types.push({ key: 'fuel', name: 'Fuel taxes', amount: fuelTax, tone: 'taxstrong', conf: 'med' });
+    const typesFiltered = types.filter(function (t) { return t.amount > 0.5; });
+
+    // cross-country comparison (direct-tax rate, FX-converted salary)
+    const comparison = DATA.order.map(function (k) {
+      const oc = DATA.countries[k];
+      if (k === key) {
+        return { key: k, name: c.name + (region ? ' · ' + region : ''), flag: c.flag, rate: directRate, isMe: true };
+      }
+      const g = convert(y, c.currency.code, oc.currency.code);
+      const rr = repRegion(k);
+      const d = directTaxFor(k, g, { status: 'single', region: rr });
+      return {
+        key: k,
+        name: oc.name + (k === 'US' ? ' · fed.' : rr ? ' · ' + rr : ''),
+        flag: oc.flag,
+        rate: g > 0 ? d.total / g : 0,
+        isMe: false
+      };
+    });
+
+    // tax freedom day (from total effective rate)
+    const days = Math.round(Math.min(effRate, 0.999) * 365);
+    const tfd = new Date(2026, 0, 1);
+    tfd.setDate(tfd.getDate() + days);
+
+    return {
+      countryKey: key, country: c, currency: c.currency,
+      gross: y, status: status, region: region,
+      direct: direct, indirect: { total: indirectTotal, consumption: consumptionTax, fuel: fuelTax, byCat: byCat },
+      taxTotal: taxTotal, effRate: effRate, directRate: directRate,
+      netAnnual: netAnnual, netMonthly: netAnnual / 12,
+      visible: direct.total, hidden: indirectTotal,
+      savings: estimateSavings(key, y, opts),
+      types: typesFiltered, comparison: comparison, taxFreedomDay: tfd
+    };
+  }
+
+  return { compute: compute, directTaxFor: directTaxFor, convert: convert, estimateSavings: estimateSavings };
+})(window.TAXCAL_DATA);
+
+/* ============================================================================
+   Tax.cal — app (UI wiring). No framework, no third-party scripts.
+   ========================================================================== */
+(function () {
+  'use strict';
+  var DATA = window.TAXCAL_DATA, ENGINE = window.TaxEngine;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var el = function (id) { return document.getElementById(id); };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var state = { spendTouched: false, example: true, last: null };
+  // ↓↓↓ Paste your Formspree form endpoint here to collect signups (see README). ↓↓↓
+  var CONFIG = { formspree: 'https://formspree.io/f/mjyveryv' };
+  var pendingRegion = null;
+
+  /* ---- formatting -------------------------------------------------------- */
+  function money(n, cur, dp) {
+    try {
+      return new Intl.NumberFormat(cur.locale, {
+        style: 'currency', currency: cur.code,
+        minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0
+      }).format(Math.round(n));
+    } catch (e) { return cur.symbol + Math.round(n).toLocaleString(); }
+  }
+  function pct(x, dp) { return (x * 100).toFixed(dp == null ? 1 : dp) + '%'; }
+
+  /* ---- populate selects -------------------------------------------------- */
+  function initSelects() {
+    var cs = el('country');
+    DATA.order.forEach(function (k) {
+      var c = DATA.countries[k];
+      var o = document.createElement('option');
+      o.value = k; o.textContent = c.flag + '  ' + c.name;
+      cs.appendChild(o);
+    });
+  }
+  // populate the region dropdown (US states / Canadian provinces) for the country
+  function populateRegion(key) {
+    var c = DATA.countries[key], sel = el('region');
+    var prev = sel.value;
+    sel.innerHTML = '';
+    if (!c.regionType) return;
+    var tbl = DATA.regionTable[key] || {};
+    Object.keys(tbl).sort(function (a, b) { return tbl[a].name.localeCompare(tbl[b].name); }).forEach(function (rk) {
+      var o = document.createElement('option'); o.value = rk; o.textContent = tbl[rk].name; sel.appendChild(o);
+    });
+    sel.value = tbl[prev] ? prev : (c.regionDefault || (key === 'US' ? 'CA' : Object.keys(tbl)[0]));
+  }
+
+  /* ---- prefill spending from salary -------------------------------------- */
+  function prefillSpend(force) {
+    if (state.spendTouched && !force) return;
+    var gross = Number(el('salary').value) || 0;
+    var monthly = gross / 12;
+    DATA.categories.forEach(function (cat) {
+      var v = Math.round((monthly * cat.def) / 10) * 10;
+      el('spend_' + cat.id).value = v > 0 ? v : '';
+    });
+  }
+
+  /* ---- read inputs ------------------------------------------------------- */
+  function readInput() {
+    var key = el('country').value;
+    var spend = {};
+    DATA.categories.forEach(function (cat) { spend[cat.id] = Number(el('spend_' + cat.id).value) || 0; });
+    return {
+      countryKey: key,
+      gross: Number(el('salary').value) || 0,
+      filingStatus: el('filing').value,
+      region: el('region').value,
+      spend: spend
+    };
+  }
+
+  /* ---- country-dependent UI ---------------------------------------------- */
+  function syncCountryUI() {
+    var key = el('country').value, c = DATA.countries[key];
+    el('curSalary').textContent = c.currency.symbol;
+    DATA.categories.forEach(function (cat) { el('cur_' + cat.id).textContent = c.currency.symbol; });
+    var hasRegion = !!c.regionType;
+    el('regionFields').classList.toggle('hidden', !hasRegion);
+    el('filingField').classList.toggle('hidden', key !== 'US');
+    if (hasRegion) { el('regionLabel').textContent = c.regionLabel || 'Region'; populateRegion(key); }
+    var note = el('regionNote');
+    if (c.note) { note.textContent = c.note; note.classList.remove('hidden'); }
+    else note.classList.add('hidden');
+    document.documentElement.setAttribute('data-country', key);
+  }
+
+  /* ---- ring -------------------------------------------------------------- */
+  function drawRing(rate, animate) {
+    var C = 2 * Math.PI * 52;              // r=52
+    var taxLen = Math.max(0, Math.min(rate, 1)) * C;
+    var arc = el('ringTax');
+    arc.style.strokeDasharray = C.toFixed(2);
+    if (animate && !reduce) {
+      arc.style.transition = 'none';
+      arc.style.strokeDashoffset = C.toFixed(2);
+      arc.getBoundingClientRect();
+      arc.style.transition = 'stroke-dashoffset 900ms cubic-bezier(.22,1,.36,1)';
+      arc.style.strokeDashoffset = (C - taxLen).toFixed(2);
+    } else {
+      arc.style.transition = 'none';
+      arc.style.strokeDashoffset = (C - taxLen).toFixed(2);
+    }
+  }
+
+  /* ---- animated number --------------------------------------------------- */
+  function countTo(node, to, fmt, animate) {
+    if (!animate || reduce) { node.textContent = fmt(to); return; }
+    var from = 0, start = null, dur = 850;
+    function step(t) {
+      if (start == null) start = t;
+      var p = Math.min(1, (t - start) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      node.textContent = fmt(from + (to - from) * e);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---- render ------------------------------------------------------------ */
+  var TONE = { brand: 'var(--brand)', brand2: 'var(--brand-2)', brandink: 'var(--brand-ink)', tax: 'var(--tax)', taxstrong: 'var(--tax-strong)' };
+
+  function render(r, animate) {
+    var cur = r.currency;
+    // example flag
+    el('exampleFlag').classList.toggle('hidden', !state.example);
+
+    // ring + hero
+    drawRing(r.effRate, animate);
+    countTo(el('ringPct'), r.effRate, function (v) { return pct(v, 0); }, animate);
+    countTo(el('heroBig'), r.taxTotal, function (v) { return money(v, cur); }, animate);
+    el('heroSub').innerHTML = 'of your <b>' + money(r.gross, cur) + '</b> gross income ends up as tax';
+    el('netLine').innerHTML = 'You keep about <b>' + money(r.netMonthly, cur) + '/month</b> after direct deductions'
+      + (r.hidden > 0 ? ' — before <b>' + money(r.hidden, cur) + '/yr</b> of tax hidden in what you spend.' : '.');
+
+    // savings — the value story. Leads with the high end, but framed as a typical-case
+    // model (not a personal finding) so the claim stays defensible.
+    // "the United Kingdom / United States / Netherlands", but bare "Germany", "France", …
+    var sv = r.savings, cn = (['UK', 'US', 'NL'].indexOf(r.countryKey) > -1 ? 'the ' : '') + r.country.name;
+    el('saveHigh').textContent = money(sv.high, cur);
+    el('saveSub').innerHTML = "That's around <b>" + money(sv.monthly, cur) + ' a month</b>. It\'s what someone earning what you '
+      + 'earn could keep by making full use of the legal tax-advantaged allowances in ' + cn + ' — most people never use all of them.';
+    el('saveFine').textContent = 'Upper end of an estimate — not a personal finding. Modelled from your marginal rate ('
+      + pct(sv.marginalRate, 0) + ') and the contribution limits available in ' + cn + '. We have not seen your actual '
+      + 'circumstances, so some or none of this may apply to you. Information only, not tax advice.';
+    el('notifyPitch').innerHTML = 'The figure above is what\'s <i>typically</i> possible at your income. Tax.cal Plus asks you a '
+      + 'short set of questions about your real situation — what you already contribute, how you\'re paid, what you can claim — '
+      + 'then tells you which of it you can actually use, and what each move is worth to you. In development — join the early-access list.';
+
+    // split bar
+    var seen = r.visible, unseen = r.hidden, tot = seen + unseen || 1;
+    el('splitSeen').style.flex = seen / tot;
+    el('splitUnseen').style.flex = unseen / tot;
+    el('splitSeen').textContent = tot > 0 && seen / tot > .12 ? Math.round(seen / tot * 100) + '%' : '';
+    el('splitUnseen').textContent = tot > 0 && unseen / tot > .12 ? Math.round(unseen / tot * 100) + '%' : '';
+    el('legendSeen').innerHTML = 'Tax you see <b>' + money(seen, cur) + '/yr</b>';
+    el('legendUnseen').innerHTML = 'Tax you don’t <b>' + money(unseen, cur) + '/yr</b>';
+
+    // breakdown by type
+    var maxType = Math.max.apply(null, r.types.map(function (t) { return t.amount; }).concat([1]));
+    el('typeRows').innerHTML = r.types.map(function (t) {
+      return '<div class="row"><div class="lhs"><span class="tick" style="background:' + TONE[t.tone] + '"></span>'
+        + '<span><div class="name">' + t.name + '</div>'
+        + '<div class="meta"><span class="conf ' + t.conf + '">' + (t.conf === 'high' ? 'known rate' : t.conf === 'med' ? 'estimate' : 'rough') + '</span></div></span></div>'
+        + '<div class="amt tnum">' + money(t.amount, cur) + '<span class="of">' + pct(t.amount / r.gross) + ' of income</span></div></div>';
+    }).join('');
+
+    // categories (indirect)
+    var cats = r.indirect.byCat.slice().filter(function (c) { return c.annual > 0; }).sort(function (a, b) { return b.annual - a.annual; });
+    var maxCat = Math.max.apply(null, cats.map(function (c) { return c.annual; }).concat([1]));
+    el('catRows').innerHTML = cats.length ? cats.map(function (c) {
+      return '<div class="cat"><div class="cname">' + c.emoji + ' ' + c.label + '</div>'
+        + '<div class="track"><div class="fill" style="width:' + (c.annual / maxCat * 100).toFixed(0) + '%"></div></div>'
+        + '<div class="cval tnum">' + money(c.annual, cur) + '</div></div>';
+    }).join('') : '<p class="hint" style="padding:6px 0">Add your monthly spending above to reveal the tax hidden in it.</p>';
+    el('catTotal').textContent = money(r.indirect.total, cur) + '/yr';
+
+    // comparison
+    var maxR = Math.max.apply(null, r.comparison.map(function (c) { return c.rate; }).concat([.01]));
+    el('cmpBars').innerHTML = r.comparison.slice().sort(function (a, b) { return b.rate - a.rate; }).map(function (c) {
+      return '<div class="bar ' + (c.isMe ? 'me' : '') + '"><div class="cty"><span class="fl">' + c.flag + '</span>' + c.name + '</div>'
+        + '<div class="track"><div class="fill" style="width:' + Math.max(3, c.rate / maxR * 100).toFixed(0) + '%"></div></div>'
+        + '<div class="val tnum">' + pct(c.rate, 0) + '</div></div>';
+    }).join('');
+
+    // tax freedom day
+    var d = r.taxFreedomDay;
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    el('tfdMonth').textContent = months[d.getMonth()];
+    el('tfdDay').textContent = d.getDate();
+    el('tfdText').innerHTML = 'At this rate you work from <b>1 January until ' + d.getDate() + ' ' + months[d.getMonth()]
+      + '</b> just to cover tax. Everything after is yours.';
+
+    // tips
+    el('tips').innerHTML = r.country.tips.map(function (t) {
+      return '<div class="tip"><span class="ti">' + ICON.bulb + '</span><div><h4>' + t[0] + '</h4><p>' + t[1] + '</p></div></div>';
+    }).join('');
+    el('tipsCountry').textContent = r.country.name;
+
+    // share card
+    drawShareCard(r);
+    state.last = r;
+    updateDeepLink(r);
+  }
+
+  /* ---- deep link (for country landing pages / sharing) ------------------- */
+  function updateDeepLink(r) {
+    if (!window.history || !history.replaceState) return;
+    var p = new URLSearchParams();
+    p.set('c', r.countryKey);
+    if (r.region) p.set('s', r.region);
+    try { history.replaceState(null, '', '#' + p.toString()); } catch (e) {}
+  }
+  function readDeepLink() {
+    var h = (location.hash || '').replace(/^#/, '');
+    if (!h) return;
+    var p = new URLSearchParams(h);
+    var c = p.get('c'); if (c && DATA.countries[c]) el('country').value = c;
+    pendingRegion = p.get('s'); // applied after the region dropdown is populated
+  }
+
+  /* ---- share card (canvas) ---------------------------------------------- */
+  function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function drawShareCard(r) {
+    var cv = el('shareCanvas'); if (!cv) return;
+    var W = 1080, H = 1350; cv.width = W; cv.height = H;
+    var x = cv.getContext('2d');
+    var g = x.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, '#0C1A22'); g.addColorStop(1, '#0B2A2C');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    // subtle brand glow
+    var rg = x.createRadialGradient(W * .8, H * .15, 40, W * .8, H * .15, 700);
+    rg.addColorStop(0, 'rgba(16,185,129,.22)'); rg.addColorStop(1, 'rgba(16,185,129,0)');
+    x.fillStyle = rg; x.fillRect(0, 0, W, H);
+
+    x.textBaseline = 'alphabetic';
+    // wordmark
+    x.fillStyle = '#EAF2F1'; x.font = '800 46px "Bricolage Grotesque", sans-serif';
+    x.fillText('Tax.cal', 96, 130);
+    x.fillStyle = '#7FB8AE'; x.font = '500 30px "IBM Plex Sans", sans-serif';
+    x.fillText(r.country.flag + '  ' + r.country.name + (r.countryKey === 'US' ? ' · ' + r.usState : ''), 96, 178);
+
+    // ring
+    var cx = W / 2, cy = 560, rad = 210, lw = 46;
+    x.lineCap = 'round';
+    x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = lw;
+    x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2); x.stroke();
+    var start = -Math.PI / 2, end = start + Math.max(0, Math.min(r.effRate, 1)) * Math.PI * 2;
+    var ag = x.createLinearGradient(cx - rad, cy, cx + rad, cy);
+    ag.addColorStop(0, '#F59E0B'); ag.addColorStop(1, '#F97316');
+    x.strokeStyle = ag; x.lineWidth = lw;
+    x.beginPath(); x.arc(cx, cy, rad, start, end); x.stroke();
+    // center
+    x.textAlign = 'center';
+    x.fillStyle = '#F7B54A'; x.font = '800 150px "Bricolage Grotesque", sans-serif';
+    x.fillText(pct(r.effRate, 0), cx, cy + 40);
+    x.fillStyle = '#9FC3BC'; x.font = '600 30px "IBM Plex Sans", sans-serif';
+    x.fillText('OF MY INCOME GOES TO TAX', cx, cy + 108);
+
+    // headline
+    x.fillStyle = '#EAF2F1'; x.font = '800 52px "Bricolage Grotesque", sans-serif';
+    x.fillText('That’s ' + money(r.taxTotal, r.currency) + ' a year', cx, 900);
+
+    // split chips
+    var chipY = 980, cw = 400, ch = 120, gap = 40;
+    function chip(px, label, val, col) {
+      rr(x, px, chipY, cw, ch, 22); x.fillStyle = 'rgba(255,255,255,.05)'; x.fill();
+      x.strokeStyle = 'rgba(255,255,255,.08)'; x.lineWidth = 2; x.stroke();
+      x.textAlign = 'left';
+      x.fillStyle = '#8FB2AC'; x.font = '600 26px "IBM Plex Sans", sans-serif'; x.fillText(label, px + 30, chipY + 48);
+      x.fillStyle = col; x.font = '800 44px "Bricolage Grotesque", sans-serif'; x.fillText(val, px + 30, chipY + 96);
+    }
+    chip(cx - cw - gap / 2, 'Tax you see', money(r.visible, r.currency), '#5BE0B0');
+    chip(cx + gap / 2, 'Tax you don’t', money(r.hidden, r.currency), '#F7B54A');
+
+    // freedom day
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    x.textAlign = 'center'; x.fillStyle = '#B9D6D0'; x.font = '500 30px "IBM Plex Sans", sans-serif';
+    x.fillText('I work until ' + r.taxFreedomDay.getDate() + ' ' + months[r.taxFreedomDay.getMonth()] + ' just to pay it.', cx, 1210);
+    x.fillStyle = '#5E8580'; x.font = '500 24px "IBM Plex Sans", sans-serif';
+    x.fillText('Estimate · check yours at taxcal.siddheshthapa.com', cx, 1275);
+    x.textAlign = 'left';
+  }
+
+  /* ---- share / download -------------------------------------------------
+     Works in three environments, best-first:
+       1) Web Share with a file  — mobile browsers on the real site
+       2) claude.ai "downloads" capability — when running as an Artifact
+       3) plain <a download>     — desktop on the self-hosted site         */
+  function canvasBlob() { return new Promise(function (res) { el('shareCanvas').toBlob(res, 'image/png'); }); }
+  function anchorDownload(blob) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'my-tax-wrapped.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  }
+  async function artifactSave(blob) {
+    // Only present when the page runs inside claude.ai as an Artifact.
+    if (!(window.claude && typeof window.claude.use === 'function')) return false;
+    try {
+      var downloads = await window.claude.use('downloads');
+      if (!downloads) return false;
+      await downloads.save({ filename: 'my-tax-wrapped.png', data: blob });
+      return true;
+    } catch (e) { return true; } // declined/rate-limited etc. — don't fall through to a dead link
+  }
+  async function offerCard(preferShare) {
+    var blob = await canvasBlob();
+    if (preferShare) {
+      try {
+        var file = new File([blob], 'my-tax-wrapped.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'Tax.cal', text: 'My real tax rate is ' + pct(state.last.effRate, 0) + '. See yours at taxcal.siddheshthapa.com' });
+          return;
+        }
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    if (await artifactSave(blob)) return;
+    anchorDownload(blob);
+  }
+
+  /* ---- compute + paint --------------------------------------------------- */
+  function recompute(animate) {
+    var r = ENGINE.compute(readInput());
+    render(r, animate);
+  }
+  var debTimer;
+  function debouncedRecompute() { clearTimeout(debTimer); debTimer = setTimeout(function () { recompute(false); }, 120); }
+
+  /* ---- events ------------------------------------------------------------ */
+  function bind() {
+    el('country').addEventListener('change', function () {
+      syncCountryUI(); prefillSpend(false); recompute(false);
+    });
+    el('filing').addEventListener('change', function () { recompute(false); });
+    el('region').addEventListener('change', function () { recompute(false); });
+    el('salary').addEventListener('input', function () {
+      state.example = false; prefillSpend(false); debouncedRecompute();
+    });
+    DATA.categories.forEach(function (cat) {
+      el('spend_' + cat.id).addEventListener('input', function () {
+        state.spendTouched = true; state.example = false; debouncedRecompute();
+      });
+    });
+    el('revealBtn').addEventListener('click', function () {
+      state.example = false;
+      recompute(true);
+      el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+    el('dlBtn').addEventListener('click', function () { offerCard(false); });
+    el('shareBtn').addEventListener('click', function () { offerCard(true); });
+    el('notifyForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var email = el('email').value;
+      try { localStorage.setItem('taxcal_notify', email); } catch (x) {}
+      var finish = function () { el('notifyForm').classList.add('hidden'); el('notifyOk').classList.remove('hidden'); };
+      var url = CONFIG.formspree;
+      if (url && url.indexOf('REPLACE_ME') === -1) { // real endpoint configured → collect the signup
+        var fd = new FormData();
+        fd.append('email', email);
+        fd.append('country', el('country').value);
+        fd.append('_subject', 'New Tax.cal early-access signup');
+        fetch(url, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(finish, finish);
+      } else { finish(); } // no endpoint yet: stored locally, thank the user
+    });
+    el('themeBtn').addEventListener('click', toggleTheme);
+  }
+
+  /* ---- theme ------------------------------------------------------------- */
+  function toggleTheme() {
+    var cur = document.documentElement.getAttribute('data-theme');
+    var isDark = cur === 'dark' || (!cur && matchMedia('(prefers-color-scheme: dark)').matches);
+    var next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('taxcal_theme', next); } catch (e) {}
+    syncThemeIcon();
+    if (state.last) drawShareCard(state.last);
+  }
+  function syncThemeIcon() {
+    var cur = document.documentElement.getAttribute('data-theme');
+    var isDark = cur === 'dark' || (!cur && matchMedia('(prefers-color-scheme: dark)').matches);
+    el('themeBtn').innerHTML = isDark ? ICON.sun : ICON.moon;
+  }
+  function initTheme() {
+    try { var t = localStorage.getItem('taxcal_theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+    syncThemeIcon();
+  }
+
+  /* ---- icons ------------------------------------------------------------- */
+  var ICON = {
+    bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2Z"/></svg>',
+    sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>'
+  };
+
+  /* ---- boot -------------------------------------------------------------- */
+  function boot() {
+    initSelects();
+    initTheme();
+    // example starting state (UK, £45,000) unless deep-linked
+    el('country').value = 'UK';
+    el('salary').value = 45000;
+    readDeepLink();
+    syncCountryUI();
+    if (pendingRegion) { var tbl = DATA.regionTable[el('country').value]; if (tbl && tbl[pendingRegion]) el('region').value = pendingRegion; }
+    prefillSpend(true);
+    bind();
+    recompute(false);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+</script>
+
+</body>
+</html>
