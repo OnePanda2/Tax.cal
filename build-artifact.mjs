@@ -14,14 +14,23 @@ let html = read('./index.html');
 // strip PWA-only bits (manifest link, theme-color meta, service-worker registration)
 html = html.replace(/<!-- PWA:start -->[\s\S]*?<!-- PWA:end -->/g, '');
 
-// inline CSS
-html = html.replace(/<link rel="stylesheet" href="styles\.css">/, `<style>\n${css}\n</style>`);
+// Inline CSS and JS.
+// NB: the replacement MUST be a function. As a plain string, `$` sequences are
+// interpreted as replacement patterns — and `symbol: '$'` in tax-data.js contains
+// `$'`, which means "everything after the match" and silently splices the tail of
+// the document into the middle of the data file. Broke US, Canada and Australia.
+html = html.replace(/<link rel="stylesheet" href="styles\.css">/, () => `<style>\n${css}\n</style>`);
 
 // inline JS (data + engine + app in order)
 html = html
   .replace(/<script src="assets\/tax-data\.js"><\/script>\s*/, '')
   .replace(/<script src="assets\/tax-engine\.js"><\/script>\s*/, '')
-  .replace(/<script src="assets\/app\.js"><\/script>/, `<script>\n${js}\n</script>`);
+  .replace(/<script src="assets\/app\.js"><\/script>/, () => `<script>\n${js}\n</script>`);
+
+// Sanity check: the CSS and JS must survive inlining byte-for-byte. This is the
+// guard against the `$`-pattern class of bug above, which fails silently.
+if (!html.includes(js)) throw new Error('Inlined JS does not match source — check for $ replacement patterns.');
+if (!html.includes(css)) throw new Error('Inlined CSS does not match source — check for $ replacement patterns.');
 
 mkdirSync(new URL('./dist/', import.meta.url), { recursive: true });
 

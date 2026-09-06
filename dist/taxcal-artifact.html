@@ -226,6 +226,15 @@ button { font-family: inherit; cursor: pointer; }
   font-variant-numeric: tabular-nums;
 }
 .control select { cursor: pointer; -webkit-appearance: none; appearance: none; padding-right: 20px; }
+/* The native dropdown popup is painted outside .control, so it inherits the light
+   `color` above with no background of its own — light-on-light, i.e. invisible in
+   dark mode. Give the options an explicit pair. (macOS draws this list natively and
+   ignores it, but honours `color-scheme`, which is set on :root.) */
+.control select option,
+.control select optgroup {
+  background-color: var(--surface-2);
+  color: var(--ink);
+}
 .control.select-ctl { position: relative; }
 .control.select-ctl::after {
   content: ""; position: absolute; right: 15px; top: 50%; width: 9px; height: 9px;
@@ -736,13 +745,10 @@ window.TAXCAL_DATA = (function () {
 
     US: {
       name: 'United States', flag: '🇺🇸', model: 'us', taxYear: '2026',
-      currency: { code: 'USD', symbol: '
-
-
-
-, locale: 'en-US' },
+      currency: { code: 'USD', symbol: '$', locale: 'en-US' },
       incomeName: 'Federal income tax', socialName: 'Social Security + Medicare (FICA)',
       consumptionName: 'Sales tax', vatStandard: 0.0753,
+      regionType: 'state', regionLabel: 'State', regionDefault: 'CA',
       note: 'State income tax and state + local sales tax vary by the state you pick. Local city taxes (e.g. NYC) are not included.',
       /* US categories are computed from the chosen state\'s sales-tax rate ×
          a taxable share (many states exempt groceries; services often untaxed).
@@ -819,11 +825,7 @@ window.TAXCAL_DATA = (function () {
 
     CA: {
       name: 'Canada', flag: '🇨🇦', model: 'ca', taxYear: '2026',
-      currency: { code: 'CAD', symbol: '
-
-</body>
-</html>
-, locale: 'en-CA' },
+      currency: { code: 'CAD', symbol: '$', locale: 'en-CA' },
       incomeName: 'Income tax (federal + provincial)', socialName: 'CPP + EI',
       consumptionName: 'Sales tax', vatStandard: 0.05,
       regionType: 'province', regionLabel: 'Province', regionDefault: 'ON',
@@ -840,11 +842,7 @@ window.TAXCAL_DATA = (function () {
 
     AU: {
       name: 'Australia', flag: '🇦🇺', model: 'au', taxYear: '2026-27',
-      currency: { code: 'AUD', symbol: '
-
-</body>
-</html>
-, locale: 'en-AU' },
+      currency: { code: 'AUD', symbol: '$', locale: 'en-AU' },
       incomeName: 'Income tax', socialName: 'Medicare levy',
       consumptionName: 'GST', vatStandard: 0.10,
       note: 'Resident single, 2026-27 rates (the 15% bracket started 1 July 2026). Superannuation is paid by your employer on top, so it is not counted as your tax here.',
@@ -1166,7 +1164,13 @@ window.TaxEngine = (function (DATA) {
     const c = DATA.countries[key];
     const y = Math.max(0, Number(input.gross) || 0);
     const status = input.filingStatus || 'single';
-    const region = c.regionType ? (input.region || c.regionDefault || (key === 'US' ? 'CA' : 'ON')) : null;
+    // Validate the region against the lookup table rather than trusting the input.
+    // An unknown key (stale select, hand-edited deep link) used to fall through as
+    // "no region", which silently zeroed both state income tax and sales tax.
+    const regionTbl = DATA.regionTable[key] || {};
+    const region = c.regionType
+      ? (regionTbl[input.region] ? input.region : (c.regionDefault || Object.keys(regionTbl)[0] || null))
+      : null;
     const opts = { status: status, region: region };
 
     const direct = directTaxFor(key, y, opts);
@@ -1655,6 +1659,3 @@ window.TaxEngine = (function (DATA) {
 })();
 
 </script>
-
-</body>
-</html>

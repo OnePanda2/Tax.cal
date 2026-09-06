@@ -50,6 +50,7 @@ window.TAXCAL_DATA = (function () {
       currency: { code: 'USD', symbol: '$', locale: 'en-US' },
       incomeName: 'Federal income tax', socialName: 'Social Security + Medicare (FICA)',
       consumptionName: 'Sales tax', vatStandard: 0.0753,
+      regionType: 'state', regionLabel: 'State', regionDefault: 'CA',
       note: 'State income tax and state + local sales tax vary by the state you pick. Local city taxes (e.g. NYC) are not included.',
       /* US categories are computed from the chosen state\'s sales-tax rate ×
          a taxable share (many states exempt groceries; services often untaxed).

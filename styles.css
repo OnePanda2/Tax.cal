@@ -198,6 +198,15 @@ button { font-family: inherit; cursor: pointer; }
   font-variant-numeric: tabular-nums;
 }
 .control select { cursor: pointer; -webkit-appearance: none; appearance: none; padding-right: 20px; }
+/* The native dropdown popup is painted outside .control, so it inherits the light
+   `color` above with no background of its own — light-on-light, i.e. invisible in
+   dark mode. Give the options an explicit pair. (macOS draws this list natively and
+   ignores it, but honours `color-scheme`, which is set on :root.) */
+.control select option,
+.control select optgroup {
+  background-color: var(--surface-2);
+  color: var(--ink);
+}
 .control.select-ctl { position: relative; }
 .control.select-ctl::after {
   content: ""; position: absolute; right: 15px; top: 50%; width: 9px; height: 9px;

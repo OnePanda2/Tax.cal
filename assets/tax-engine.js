@@ -186,7 +186,13 @@ window.TaxEngine = (function (DATA) {
     const c = DATA.countries[key];
     const y = Math.max(0, Number(input.gross) || 0);
     const status = input.filingStatus || 'single';
-    const region = c.regionType ? (input.region || c.regionDefault || (key === 'US' ? 'CA' : 'ON')) : null;
+    // Validate the region against the lookup table rather than trusting the input.
+    // An unknown key (stale select, hand-edited deep link) used to fall through as
+    // "no region", which silently zeroed both state income tax and sales tax.
+    const regionTbl = DATA.regionTable[key] || {};
+    const region = c.regionType
+      ? (regionTbl[input.region] ? input.region : (c.regionDefault || Object.keys(regionTbl)[0] || null))
+      : null;
     const opts = { status: status, region: region };
 
     const direct = directTaxFor(key, y, opts);
