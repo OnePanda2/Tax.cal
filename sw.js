@@ -1,6 +1,6 @@
 /* Tax.cal service worker — offline-first for a fully client-side app.
    Bump CACHE when you change app files so clients pick up the new version. */
-const CACHE = 'taxcal-v5';
+const CACHE = 'taxcal-v6';
 const ASSETS = [
   './',
   './index.html',

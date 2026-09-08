@@ -1,0 +1,22 @@
+name = "taxcal-plus-api"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# D1 is created by `npx wrangler d1 create taxcal-plus` — paste the returned
+# database_id below. Pass --location eeur / weur at creation to keep the data
+# in Europe, which is where the customers are.
+[[d1_databases]]
+binding = "DB"
+database_name = "taxcal-plus"
+database_id = "REPLACE_WITH_DATABASE_ID"
+
+[vars]
+# Non-secret default. Override in production with:
+#   npx wrangler secret put RATE_SALT
+RATE_SALT = "taxcal-default-salt"
+
+# Serve at api.siddheshthapa.com once the zone is on Cloudflare.
+# Leave commented to use the free *.workers.dev hostname instead.
+# [[routes]]
+# pattern = "api.siddheshthapa.com/*"
+# custom_domain = true

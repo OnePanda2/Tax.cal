@@ -516,3 +516,19 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
   .site-head, .q-actions, .prog-wrap, footer .row2 { display: none !important; }
   .card, .finding { break-inside: avoid; box-shadow: none; }
 }
+
+/* keeping a saved review (plus/) */
+.keep-out { margin-top: 16px; }
+.link-row { display: flex; gap: 8px; align-items: stretch; }
+.link-row input {
+  flex: 1 1 auto; min-width: 0; padding: 0 14px; height: 48px;
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-md);
+  background: var(--surface-2); color: var(--ink);
+  font: inherit; font-size: 13.5px; outline: none;
+}
+.link-row input:focus { border-color: var(--brand-2); }
+.link-row .btn { width: auto; flex: 0 0 auto; height: 48px; font-size: 14px; padding: 0 18px; }
+.btn.ghost.danger { color: var(--crit); border-color: color-mix(in srgb, var(--crit) 40%, transparent); width: auto; }
+.btn.ghost.danger:hover { background: color-mix(in srgb, var(--crit) 8%, transparent); }
+.keep-note:empty { display: none; }
+.keep-note { margin-top: 12px; }

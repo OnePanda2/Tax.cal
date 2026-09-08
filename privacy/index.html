@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Privacy at Tax.cal</title>
+  <meta name="description" content="Exactly what Tax.cal stores, what it does not, and how to delete anything you have saved.">
+  <link rel="canonical" href="https://taxcal.siddheshthapa.com/privacy/">
+  <link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<script>try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html" style="text-decoration:none;color:inherit">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#0694A2"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/><g fill="none" stroke-width="7.4" stroke-linecap="round"><circle cx="32" cy="32" r="15.5" stroke="#fff"/><path d="M32 16.5 A15.5 15.5 0 0 1 45.4 40.2" stroke="#F59E0B"/></g></svg>
+      Tax<span class="dot">.cal</span>
+    </a>
+    <span class="head-spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme"></button>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <div class="hero">
+      <p class="eyebrow">Privacy</p>
+      <h1>What we store, and what we <span class="u">don't</span>.</h1>
+      <p class="lede">Short version: the calculator stores nothing at all. The Plus questionnaire stores nothing unless you press Save, and even then it holds no name, no email and no password — just your answers behind a private link you can delete yourself.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:22px">
+      <div class="sec-title"><div><span class="kicker">The calculator</span><h2>Nothing leaves your device</h2></div></div>
+      <p class="hint">Your salary, your spending and every figure on the results page are calculated in your browser using JavaScript that ships with the page. None of it is transmitted to us or to anyone else. Close the tab and it is gone.</p>
+      <p class="hint" style="margin-top:10px">The only thing kept on your device is your light/dark theme preference, in your browser's own storage. It never reaches us.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Tax.cal Plus</span><h2>Only if you choose to save</h2></div></div>
+      <p class="hint">While you answer the questions, everything stays on your device. If you press <b>Save my review</b> on the results page, we store:</p>
+      <ul class="plain-list" style="margin-top:12px">
+        <li>Your answers to the questionnaire</li>
+        <li>The country, region, gross salary and marginal rate the review was based on</li>
+        <li>A snapshot of the findings you were shown</li>
+        <li>The date it was created and the date it expires</li>
+      </ul>
+      <p class="hint" style="margin-top:14px">We deliberately do <b>not</b> store your name, your email address, a password, or your IP address. There is no account to create, because a saved review is reached only through its private link. That link contains a secret that we keep only as a one-way hash — meaning even we cannot reconstruct your link, and if our database were ever exposed, the records in it could not be opened or traced to a person.</p>
+      <p class="hint" style="margin-top:10px"><b>Treat the link like a password.</b> Anyone who has it can open that review.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Deleting it</span><h2>You do not have to ask us</h2></div></div>
+      <p class="hint">Open your saved review and press <b>Delete it permanently</b>. The record is removed immediately and the link stops working. There is no soft delete and no copy kept.</p>
+      <p class="hint" style="margin-top:10px">If you do nothing, a saved review <b>deletes itself one year</b> after you save it. We would rather old data disappear on its own than accumulate.</p>
+      <p class="hint" style="margin-top:10px">If you have lost your link, we genuinely cannot help you recover it or delete that specific review — we have no way to identify which record is yours. That is the deliberate cost of not holding your identity. It will expire on its own.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">The waiting list</span><h2>Your email, if you give it</h2></div></div>
+      <p class="hint">If you join the early-access list, we store the email address you typed and the country selected in the calculator, so we know which markets people are writing in from. That is handled by <b>Formspree</b>, which processes the submission and forwards it to us.</p>
+      <p class="hint" style="margin-top:10px">We use it to tell you when Tax.cal Plus opens. We do not sell it, and we do not pass it to advertisers. Reply to any message from us asking to be removed and you will be.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Who else touches it</span><h2>Our suppliers</h2></div></div>
+      <ul class="plain-list">
+        <li><b>GitHub Pages</b> serves the website itself and, like any web server, sees the requests your browser makes for pages and images.</li>
+        <li><b>Cloudflare</b> runs the service that stores saved reviews.</li>
+        <li><b>Formspree</b> handles early-access sign-ups.</li>
+        <li><b>Google Fonts</b> serves the typefaces used on these pages.</li>
+      </ul>
+      <p class="hint" style="margin-top:14px">We do not run advertising, tracking pixels, session recording, or third-party analytics on this site.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Your rights</span><h2>If you are in the UK or the EU</h2></div></div>
+      <p class="hint">You have the right to access a copy of your data, correct it, delete it, restrict how it is used, object to its use, and complain to your data protection regulator.</p>
+      <p class="hint" style="margin-top:10px">For a saved review, the access and deletion rights are built into the page itself — opening your link shows you everything we hold, and the delete button removes it. For anything else, including the waiting list, contact us using the details below.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Contact</span><h2>How to reach us</h2></div></div>
+      <p class="hint" id="contactLine">Email <b>[ADD YOUR CONTACT EMAIL]</b>. Tax.cal is operated by <b>[ADD YOUR NAME OR COMPANY]</b>, <b>[ADD YOUR COUNTRY]</b>.</p>
+      <p class="hint" style="margin-top:10px">Last updated: 8 September 2026.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <div class="disc"><strong>Estimates only.</strong> Tax.cal gives an approximate, educational view of your tax position. It is not tax, financial or legal advice.</div>
+  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Calculator</a></span></div>
+</footer>
+
+<script>
+document.getElementById('themeBtn').addEventListener('click', function () {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var dark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var next = dark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('taxcal_theme', next); } catch (e) {}
+});
+</script>
+</body>
+</html>

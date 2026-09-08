@@ -68,7 +68,8 @@
     <div class="card pad privacy" style="margin-top:16px">
       <div class="sec-title"><div><span class="kicker">Before you start</span><h2>What happens to your answers</h2></div></div>
       <ul class="plain-list">
-        <li><b>Your answers stay in this browser.</b> They are worked out on your own device and are not sent to a server as you go.</li>
+        <li><b>Your answers stay in this browser while you answer.</b> Everything is worked out on your own device. Nothing is sent anywhere unless you choose to save your review at the end.</li>
+        <li><b>If you do save it, we store no identity.</b> No email, no name, no password — just the answers and a private link only you hold. You can delete it yourself at any time, and it expires on its own after a year.</li>
         <li><b>We ask only what changes the outcome.</b> Every question exists because it decides whether a specific saving is open to you.</li>
         <li><b>"I'm not sure" is a real answer.</b> We would rather treat something as unknown than build a recommendation on a guess.</li>
         <li><b>This is information, not personal tax advice.</b> It tells you what to check and why. It is not a substitute for an accountant, and we have not seen your return.</li>
@@ -148,18 +149,38 @@
         <button class="btn" id="printBtn" type="button">Save as PDF</button>
       </div>
     </div>
+
+    <div class="card pad" id="keepCard" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Keep this</span><h2>Get a link back to it</h2></div></div>
+      <p class="hint" style="margin:-6px 0 14px" id="keepIntro">Right now this exists only in your browser — refresh and it is gone. Save it and you get a private link that reopens it on any device.</p>
+
+      <button class="btn" id="keepBtn" type="button">Save my review</button>
+
+      <div class="keep-out hidden" id="keepOut">
+        <label class="other-label" for="keepLink">Your private link — bookmark it</label>
+        <div class="link-row">
+          <input id="keepLink" type="text" readonly>
+          <button class="btn ghost" id="copyBtn" type="button">Copy</button>
+        </div>
+        <p class="hint" style="margin-top:10px" id="keepMeta"></p>
+        <button class="btn ghost danger" id="deleteBtn" type="button" style="margin-top:14px">Delete it permanently</button>
+      </div>
+
+      <p class="hint keep-note" id="keepNote"></p>
+    </div>
   </section>
 </main>
 
 <footer class="foot wrap">
   <div class="disc"><strong>Estimates only.</strong> Tax.cal Plus gives you a prioritised list of things to check, based on your answers and 2026 rates. It is not tax, financial or legal advice, and figures may differ from your actual liability. Always confirm with a qualified professional before making decisions.</div>
-  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Back to the free calculator</a></span></div>
+  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../privacy/">Privacy</a></span><span>·</span><span><a href="../index.html">Back to the free calculator</a></span></div>
 </footer>
 
 <script src="../assets/tax-data.js"></script>
 <script src="../assets/tax-engine.js"></script>
 <script src="../assets/plus-questions.js"></script>
 <script src="../assets/plus-engine.js"></script>
+<script src="../assets/plus-api.js"></script>
 <script src="../assets/plus-app.js"></script>
 </body>
 </html>

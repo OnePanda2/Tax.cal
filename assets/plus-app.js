@@ -1,10 +1,10 @@
 /* ============================================================================
    Tax.cal Plus — questionnaire UI.
 
-   Runs entirely in the browser. Answers are held in memory and in sessionStorage
-   so a refresh does not lose progress; nothing is transmitted. When this becomes
-   a paid product with a backend, that is the single place this changes — and the
-   privacy copy on the page has to change with it.
+   Answers are held in memory and in sessionStorage, and every question and
+   finding is computed on the device. Nothing is transmitted unless the user
+   explicitly presses Save on the results page, which is exactly what the
+   privacy copy on the page promises — keep the two in step.
    ========================================================================== */
 (function () {
   'use strict';
@@ -351,6 +351,117 @@
     } else {
       hide(el('reviewCard'));
     }
+
+    renderKeepCard();
+  }
+
+  /* ---- saving, restoring and deleting a review ---------------------------
+     Saving is optional and explicit. Nothing leaves the browser until the
+     user presses the button, which is what the privacy copy promises.
+     -------------------------------------------------------------------- */
+  var saved = null;   // { id, token, expiresAt } once saved
+
+  function renderKeepCard() {
+    var API = window.TaxCalAPI;
+    var card = el('keepCard');
+    if (!card) return;
+
+    if (!API || !API.enabled()) {
+      // Backend not deployed yet — say so plainly instead of showing a button
+      // that silently does nothing.
+      hide(el('keepBtn'));
+      hide(el('keepOut'));
+      el('keepIntro').textContent = 'This review lives only in this browser tab.';
+      el('keepNote').textContent = 'Saving is not switched on yet. Use "Save as PDF" above to keep a copy.';
+      return;
+    }
+
+    if (!saved) {
+      show(el('keepBtn'));
+      hide(el('keepOut'));
+      el('keepNote').textContent = '';
+      return;
+    }
+
+    hide(el('keepBtn'));
+    show(el('keepOut'));
+    var link = API.linkFor(saved.id, saved.token);
+    el('keepLink').value = link;
+    var until = saved.expiresAt ? new Date(saved.expiresAt * 1000) : null;
+    el('keepMeta').innerHTML = 'Anyone with this link can open the review, so treat it like a password. '
+      + 'We stored no email or name against it'
+      + (until ? ', and it deletes itself on <b>' + until.toLocaleDateString() + '</b>' : '') + '.';
+    el('keepNote').textContent = '';
+  }
+
+  function doSave() {
+    var API = window.TaxCalAPI;
+    var btn = el('keepBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    var res = PLUS.evaluate(S.ctx, S.answers);
+    API.save(S.ctx, S.answers, S.other, res.findings).then(function (r) {
+      btn.disabled = false;
+      btn.textContent = 'Save my review';
+      if (r.ok) {
+        saved = { id: r.id, token: r.token, expiresAt: r.expiresAt };
+        try { history.replaceState(null, '', API.linkFor(r.id, r.token)); } catch (e) {}
+        renderKeepCard();
+      } else {
+        el('keepNote').textContent = r.offline
+          ? 'Could not reach the server. Your review is still here — try again, or save a PDF.'
+          : (String(r.error || 'Could not save that.').replace(/\.?$/, '.') + ' Your review is still here.');
+      }
+    });
+  }
+
+  function doDelete() {
+    var API = window.TaxCalAPI;
+    if (!saved) return;
+    if (!confirm('Delete this saved review permanently? The link will stop working. This cannot be undone.')) return;
+    var btn = el('deleteBtn');
+    btn.disabled = true; btn.textContent = 'Deleting…';
+    API.remove(saved.id, saved.token).then(function (r) {
+      btn.disabled = false; btn.textContent = 'Delete it permanently';
+      if (r.ok) {
+        saved = null;
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
+        renderKeepCard();
+        el('keepNote').textContent = 'Deleted. Nothing of that review remains on our side.';
+      } else {
+        el('keepNote').textContent = 'Could not delete it just now. Please try again.';
+      }
+    });
+  }
+
+  /* Reopen a saved review from its link. Restores the answers too, so "Start
+     over" and going Back both behave normally afterwards. */
+  function restoreFromLink() {
+    var API = window.TaxCalAPI;
+    if (!API || !API.enabled()) return false;
+    var link = API.readLink();
+    if (!link) return false;
+
+    el('keepIntro').textContent = 'Opening your saved review…';
+    API.load(link.id, link.token).then(function (r) {
+      if (!r.ok) {
+        alert(r.offline
+          ? 'Could not reach the server to open that review. Please try again.'
+          : 'That link did not work. It may have been deleted or expired.');
+        return;
+      }
+      var rev = r.review;
+      S.ctx = buildCtx(rev.ctx.countryKey, rev.ctx.gross, rev.ctx.region, rev.ctx.filingStatus, {});
+      S.answers = rev.answers || {};
+      S.other = rev.other || {};
+      S.queue = QDEF.questions[S.ctx.countryKey].base.slice();
+      syncQueue();
+      S.idx = S.queue.length;
+      saved = { id: rev.id, token: link.token, expiresAt: rev.expiresAt };
+      hide(el('stepIntro'));
+      renderResults();
+    });
+    return true;
   }
 
   /* ---- wiring ------------------------------------------------------------ */
@@ -373,6 +484,7 @@
     initBasics();
     S.carry = readCarry();
     renderCarrySummary();
+    restoreFromLink();
 
     el('startBtn').addEventListener('click', function () {
       var ctx = S.ctx;
@@ -418,6 +530,8 @@
 
     el('restartBtn').addEventListener('click', function () {
       S.answers = {}; S.other = {}; S.queue = []; S.idx = 0;
+      saved = null;
+      try { history.replaceState(null, '', location.pathname); } catch (e) {}
       try { sessionStorage.removeItem(PROGRESS_KEY); } catch (e) {}
       hide(el('stepResults'));
       show(el('stepIntro'));
@@ -425,6 +539,19 @@
     });
 
     el('printBtn').addEventListener('click', function () { window.print(); });
+
+    if (el('keepBtn')) el('keepBtn').addEventListener('click', doSave);
+    if (el('deleteBtn')) el('deleteBtn').addEventListener('click', doDelete);
+    if (el('copyBtn')) el('copyBtn').addEventListener('click', function () {
+      var input = el('keepLink');
+      input.select();
+      var done = function () {
+        var b = el('copyBtn'); b.textContent = 'Copied';
+        setTimeout(function () { b.textContent = 'Copy'; }, 1600);
+      };
+      if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(done, done);
+      else { try { document.execCommand('copy'); done(); } catch (e) {} }
+    });
 
     // Keyboard: number keys pick options on single-choice questions.
     document.addEventListener('keydown', function (e) {

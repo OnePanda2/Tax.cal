@@ -13,3 +13,7 @@ dissectmac-international-users-playbook.pdf
 # Private strategy notes — kept locally, not published.
 taxmirror-office-hours-design-doc.md
 taxmirror_handover_prompt.md
+
+# Cloudflare Worker local state
+api/.wrangler-test/
+api/.wrangler/
