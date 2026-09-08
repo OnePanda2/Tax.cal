@@ -88,7 +88,11 @@ window.TaxCalPlus = (function () {
         caveat: 'Adjusted net income is not the same as salary — bonuses, benefits and other income all count.' },
 
       { id: 'uk_marriage_allowance', priority: 70, confidence: 'high',
-        when: function (t) { return t.has('marriage_allowance_eligible'); },
+        // Only where the receiving partner is a basic-rate taxpayer. Firing this
+        // for a higher-rate earner would quote a saving that cannot exist.
+        // Tested against the income-tax band, not ctx.marginalRate — the latter
+        // includes National Insurance, so a basic-rate payer reads as ~28%.
+        when: function (t, ctx) { return t.has('marriage_allowance_eligible') && ctx.gross <= 50270; },
         title: 'Claim Marriage Allowance',
         why: 'If your partner earns under the personal allowance, they can transfer part of it to you. It can also be backdated up to four tax years.',
         action: 'Apply through HMRC. The lower earner makes the claim, not you.',

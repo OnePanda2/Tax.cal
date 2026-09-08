@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Your Tax.cal Plus review</title>
+  <meta name="description" content="Answer a few questions about your real situation and see which legal tax moves actually apply to you.">
+  <!-- Not a search landing page: it is the logged-in-ish flow, and the answers are personal. -->
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<script>/* apply saved theme before paint to avoid a flash */try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html" style="text-decoration:none;color:inherit">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#0694A2"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/><g fill="none" stroke-width="7.4" stroke-linecap="round"><circle cx="32" cy="32" r="15.5" stroke="#fff"/><path d="M32 16.5 A15.5 15.5 0 0 1 45.4 40.2" stroke="#F59E0B"/></g></svg>
+      Tax<span class="dot">.cal</span>
+    </a>
+    <span class="head-spacer"></span>
+    <span class="pill"><span class="blip"></span>Plus</span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme"></button>
+  </div>
+</header>
+
+<main>
+  <!-- ===== STEP 1 · intro + what we know already ========================= -->
+  <section class="wrap tool" id="stepIntro">
+    <div class="hero" style="padding-bottom:8px">
+      <p class="eyebrow">Tax.cal Plus</p>
+      <h1>Let's find what <span class="u">actually</span> applies to you.</h1>
+      <p class="lede">The free calculator showed what's <strong>typically</strong> possible at your income. These questions are how we narrow that down to what's genuinely available in your situation — and rule out what isn't.</p>
+    </div>
+
+    <div class="card pad" id="carryCard">
+      <div class="sec-title"><div><span class="kicker">What we already have</span><h2>No need to repeat yourself</h2></div></div>
+      <div class="carry-grid" id="carryGrid"></div>
+      <p class="hint" style="margin-top:12px">Carried over from your calculation. <a href="../index.html" id="changeLink">Change it</a>.</p>
+    </div>
+
+    <div class="card pad" id="askBasics" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">First, the basics</span><h2>Where are you and what do you earn?</h2></div></div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="pCountry">Country</label>
+          <div class="control select-ctl"><select id="pCountry" aria-label="Country"></select></div>
+        </div>
+        <div class="field">
+          <label for="pSalary">Gross salary <span class="hint">· per year, before tax</span></label>
+          <div class="control"><span class="cur" id="pCur">£</span><input id="pSalary" type="number" inputmode="numeric" min="0" step="1000" placeholder="45,000"></div>
+        </div>
+      </div>
+      <div class="grid-2" id="pRegionWrap" style="margin-top:16px">
+        <div class="field">
+          <label for="pRegion" id="pRegionLabel">Region</label>
+          <div class="control select-ctl"><select id="pRegion" aria-label="Region"></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card pad privacy" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Before you start</span><h2>What happens to your answers</h2></div></div>
+      <ul class="plain-list">
+        <li><b>Your answers stay in this browser.</b> They are worked out on your own device and are not sent to a server as you go.</li>
+        <li><b>We ask only what changes the outcome.</b> Every question exists because it decides whether a specific saving is open to you.</li>
+        <li><b>"I'm not sure" is a real answer.</b> We would rather treat something as unknown than build a recommendation on a guess.</li>
+        <li><b>This is information, not personal tax advice.</b> It tells you what to check and why. It is not a substitute for an accountant, and we have not seen your return.</li>
+      </ul>
+      <button class="btn" id="startBtn" type="button" style="margin-top:16px">Start — about 2 minutes
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STEP 2 · the questions ======================================= -->
+  <section class="wrap tool hidden" id="stepQuestions">
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <span class="prog-count" id="progCount">Question 1 of 5</span>
+        <span class="prog-country" id="progCountry"></span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    </div>
+
+    <div class="card pad q-card" id="qCard">
+      <h2 class="q-title" id="qTitle">—</h2>
+      <p class="hint q-help" id="qHelp"></p>
+      <div class="opt-list" id="optList" role="group" aria-labelledby="qTitle"></div>
+      <div class="other-wrap hidden" id="otherWrap">
+        <label for="otherText" class="other-label">Tell us in your own words</label>
+        <textarea id="otherText" rows="3" placeholder="Describe your situation — we will flag it for a human to look at."></textarea>
+      </div>
+      <div class="q-actions">
+        <button class="btn ghost" id="backBtn" type="button">Back</button>
+        <button class="btn" id="nextBtn" type="button">Continue</button>
+      </div>
+      <p class="hint q-foot" id="qFoot"></p>
+    </div>
+  </section>
+
+  <!-- ===== STEP 3 · results ============================================= -->
+  <section class="wrap tool hidden" id="stepResults">
+    <div class="save-card" id="resultHero">
+      <div class="save-inner">
+        <div class="save-top">
+          <span class="save-eyebrow" id="resEyebrow">Based on your answers</span>
+          <span class="save-pill">Estimate</span>
+        </div>
+        <div class="save-big" id="resBig">—</div>
+        <div class="save-sub" id="resSub"></div>
+        <div class="save-fine" id="resFine"></div>
+      </div>
+    </div>
+
+    <div class="card pad" id="thinCard" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Straight answer</span><h2>We did not find much</h2></div></div>
+      <p class="hint" id="thinText"></p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Your list</span><h2>What to check, most valuable first</h2></div></div>
+      <p class="hint" style="margin:-6px 0 14px">Each one says why it applies to you, what to do, and what we assumed. Amounts are estimates at your marginal rate — not a promise, and not a calculation of your actual return.</p>
+      <div class="findings" id="findings"></div>
+    </div>
+
+    <div class="card pad" id="reviewCard" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Flagged</span><h2>Something you told us needs a person</h2></div></div>
+      <p class="hint" id="reviewText"></p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Honest limits</span><h2>What this is not</h2></div></div>
+      <ul class="plain-list">
+        <li>We have not seen your tax return, payslip or bank statements. Everything above is based on what you told us in five to ten questions.</li>
+        <li>Amounts assume you can actually fund the contribution or claim in question. If you cannot, the saving does not exist.</li>
+        <li>Rules change, and some of these have conditions we could not check from your answers. Confirm before you act.</li>
+        <li>For anything involving property, business structure or moving money between people, get professional advice first. Those are the ones that go expensively wrong.</li>
+      </ul>
+      <div class="q-actions" style="margin-top:18px">
+        <button class="btn ghost" id="restartBtn" type="button">Start over</button>
+        <button class="btn" id="printBtn" type="button">Save as PDF</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <div class="disc"><strong>Estimates only.</strong> Tax.cal Plus gives you a prioritised list of things to check, based on your answers and 2026 rates. It is not tax, financial or legal advice, and figures may differ from your actual liability. Always confirm with a qualified professional before making decisions.</div>
+  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Back to the free calculator</a></span></div>
+</footer>
+
+<script src="../assets/tax-data.js"></script>
+<script src="../assets/tax-engine.js"></script>
+<script src="../assets/plus-questions.js"></script>
+<script src="../assets/plus-engine.js"></script>
+<script src="../assets/plus-app.js"></script>
+</body>
+</html>

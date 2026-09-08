@@ -324,8 +324,13 @@
 
   /* ---- compute + paint --------------------------------------------------- */
   function recompute(animate) {
-    var r = ENGINE.compute(readInput());
+    var input = readInput();
+    var r = ENGINE.compute(input);
     render(r, animate);
+    // Hand the current state to the Plus flow so it never re-asks what we know.
+    // sessionStorage, not localStorage: it dies with the tab, which keeps the
+    // free calculator's "nothing stored" promise honest.
+    try { sessionStorage.setItem('taxcal_carry', JSON.stringify(input)); } catch (e) {}
   }
   var debTimer;
   function debouncedRecompute() { clearTimeout(debTimer); debTimer = setTimeout(function () { recompute(false); }, 120); }

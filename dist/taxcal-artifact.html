@@ -454,6 +454,97 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
   * { animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important; }
 }
 
+/* ==========================================================================
+   Tax.cal Plus — questionnaire flow (plus/index.html)
+   Uses the tokens defined at the top of this file, so both themes come free.
+   ========================================================================== */
+.hidden { display: none !important; }
+
+/* what the calculator handed over */
+.carry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.carry-cell { background: var(--surface); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.carry-cell .ck { font-size: 12px; color: var(--faint); }
+.carry-cell .cv { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.plain-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 9px; color: var(--muted); font-size: 14.5px; }
+.plain-list b { color: var(--ink); font-weight: 600; }
+
+/* progress */
+.prog-wrap { margin-bottom: 14px; }
+.prog-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 7px; }
+.prog-count { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.prog-country { font-size: 13px; color: var(--faint); }
+.prog-bar { height: 5px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--brand), var(--brand-2)); transition: width .3s cubic-bezier(.22,1,.36,1); }
+
+/* the question */
+.q-card { padding-top: 22px; }
+.q-title { font-family: var(--font-display); font-size: clamp(21px, 3.4vw, 27px); font-weight: 700; letter-spacing: -.018em; line-height: 1.18; margin: 0 0 6px; text-wrap: balance; }
+.q-help { margin: 0 0 16px; max-width: 58ch; }
+.q-foot { margin: 12px 0 0; font-size: 12.5px; }
+
+.opt-list { display: flex; flex-direction: column; gap: 8px; }
+.opt {
+  display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%;
+  padding: 13px 15px; border-radius: var(--r-md); cursor: pointer;
+  border: 1.5px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  font: inherit; transition: border-color .13s, background .13s;
+}
+.opt:hover { border-color: var(--brand-2); background: var(--surface-2); }
+.opt:focus-visible { outline: 2px solid var(--brand-2); outline-offset: 2px; }
+.opt.on { border-color: var(--brand); background: var(--brand-wash); }
+.opt-mark { flex: 0 0 auto; width: 19px; height: 19px; border-radius: 50%; border: 2px solid var(--line-strong); margin-top: 2px; display: grid; place-items: center; transition: border-color .13s; }
+.opt-mark.box { border-radius: 5px; }
+.opt.on .opt-mark { border-color: var(--brand); background: var(--brand); }
+.opt.on .opt-mark::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--surface); }
+.opt.on .opt-mark.box::after { width: 9px; height: 5px; border-radius: 0; background: none; border-left: 2px solid var(--surface); border-bottom: 2px solid var(--surface); transform: rotate(-45deg) translate(1px, -1px); }
+.opt-body { display: flex; flex-direction: column; gap: 2px; }
+.opt-label { font-size: 15.5px; font-weight: 500; }
+.opt-hint { font-size: 13px; color: var(--muted); }
+
+.other-wrap { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.other-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.other-wrap textarea {
+  width: 100%; padding: 12px 14px; border-radius: var(--r-md);
+  border: 1.5px solid var(--line-strong); background: var(--surface-2); color: var(--ink);
+  font: inherit; font-size: 15px; resize: vertical; outline: none;
+}
+.other-wrap textarea:focus { border-color: var(--brand-2); }
+
+.q-actions { display: flex; gap: 10px; margin-top: 20px; align-items: stretch; }
+/* .btn is width:100% by default, which would stack these. Back sits at its own
+   width; the primary action takes the rest of the row. */
+.q-actions .btn { width: auto; flex: 0 0 auto; height: 52px; }
+.q-actions .btn.ghost { font-size: 15px; padding: 0 20px; }
+.q-actions .btn:not(.ghost) { flex: 1 1 auto; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* results */
+.findings { display: flex; flex-direction: column; gap: 12px; }
+.finding { border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px 18px; background: var(--surface-2); }
+.f-top { display: flex; align-items: baseline; gap: 11px; flex-wrap: wrap; }
+.f-rank { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 6px; background: var(--brand-wash); color: var(--brand-ink); font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+.f-title { font-size: 17px; font-weight: 650; margin: 0; letter-spacing: -.008em; flex: 1 1 auto; }
+.f-val { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.f-val.none { font-family: var(--font-body); font-size: 12.5px; font-weight: 500; color: var(--faint); }
+.f-why { color: var(--muted); font-size: 14.5px; margin: 9px 0 0; max-width: 66ch; }
+.f-do { font-size: 14.5px; margin: 8px 0 0; max-width: 66ch; }
+.f-do b { font-weight: 650; }
+.f-meta { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-top: 11px; }
+.f-conf { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; white-space: nowrap; }
+.f-conf.c-high { background: var(--brand-wash); color: var(--brand-ink); }
+.f-conf.c-med { background: var(--tax-wash); color: var(--tax-ink); }
+.f-conf.c-low { background: var(--surface); color: var(--faint); border: 1px solid var(--line-strong); }
+.f-basis { font-size: 12.5px; color: var(--faint); flex: 1 1 220px; }
+.f-caveat { font-size: 12.5px; color: var(--faint); margin: 9px 0 0; padding-top: 9px; border-top: 1px solid var(--line); max-width: 70ch; }
+
+#resultHero .save-big { font-size: clamp(23px, 4vw, 32px); }
+
+@media print {
+  .site-head, .q-actions, .prog-wrap, footer .row2 { display: none !important; }
+  .card, .finding { break-inside: avoid; box-shadow: none; }
+}
+
 </style>
 
   <!-- Structured data: helps Google, Bing and AI search understand the tool -->
@@ -650,6 +741,7 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
         <button class="btn" type="submit">Join the early-access list</button>
       </form>
       <p class="notify-ok hidden" id="notifyOk">You're on the list — we'll email you when Tax.cal Plus opens. (Your address, nothing else.)</p>
+      <p class="hint" style="margin-top:14px">Curious what we'd ask? <a href="plus/index.html" id="previewPlus">Try the questions now</a> — free while Plus is in development, and your figures above carry over.</p>
       <p class="hint" style="margin-top:10px;font-size:12px;opacity:.75">Tax.cal Plus is not yet available and no payment is being taken. Tax.cal provides general information, not personal tax, legal or financial advice.</p>
     </div>
   </section>
@@ -1568,8 +1660,13 @@ window.TaxEngine = (function (DATA) {
 
   /* ---- compute + paint --------------------------------------------------- */
   function recompute(animate) {
-    var r = ENGINE.compute(readInput());
+    var input = readInput();
+    var r = ENGINE.compute(input);
     render(r, animate);
+    // Hand the current state to the Plus flow so it never re-asks what we know.
+    // sessionStorage, not localStorage: it dies with the tab, which keeps the
+    // free calculator's "nothing stored" promise honest.
+    try { sessionStorage.setItem('taxcal_carry', JSON.stringify(input)); } catch (e) {}
   }
   var debTimer;
   function debouncedRecompute() { clearTimeout(debTimer); debTimer = setTimeout(function () { recompute(false); }, 120); }
