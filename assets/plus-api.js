@@ -10,11 +10,15 @@
 window.TaxCalAPI = (function () {
   'use strict';
 
-  // ↓↓↓ Paste the deployed Worker URL here to enable saving. ↓↓↓
-  var BASE = '';
+  // The deployed Worker. Blank this out to turn saving off everywhere; the
+  // results page then says so and offers the PDF instead.
+  var BASE = 'https://taxcal-plus-api.onepanda2.workers.dev';
 
-  // Local development convenience: use the local worker when serving locally.
-  if (!BASE && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) {
+  // When developing against a local worker (`npx wrangler dev`), append
+  // ?api=local to the page URL to point at it instead of production, so local
+  // testing does not write rows into the live database.
+  if (/^(127\.0\.0\.1|localhost)$/.test(location.hostname)
+      && /(\?|&)api=local(&|$)/.test(location.search)) {
     BASE = 'http://127.0.0.1:8787';
   }
 

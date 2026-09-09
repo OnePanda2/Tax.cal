@@ -51,6 +51,19 @@ they are never stored, but it should not be the default):
 npx wrangler secret put RATE_SALT
 ```
 
+**Order matters, and this bit bites.** A `[vars]` entry in `wrangler.toml`
+overrides a secret of the same name on *every* deploy. An earlier version of
+this file declared `RATE_SALT` under `[vars]`, and deploying silently replaced
+the real secret with that plaintext default. The declaration has been removed —
+do not add it back. If you ever see this in a deploy's binding list:
+
+```
+env.RATE_SALT ("taxcal-default-salt")   Environment Variable
+```
+
+then the var is overriding your secret. Set the secret *after* removing the var,
+then deploy again.
+
 Deploy:
 
 ```bash
@@ -64,10 +77,10 @@ Wrangler prints a `https://taxcal-plus-api.<subdomain>.workers.dev` URL.
 Open `assets/plus-api.js` and set the URL near the top:
 
 ```js
-var BASE = 'https://taxcal-plus-api.<your-subdomain>.workers.dev';
+var BASE = 'https://taxcal-plus-api.onepanda2.workers.dev';
 ```
 
-Until you do, the site works exactly as before — the results page says saving
+This is already set. Blank it out and the site works exactly as before — the results page says saving
 is not switched on and offers the PDF instead. Saving is an enhancement, never
 a dependency, so a Worker outage degrades the product rather than breaking it.
 
