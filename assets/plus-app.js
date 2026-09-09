@@ -21,6 +21,21 @@
   var CARRY_KEY = 'taxcal_carry';     // written by the calculator
   var PROGRESS_KEY = 'taxcal_plus_progress';
 
+  /* ---- the concierge offer -----------------------------------------------
+     Deliberately manual: the customer emails, Siddhesh replies with a payment
+     link and does the review by hand. No card details are taken on this site
+     and no billing system exists yet — which is the point. It proves someone
+     will pay before any of that gets built.
+     Prices are roughly equivalent across currencies; edit them here.
+     -------------------------------------------------------------------- */
+  var CONCIERGE = {
+    email: 'siddheshthapa02@gmail.com',
+    price: {
+      UK: '£29', US: '$39', CA: 'CA$49', AU: 'AU$59',
+      IE: '€34', DE: '€34', FR: '€34', NL: '€34', ES: '€34', IT: '€34'
+    }
+  };
+
   var S = {
     ctx: null,        // { countryKey, region, gross, marginalRate, currency, ... }
     carry: null,      // what the calculator handed over, if anything
@@ -353,6 +368,7 @@
     }
 
     renderKeepCard();
+    renderConcierge(res);
   }
 
   /* ---- saving, restoring and deleting a review ---------------------------
@@ -462,6 +478,65 @@
       renderResults();
     });
     return true;
+  }
+
+
+  /* Render the concierge offer. Tone shifts with the verdict: if we found
+     little, pushing a paid review at them would contradict the refund promise
+     we just made, so the offer stays available but stops selling. */
+  function renderConcierge(res) {
+    var card = el('conciergeCard');
+    if (!card) return;
+    var price = CONCIERGE.price[S.ctx.countryKey] || '£29';
+    var cur = S.ctx.currency;
+    var thin = res.shouldOfferRefund;
+
+    el('concPrice').textContent = price;
+
+    if (thin) {
+      el('concKicker').textContent = 'Only if you want a second opinion';
+      el('concTitle').textContent = 'You probably do not need me';
+      el('concPitch').innerHTML = 'We did not find much, so I am not going to push a paid review at you. '
+        + 'If you would still like someone to sanity-check it — particularly if your situation changed this year — I am here.';
+    } else {
+      el('concKicker').textContent = 'Want a person to check it?';
+      el('concTitle').textContent = "I'll go through this myself";
+      var top = res.findings.filter(function (f) { return f.value != null; })[0];
+      el('concPitch').innerHTML = 'The list above is what the rules say fits your answers. It cannot see everything — '
+        + 'your payslip, your contract, what you already claim. '
+        // Titles are a mix of sentences ("You are in the 60% trap") and
+        // imperatives ("Increase your pension contribution"). Quoting reads
+        // correctly for both; lowercasing them does not.
+        + (top ? 'Before you act on <b>&ldquo;' + esc(top.title) + '&rdquo;</b>, ' : 'Before you act on any of it, ')
+        + 'it is worth having someone confirm it actually applies to you.';
+    }
+
+    // Pre-filled email. The user sees the draft in their own mail client and
+    // presses send themselves — nothing is transmitted from this page.
+    var lines = [];
+    lines.push('Hi Siddhesh,');
+    lines.push('');
+    lines.push('I just used Tax.cal Plus and would like you to review my results.');
+    lines.push('');
+    lines.push('Country: ' + S.ctx.country.name + (S.ctx.region ? ' (' + S.ctx.region + ')' : ''));
+    lines.push('Gross salary: ' + money(S.ctx.gross, cur));
+    lines.push('Marginal rate: ' + Math.round(S.ctx.marginalRate * 100) + '%');
+    if (saved) lines.push('My saved review: ' + window.TaxCalAPI.linkFor(saved.id, saved.token));
+    lines.push('');
+    lines.push('Top items it flagged:');
+    res.findings.slice(0, 3).forEach(function (f) {
+      lines.push('- ' + f.title + (f.value != null ? ' (est. ' + money(f.value, cur) + ')' : ''));
+    });
+    lines.push('');
+    lines.push('Anything else you should know about my situation:');
+    lines.push('');
+    lines.push('');
+
+    var subject = 'Tax.cal Plus review request (' + S.ctx.country.name + ')';
+    el('concCta').href = 'mailto:' + CONCIERGE.email
+      + '?subject=' + encodeURIComponent(subject)
+      + '&body=' + encodeURIComponent(lines.join('\r\n'));
+    el('concCta').firstChild.textContent = thin ? 'Ask for a second opinion ' : 'Ask Siddhesh to review it ';
   }
 
   /* ---- wiring ------------------------------------------------------------ */

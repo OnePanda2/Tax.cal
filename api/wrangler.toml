@@ -8,7 +8,7 @@ compatibility_date = "2026-09-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "taxcal-plus"
-database_id = "REPLACE_WITH_DATABASE_ID"
+database_id = "a85a81c3-b404-46c3-aacd-562b4842752a"
 
 [vars]
 # Non-secret default. Override in production with:
