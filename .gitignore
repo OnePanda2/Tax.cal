@@ -17,3 +17,7 @@ taxmirror_handover_prompt.md
 # Cloudflare Worker local state
 api/.wrangler-test/
 api/.wrangler/
+
+# Full project report & handover — strategy, pricing, legal and security notes.
+# The repo is public; this stays local.
+PROJECT-HANDOVER.md
