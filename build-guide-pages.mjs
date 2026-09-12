@@ -111,7 +111,7 @@ const html = `<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../styles.css?v=17">
+<link rel="stylesheet" href="../styles.css?v=18">
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-Wj_1OavoJ4_-NVQlAh9IK.js"></script>
   <script>
@@ -218,6 +218,7 @@ const html = `<!doctype html>
       <a class="btn" href="${SITE}/#c=UK" style="max-width:340px;margin:0 auto;text-decoration:none">Open the calculator
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <p class="hint" style="margin:16px 0 0">The same method runs for ten countries — <a href="../country/uk/">see the UK summary</a>, or pick another from the calculator.</p>
+        <p class="hint" style="margin:8px 0 0">Or see the same method applied across all ten: <a href="../tax-by-country/">which country taxes you most</a>.</p>
         <p class="site-url">or go straight to <a href="${SITE}/">taxcal.siddheshthapa.com</a></p>
     </div>
 
