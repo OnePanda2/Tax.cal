@@ -19,13 +19,13 @@ html = html.replace(/<!-- PWA:start -->[\s\S]*?<!-- PWA:end -->/g, '');
 // interpreted as replacement patterns — and `symbol: '$'` in tax-data.js contains
 // `$'`, which means "everything after the match" and silently splices the tail of
 // the document into the middle of the data file. Broke US, Canada and Australia.
-html = html.replace(/<link rel="stylesheet" href="styles\.css">/, () => `<style>\n${css}\n</style>`);
+html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?[^"]*)?">/, () => `<style>\n${css}\n</style>`);
 
 // inline JS (data + engine + app in order)
 html = html
-  .replace(/<script src="assets\/tax-data\.js"><\/script>\s*/, '')
-  .replace(/<script src="assets\/tax-engine\.js"><\/script>\s*/, '')
-  .replace(/<script src="assets\/app\.js"><\/script>/, () => `<script>\n${js}\n</script>`);
+  .replace(/<script src="assets\/tax-data\.js(?:\?[^"]*)?"><\/script>\s*/, '')
+  .replace(/<script src="assets\/tax-engine\.js(?:\?[^"]*)?"><\/script>\s*/, '')
+  .replace(/<script src="assets\/app\.js(?:\?[^"]*)?"><\/script>/, () => `<script>\n${js}\n</script>`);
 
 // Sanity check: the CSS and JS must survive inlining byte-for-byte. This is the
 // guard against the `$`-pattern class of bug above, which fails silently.

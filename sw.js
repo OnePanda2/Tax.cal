@@ -1,5 +1,10 @@
 /* Tax.cal service worker — offline-first for a fully client-side app.
-   Bump CACHE when you change app files so clients pick up the new version. */
+
+   Bump CACHE when you change app files so clients pick up the new version, AND
+   bump the matching ?v= on the asset URLs in index.html / plus/index.html /
+   privacy/index.html. The query string is what actually defeats the browser's
+   own HTTP cache (GitHub Pages serves assets with max-age=600), so without it a
+   returning visitor can pair fresh HTML with up to ten minutes of stale JS. */
 const CACHE = 'taxcal-v9';
 const ASSETS = [
   './',
