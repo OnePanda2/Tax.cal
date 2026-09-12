@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="../styles.css?v=10">
+  <link rel="stylesheet" href="../styles.css?v=11">
 </head>
 <body>
 <script>/* apply saved theme before paint to avoid a flash */try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
@@ -131,21 +131,11 @@
       <div class="findings" id="findings"></div>
     </div>
 
-    <div class="card pad concierge" id="conciergeCard" style="margin-top:16px">
-      <div class="sec-title"><div><span class="kicker" id="concKicker">Want a person to check it?</span><h2 id="concTitle">I'll go through this myself</h2></div></div>
-      <p class="hint" id="concPitch"></p>
-      <ul class="plain-list conc-list" id="concList">
-        <li>I read your answers properly and tell you <b>which of the items above actually apply to you</b> — and which to ignore.</li>
-        <li>You get it back <b>within 48 hours</b>, written in plain English.</li>
-        <li>If I can't find anything useful for you, <b>I'll say so and refund you</b>.</li>
-      </ul>
-      <div class="conc-buy">
-        <span class="conc-price" id="concPrice">—</span>
-        <a class="btn conc-cta" id="concCta" href="#">Ask Siddhesh to review it
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-      </div>
-      <p class="hint conc-fine">This opens an email to me — nothing is charged here and no card details are taken on this site. I reply with what I need and a payment link. I'm not a regulated tax adviser: this is help understanding which general reliefs fit your situation, not personal financial advice, and it doesn't replace an accountant.</p>
+    <div class="card pad" id="nextCard" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">What happens next</span><h2>Tax.cal Plus is still being built</h2></div></div>
+      <p class="hint">What you just used is the free preview. The full version will check your answers against your country's rules automatically and keep the list up to date as they change.</p>
+      <p class="hint" style="margin-top:10px">If you want to know when it opens, join the early-access list — an email address, nothing else.</p>
+      <a class="btn" id="nextCta" href="../index.html#notify" style="margin-top:16px;width:auto">Join the early-access list</a>
     </div>
 
     <div class="card pad" id="reviewCard" style="margin-top:16px">
@@ -193,11 +183,11 @@
   <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../privacy/">Privacy</a></span><span>·</span><span><a href="../index.html">Back to the free calculator</a></span></div>
 </footer>
 
-<script src="../assets/tax-data.js?v=10"></script>
-<script src="../assets/tax-engine.js?v=10"></script>
-<script src="../assets/plus-questions.js?v=10"></script>
-<script src="../assets/plus-engine.js?v=10"></script>
-<script src="../assets/plus-api.js?v=10"></script>
-<script src="../assets/plus-app.js?v=10"></script>
+<script src="../assets/tax-data.js?v=11"></script>
+<script src="../assets/tax-engine.js?v=11"></script>
+<script src="../assets/plus-questions.js?v=11"></script>
+<script src="../assets/plus-engine.js?v=11"></script>
+<script src="../assets/plus-api.js?v=11"></script>
+<script src="../assets/plus-app.js?v=11"></script>
 </body>
 </html>
