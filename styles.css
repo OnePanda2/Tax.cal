@@ -543,3 +543,64 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
 }
 .conc-cta { width: auto; flex: 1 1 auto; min-width: 220px; }
 .conc-fine { margin-top: 14px; font-size: 12.5px; }
+
+/* ==========================================================================
+   Hero proof — the worked example on the first screen
+   ========================================================================== */
+.proof {
+  margin-top: 22px; padding: 18px 20px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  background: var(--surface); box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.proof-row { display: flex; align-items: baseline; gap: 13px; flex-wrap: wrap; }
+.proof-big {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(38px, 9vw, 54px); line-height: .9; letter-spacing: -.03em;
+  color: var(--tax-strong); font-variant-numeric: tabular-nums;
+}
+.proof-txt { font-size: 16px; color: var(--muted); flex: 1 1 220px; min-width: 0; }
+.proof-txt b { color: var(--ink); font-weight: 650; }
+.proof-split { display: flex; gap: 8px; flex-wrap: wrap; }
+.proof-chip {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 7px 12px; border-radius: var(--r-pill);
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.proof-chip .pc-k { font-size: 12.5px; color: var(--faint); }
+.proof-chip .pc-v { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--brand-ink); }
+.proof-chip.hidden-tax { background: var(--tax-wash); border-color: color-mix(in srgb, var(--tax) 32%, transparent); }
+.proof-chip.hidden-tax .pc-v { color: var(--tax-ink); }
+.proof-cta {
+  display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
+  font-size: 14.5px; font-weight: 600; color: var(--brand-ink);
+}
+.proof-cta svg { width: 17px; height: 17px; }
+.proof-cta:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Persistent early-access button
+   ========================================================================== */
+.sticky-cta {
+  position: fixed; z-index: 40;
+  right: 16px; bottom: 16px;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 19px; border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 15.5px;
+  letter-spacing: -.01em; box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,.14) inset;
+  transition: transform .16s cubic-bezier(.22,1,.36,1), opacity .2s, visibility .2s;
+}
+.sticky-cta:hover { text-decoration: none; transform: translateY(-2px); }
+.sticky-cta:active { transform: translateY(0) scale(.985); }
+.sticky-cta svg { width: 18px; height: 18px; flex: 0 0 auto; }
+/* Out of the way once the real signup form is on screen. */
+.sticky-cta.gone { opacity: 0; visibility: hidden; transform: translateY(10px); }
+
+@media (max-width: 560px) {
+  .sticky-cta { left: 14px; right: 14px; bottom: 14px; justify-content: center; padding: 15px 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sticky-cta { transition: opacity .2s, visibility .2s; }
+  .sticky-cta:hover, .sticky-cta:active { transform: none; }
+}

@@ -23,6 +23,11 @@
     } catch (e) { return cur.symbol + Math.round(n).toLocaleString(); }
   }
   function pct(x, dp) { return (x * 100).toFixed(dp == null ? 1 : dp) + '%'; }
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  // "the United Kingdom" / "the Netherlands", but bare "Germany".
+  function cn0(r) {
+    return (['UK', 'US', 'NL'].indexOf(r.countryKey) > -1 ? 'the ' : '') + r.country.name;
+  }
 
   /* ---- populate selects -------------------------------------------------- */
   function initSelects() {
@@ -134,6 +139,19 @@
     el('heroSub').innerHTML = 'of your <b>' + money(r.gross, cur) + '</b> gross income ends up as tax';
     el('netLine').innerHTML = 'You keep about <b>' + money(r.netMonthly, cur) + '/month</b> after direct deductions'
       + (r.hidden > 0 ? ' — before <b>' + money(r.hidden, cur) + '/yr</b> of tax hidden in what you spend.' : '.');
+
+    // hero proof line — the worked example on the first screen. Driven by the
+    // same `r` as the rest of the page, so it can never disagree with the
+    // calculator below it.
+    var pr = el('proofRate');
+    if (pr) {
+      var hiddenPts = r.gross > 0 ? (r.hidden / r.gross) * 100 : 0;
+      pr.textContent = pct(r.effRate, 0);
+      el('proofLine').innerHTML = 'of a <b>' + money(r.gross, cur) + '</b> salary in '
+        + esc(cn0(r)) + ' goes to tax once you count what is buried in spending.';
+      el('proofSeen').textContent = pct(r.directRate, 0);
+      el('proofHidden').textContent = '+' + hiddenPts.toFixed(1) + ' pts';
+    }
 
     // savings — the value story. Leads with the high end, but framed as a typical-case
     // model (not a personal finding) so the claim stays defensible.
@@ -402,6 +420,28 @@
   };
 
   /* ---- boot -------------------------------------------------------------- */
+  /* ---- persistent early-access button -----------------------------------
+     Scrolls to the real signup form, and gets out of the way once that form
+     is visible so it never covers the thing it points at.
+     -------------------------------------------------------------------- */
+  function initStickyCta() {
+    var cta = el('stickyCta'), target = el('notify');
+    if (!cta || !target) return;
+
+    cta.addEventListener('click', function (e) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      // Focus the field so a keyboard user lands where they can actually type.
+      setTimeout(function () { var f = el('email'); if (f) f.focus({ preventScroll: true }); }, reduce ? 0 : 500);
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        cta.classList.toggle('gone', entries[0].isIntersecting);
+      }, { threshold: 0.25 }).observe(target);
+    }
+  }
+
   function boot() {
     initSelects();
     initTheme();
@@ -413,6 +453,7 @@
     if (pendingRegion) { var tbl = DATA.regionTable[el('country').value]; if (tbl && tbl[pendingRegion]) el('region').value = pendingRegion; }
     prefillSpend(true);
     bind();
+    initStickyCta();
     recompute(false);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

@@ -577,6 +577,67 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
 .conc-cta { width: auto; flex: 1 1 auto; min-width: 220px; }
 .conc-fine { margin-top: 14px; font-size: 12.5px; }
 
+/* ==========================================================================
+   Hero proof — the worked example on the first screen
+   ========================================================================== */
+.proof {
+  margin-top: 22px; padding: 18px 20px;
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  background: var(--surface); box-shadow: var(--shadow-sm);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.proof-row { display: flex; align-items: baseline; gap: 13px; flex-wrap: wrap; }
+.proof-big {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(38px, 9vw, 54px); line-height: .9; letter-spacing: -.03em;
+  color: var(--tax-strong); font-variant-numeric: tabular-nums;
+}
+.proof-txt { font-size: 16px; color: var(--muted); flex: 1 1 220px; min-width: 0; }
+.proof-txt b { color: var(--ink); font-weight: 650; }
+.proof-split { display: flex; gap: 8px; flex-wrap: wrap; }
+.proof-chip {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 7px 12px; border-radius: var(--r-pill);
+  background: var(--surface-2); border: 1px solid var(--line);
+}
+.proof-chip .pc-k { font-size: 12.5px; color: var(--faint); }
+.proof-chip .pc-v { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--brand-ink); }
+.proof-chip.hidden-tax { background: var(--tax-wash); border-color: color-mix(in srgb, var(--tax) 32%, transparent); }
+.proof-chip.hidden-tax .pc-v { color: var(--tax-ink); }
+.proof-cta {
+  display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
+  font-size: 14.5px; font-weight: 600; color: var(--brand-ink);
+}
+.proof-cta svg { width: 17px; height: 17px; }
+.proof-cta:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Persistent early-access button
+   ========================================================================== */
+.sticky-cta {
+  position: fixed; z-index: 40;
+  right: 16px; bottom: 16px;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 19px; border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 15.5px;
+  letter-spacing: -.01em; box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,.14) inset;
+  transition: transform .16s cubic-bezier(.22,1,.36,1), opacity .2s, visibility .2s;
+}
+.sticky-cta:hover { text-decoration: none; transform: translateY(-2px); }
+.sticky-cta:active { transform: translateY(0) scale(.985); }
+.sticky-cta svg { width: 18px; height: 18px; flex: 0 0 auto; }
+/* Out of the way once the real signup form is on screen. */
+.sticky-cta.gone { opacity: 0; visibility: hidden; transform: translateY(10px); }
+
+@media (max-width: 560px) {
+  .sticky-cta { left: 14px; right: 14px; bottom: 14px; justify-content: center; padding: 15px 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sticky-cta { transition: opacity .2s, visibility .2s; }
+  .sticky-cta:hover, .sticky-cta:active { transform: none; }
+}
+
 </style>
 
   <!-- Structured data: helps Google, Bing and AI search understand the tool -->
@@ -628,10 +689,27 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
     <p class="eyebrow">Your real tax rate</p>
     <h1>See the tax you <span class="u">really</span> pay.</h1>
     <p class="lede">Your payslip shows income tax and social contributions — but that's only half the story. You also pay <strong>VAT or sales tax</strong> on nearly everything you buy, plus heavy <strong>fuel duties</strong>. Tax.cal adds it all up. <strong>Free, private, nothing stored.</strong></p>
+
+    <!-- Worked example, computed live by the engine so it can never contradict
+         the calculator below. This is the demonstration: the visitor sees the
+         product do its job before being asked to type anything. -->
+    <div class="proof" id="heroProof">
+      <div class="proof-row">
+        <span class="proof-big" id="proofRate">—</span>
+        <span class="proof-txt" id="proofLine"></span>
+      </div>
+      <div class="proof-split">
+        <span class="proof-chip"><span class="pc-k">On the payslip</span><span class="pc-v" id="proofSeen">—</span></span>
+        <span class="proof-chip hidden-tax"><span class="pc-k">Hidden in spending</span><span class="pc-v" id="proofHidden">—</span></span>
+      </div>
+      <a class="proof-cta" href="#calc" id="proofCta">Now do it with your own numbers
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+      </a>
+    </div>
   </section>
 
   <!-- TOOL -->
-  <section class="wrap tool">
+  <section class="wrap tool" id="calc" style="scroll-margin-top:70px">
     <div class="card pad stack">
       <div class="grid-2">
         <div class="field">
@@ -696,7 +774,7 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
       </div>
       <div class="example-flag" id="exampleFlag">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
-        Example numbers — change the salary and spending above to see your own.
+        A worked example. <b>Change the salary to see your own</b> — nothing is sent anywhere.
       </div>
     </div>
 
@@ -820,6 +898,13 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
     </div>
   </footer>
 </main>
+
+<!-- Persistent CTA. Hides itself once the signup card is actually on screen,
+     so it never covers the thing it points at. -->
+<a class="sticky-cta" id="stickyCta" href="#notify">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>
+  <span>Join the early-access list</span>
+</a>
 
 <script>
 /* ============================================================================
@@ -1393,6 +1478,11 @@ window.TaxEngine = (function (DATA) {
     } catch (e) { return cur.symbol + Math.round(n).toLocaleString(); }
   }
   function pct(x, dp) { return (x * 100).toFixed(dp == null ? 1 : dp) + '%'; }
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  // "the United Kingdom" / "the Netherlands", but bare "Germany".
+  function cn0(r) {
+    return (['UK', 'US', 'NL'].indexOf(r.countryKey) > -1 ? 'the ' : '') + r.country.name;
+  }
 
   /* ---- populate selects -------------------------------------------------- */
   function initSelects() {
@@ -1504,6 +1594,19 @@ window.TaxEngine = (function (DATA) {
     el('heroSub').innerHTML = 'of your <b>' + money(r.gross, cur) + '</b> gross income ends up as tax';
     el('netLine').innerHTML = 'You keep about <b>' + money(r.netMonthly, cur) + '/month</b> after direct deductions'
       + (r.hidden > 0 ? ' — before <b>' + money(r.hidden, cur) + '/yr</b> of tax hidden in what you spend.' : '.');
+
+    // hero proof line — the worked example on the first screen. Driven by the
+    // same `r` as the rest of the page, so it can never disagree with the
+    // calculator below it.
+    var pr = el('proofRate');
+    if (pr) {
+      var hiddenPts = r.gross > 0 ? (r.hidden / r.gross) * 100 : 0;
+      pr.textContent = pct(r.effRate, 0);
+      el('proofLine').innerHTML = 'of a <b>' + money(r.gross, cur) + '</b> salary in '
+        + esc(cn0(r)) + ' goes to tax once you count what is buried in spending.';
+      el('proofSeen').textContent = pct(r.directRate, 0);
+      el('proofHidden').textContent = '+' + hiddenPts.toFixed(1) + ' pts';
+    }
 
     // savings — the value story. Leads with the high end, but framed as a typical-case
     // model (not a personal finding) so the claim stays defensible.
@@ -1772,6 +1875,28 @@ window.TaxEngine = (function (DATA) {
   };
 
   /* ---- boot -------------------------------------------------------------- */
+  /* ---- persistent early-access button -----------------------------------
+     Scrolls to the real signup form, and gets out of the way once that form
+     is visible so it never covers the thing it points at.
+     -------------------------------------------------------------------- */
+  function initStickyCta() {
+    var cta = el('stickyCta'), target = el('notify');
+    if (!cta || !target) return;
+
+    cta.addEventListener('click', function (e) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      // Focus the field so a keyboard user lands where they can actually type.
+      setTimeout(function () { var f = el('email'); if (f) f.focus({ preventScroll: true }); }, reduce ? 0 : 500);
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        cta.classList.toggle('gone', entries[0].isIntersecting);
+      }, { threshold: 0.25 }).observe(target);
+    }
+  }
+
   function boot() {
     initSelects();
     initTheme();
@@ -1783,6 +1908,7 @@ window.TaxEngine = (function (DATA) {
     if (pendingRegion) { var tbl = DATA.regionTable[el('country').value]; if (tbl && tbl[pendingRegion]) el('region').value = pendingRegion; }
     prefillSpend(true);
     bind();
+    initStickyCta();
     recompute(false);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

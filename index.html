@@ -84,10 +84,27 @@
     <p class="eyebrow">Your real tax rate</p>
     <h1>See the tax you <span class="u">really</span> pay.</h1>
     <p class="lede">Your payslip shows income tax and social contributions — but that's only half the story. You also pay <strong>VAT or sales tax</strong> on nearly everything you buy, plus heavy <strong>fuel duties</strong>. Tax.cal adds it all up. <strong>Free, private, nothing stored.</strong></p>
+
+    <!-- Worked example, computed live by the engine so it can never contradict
+         the calculator below. This is the demonstration: the visitor sees the
+         product do its job before being asked to type anything. -->
+    <div class="proof" id="heroProof">
+      <div class="proof-row">
+        <span class="proof-big" id="proofRate">—</span>
+        <span class="proof-txt" id="proofLine"></span>
+      </div>
+      <div class="proof-split">
+        <span class="proof-chip"><span class="pc-k">On the payslip</span><span class="pc-v" id="proofSeen">—</span></span>
+        <span class="proof-chip hidden-tax"><span class="pc-k">Hidden in spending</span><span class="pc-v" id="proofHidden">—</span></span>
+      </div>
+      <a class="proof-cta" href="#calc" id="proofCta">Now do it with your own numbers
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+      </a>
+    </div>
   </section>
 
   <!-- TOOL -->
-  <section class="wrap tool">
+  <section class="wrap tool" id="calc" style="scroll-margin-top:70px">
     <div class="card pad stack">
       <div class="grid-2">
         <div class="field">
@@ -152,7 +169,7 @@
       </div>
       <div class="example-flag" id="exampleFlag">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
-        Example numbers — change the salary and spending above to see your own.
+        A worked example. <b>Change the salary to see your own</b> — nothing is sent anywhere.
       </div>
     </div>
 
@@ -276,6 +293,13 @@
     </div>
   </footer>
 </main>
+
+<!-- Persistent CTA. Hides itself once the signup card is actually on screen,
+     so it never covers the thing it points at. -->
+<a class="sticky-cta" id="stickyCta" href="#notify">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg>
+  <span>Join the early-access list</span>
+</a>
 
 <script src="assets/tax-data.js"></script>
 <script src="assets/tax-engine.js"></script>

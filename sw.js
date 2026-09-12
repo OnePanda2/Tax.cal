@@ -1,6 +1,6 @@
 /* Tax.cal service worker — offline-first for a fully client-side app.
    Bump CACHE when you change app files so clients pick up the new version. */
-const CACHE = 'taxcal-v8';
+const CACHE = 'taxcal-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -38,6 +38,29 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
+  // Our own code (JS/CSS) must be network-first too.
+  //
+  // This was cache-first, which shipped a real bug: the HTML was fetched fresh
+  // while app.js came from the old cache, so a returning visitor got the new
+  // markup paired with the previous deploy's script. When #usFields became
+  // #regionFields, that combination threw on load and the page rendered empty
+  // fields and a 0% rate. Never let the document and its script come from
+  // different deploys.
+  const url = new URL(request.url);
+  const isOwnCode = url.origin === self.location.origin && /\.(js|css)$/.test(url.pathname);
+
+  if (isOwnCode) {
+    e.respondWith(
+      fetch(request).then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(request, copy));
+        return res;
+      }).catch(() => caches.match(request))   // offline: last known good
+    );
+    return;
+  }
+
+  // Everything else (icons, fonts, images) is effectively immutable — cache-first.
   e.respondWith(
     caches.match(request).then((cached) => cached || fetch(request).then((res) => {
       const copy = res.clone();
