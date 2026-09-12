@@ -575,7 +575,6 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
   display: inline-flex; align-items: center; gap: 7px; align-self: flex-start;
   font-size: 14.5px; font-weight: 600; color: var(--brand-ink);
 }
-.proof-cta svg { width: 17px; height: 17px; }
 .proof-cta:hover { text-decoration: underline; }
 
 /* ==========================================================================
