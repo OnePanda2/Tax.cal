@@ -387,7 +387,10 @@
         fd.append('email', email);
         fd.append('country', el('country').value);
         fd.append('_subject', 'New Tax.cal early-access signup');
-        fetch(url, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(finish, finish);
+        fetch(url, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(function () {
+  if (window.plausible) plausible('email_signup');
+  finish();
+}, finish);
       } else { finish(); } // no endpoint yet: stored locally, thank the user
     });
     el('themeBtn').addEventListener('click', toggleTheme);
