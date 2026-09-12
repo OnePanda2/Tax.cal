@@ -16,7 +16,7 @@ const SITE = 'https://taxcal.siddheshthapa.com';
 // representative example per country: [salary, slug, usState?, compareTo[]]
 const EX = {
   UK: { salary: 40000, slug: 'uk',          cmp: ['DE', 'US'] },
-  US: { salary: 75000, slug: 'usa', region: 'CA', cmp: ['UK', 'TX'] },
+  US: { salary: 75000, slug: 'usa', region: 'CA', cmp: ['UK', 'st:TX'] },
   CA: { salary: 75000, slug: 'canada', region: 'ON', cmp: ['US', 'UK'] },
   AU: { salary: 90000, slug: 'australia',   cmp: ['UK', 'DE'] },
   IE: { salary: 50000, slug: 'ireland',     cmp: ['UK', 'NL'] },
@@ -57,12 +57,20 @@ function page(key) {
   ).join('');
 
   const cmp = ex.cmp.map((k) => {
-    if (DATA.usStates[k]) { // compare to a US state (e.g. Texas)
+    if (k.indexOf('st:') === 0) { // an intentional US state, written st:XX
+      // This used to test DATA.usStates[k] first, which silently broke on the
+      // keys present in BOTH tables: DE is Germany and Delaware, CA is Canada
+      // and California. Four country pages shipped comparing against Delaware
+      // while the prose said Germany. The prefix makes intent explicit so
+      // lookup order cannot decide it.
+      k = k.slice(3);
+      if (!DATA.usStates[k]) throw new Error('Unknown US state in cmp: ' + k);
       const g2 = ENGINE.convert(ex.salary, cur.code, 'USD');
       const d = ENGINE.directTaxFor('US', g2, { status: 'single', region: k });
       return `the USA (${DATA.usStates[k].name}) would tax the same pay at about <b>${pct(d.total / g2, 0)}</b> in direct tax`;
     }
     const oc = DATA.countries[k];
+      if (!oc) throw new Error('Unknown country in cmp: ' + k + ' (for a US state write st:' + k + ')');
     const g2 = ENGINE.convert(ex.salary, cur.code, oc.currency.code);
     const d = ENGINE.directTaxFor(k, g2, { status: 'single' });
     return `${oc.name} would tax it at about <b>${pct(d.total / g2, 0)}</b>`;
@@ -177,7 +185,7 @@ function page(key) {
   </section>
 
   <footer class="foot wrap">
-    <div class="disc"><strong>Estimates only.</strong> Figures use ${c.taxYear} rates for a single earner and reasonable assumptions about spending; ${esc(c.note || 'they are not personalised tax advice')}. Not tax, financial or legal advice.</div>
+    <div class="disc"><strong>Estimates only.</strong> Figures use ${c.taxYear} rates for a single earner and reasonable assumptions about spending; ${esc((c.note || 'they are not personalised tax advice').replace(/\.$/, ''))}. Not tax, financial or legal advice.</div>
     <div class="row2"><a href="../../index.html">← Back to Tax.cal</a><span>·</span><span>© 2026 Tax.cal</span></div>
   </footer>
 </main>
