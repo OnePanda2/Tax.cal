@@ -369,11 +369,17 @@
       });
     });
     el('revealBtn').addEventListener('click', function () {
-  state.example = false;
-  recompute(true);
-  el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  if (window.plausible) plausible('calculate');
-});
+      state.example = false;
+      recompute(true);
+      el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      // Activation: the visitor explicitly asked for their own number. The guard
+      // matters — a tracker blocker leaves window.plausible undefined, and this
+      // must never break the calculator.
+      // The country is sent as a property because Plausible's own country comes
+      // from the visitor's IP, which is not the same as the country they picked —
+      // and the picked one is what decides which market to build for.
+      if (window.plausible) plausible('calculate', { props: { country: el('country').value } });
+    });
     el('dlBtn').addEventListener('click', function () { offerCard(false); });
     el('shareBtn').addEventListener('click', function () { offerCard(true); });
     el('notifyForm').addEventListener('submit', function (e) {
@@ -382,15 +388,23 @@
       try { localStorage.setItem('taxcal_notify', email); } catch (x) {}
       var finish = function () { el('notifyForm').classList.add('hidden'); el('notifyOk').classList.remove('hidden'); };
       var url = CONFIG.formspree;
+      var country = el('country').value;
       if (url && url.indexOf('REPLACE_ME') === -1) { // real endpoint configured → collect the signup
         var fd = new FormData();
         fd.append('email', email);
-        fd.append('country', el('country').value);
+        fd.append('country', country);
         fd.append('_subject', 'New Tax.cal early-access signup');
-        fetch(url, { method: 'POST', headers: { Accept: 'application/json' }, body: fd }).then(function () {
-  if (window.plausible) plausible('email_signup');
-  finish();
-}, finish);
+        fetch(url, { method: 'POST', headers: { Accept: 'application/json' }, body: fd })
+          .then(function (res) {
+            // fetch only rejects on a network failure — a 4xx or 5xx from
+            // Formspree still lands here. Counting those as signups would
+            // inflate the one number the next decision depends on, so check
+            // the status before recording it.
+            if (res.ok && window.plausible) {
+              plausible('email_signup', { props: { country: country } });
+            }
+            finish();
+          }, finish);
       } else { finish(); } // no endpoint yet: stored locally, thank the user
     });
     el('themeBtn').addEventListener('click', toggleTheme);
