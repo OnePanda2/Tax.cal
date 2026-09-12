@@ -5,7 +5,7 @@
    privacy/index.html. The query string is what actually defeats the browser's
    own HTTP cache (GitHub Pages serves assets with max-age=600), so without it a
    returning visitor can pair fresh HTML with up to ten minutes of stale JS. */
-const CACHE = 'taxcal-v12';
+const CACHE = 'taxcal-v13';
 const ASSETS = [
   './',
   './index.html',
