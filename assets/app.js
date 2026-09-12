@@ -354,31 +354,44 @@
   function debouncedRecompute() { clearTimeout(debTimer); debTimer = setTimeout(function () { recompute(false); }, 120); }
 
   /* ---- events ------------------------------------------------------------ */
+  /* ---- activation -------------------------------------------------------
+     What counts as "this visitor actually used the calculator".
+
+     The results are visible on load and recompute live as you type, so the
+     "Show my real tax rate" button is largely a scroll-and-relabel — and it
+     sits ~3,500px down the page, past six spending fields. Counting only that
+     click badly under-reports activation: someone can land, replace the salary
+     with their own, read their real rate and leave without ever reaching it.
+
+     So activation fires on the first genuine interaction of any kind, capped at
+     once per page load so it stays a clean count rather than one per keystroke.
+     -------------------------------------------------------------------- */
+  var activationSent = false;
+  function markActivated() {
+    if (activationSent) return;
+    activationSent = true;
+    if (window.plausible) plausible('calculate', { props: { country: el('country').value } });
+  }
+
   function bind() {
     el('country').addEventListener('change', function () {
-      syncCountryUI(); prefillSpend(false); recompute(false);
+      syncCountryUI(); prefillSpend(false); recompute(false); markActivated();
     });
     el('filing').addEventListener('change', function () { recompute(false); });
     el('region').addEventListener('change', function () { recompute(false); });
     el('salary').addEventListener('input', function () {
-      state.example = false; prefillSpend(false); debouncedRecompute();
+      state.example = false; prefillSpend(false); debouncedRecompute(); markActivated();
     });
     DATA.categories.forEach(function (cat) {
       el('spend_' + cat.id).addEventListener('input', function () {
-        state.spendTouched = true; state.example = false; debouncedRecompute();
+        state.spendTouched = true; state.example = false; debouncedRecompute(); markActivated();
       });
     });
     el('revealBtn').addEventListener('click', function () {
       state.example = false;
       recompute(true);
       el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-      // Activation: the visitor explicitly asked for their own number. The guard
-      // matters — a tracker blocker leaves window.plausible undefined, and this
-      // must never break the calculator.
-      // The country is sent as a property because Plausible's own country comes
-      // from the visitor's IP, which is not the same as the country they picked —
-      // and the picked one is what decides which market to build for.
-      if (window.plausible) plausible('calculate', { props: { country: el('country').value } });
+      markActivated();
     });
     el('dlBtn').addEventListener('click', function () { offerCard(false); });
     el('shareBtn').addEventListener('click', function () { offerCard(true); });
@@ -387,6 +400,17 @@
       var email = el('email').value;
       try { localStorage.setItem('taxcal_notify', email); } catch (x) {}
       var finish = function () { el('notifyForm').classList.add('hidden'); el('notifyOk').classList.remove('hidden'); };
+      // Telling someone they joined a list they did not join is the one thing
+      // we will not do, so a failed submission says so and offers a way through.
+      var failed = function (status) {
+        var n = el('notifyErr');
+        if (!n) { finish(); return; }
+        n.innerHTML = 'That did not go through' + (status ? ' (error ' + status + ')' : '')
+          + '. Nothing was saved on our side — please email '
+          + '<a href="mailto:siddheshthapa02@gmail.com?subject=Early%20access">siddheshthapa02@gmail.com</a>'
+          + ' and I will add you by hand.';
+        n.classList.remove('hidden');
+      };
       var url = CONFIG.formspree;
       var country = el('country').value;
       if (url && url.indexOf('REPLACE_ME') === -1) { // real endpoint configured → collect the signup
@@ -400,11 +424,20 @@
             // Formspree still lands here. Counting those as signups would
             // inflate the one number the next decision depends on, so check
             // the status before recording it.
-            if (res.ok && window.plausible) {
-              plausible('email_signup', { props: { country: country } });
+            if (res.ok) {
+              if (window.plausible) plausible('email_signup', { props: { country: country } });
+              finish();
+            } else {
+              // A silent failure here is the worst outcome: the visitor is told
+              // they are on the list, we never receive the address, and the
+              // dashboard shows nothing to explain the gap. Record it and say so.
+              if (window.plausible) plausible('signup_failed', { props: { status: String(res.status) } });
+              failed(res.status);
             }
-            finish();
-          }, finish);
+          }, function () {
+            if (window.plausible) plausible('signup_failed', { props: { status: 'network' } });
+            failed(0);
+          });
       } else { finish(); } // no endpoint yet: stored locally, thank the user
     });
     el('themeBtn').addEventListener('click', toggleTheme);

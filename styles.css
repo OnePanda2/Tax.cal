@@ -593,3 +593,7 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
   .sticky-cta { transition: opacity .2s, visibility .2s; }
   .sticky-cta:hover, .sticky-cta:active { transform: none; }
 }
+
+/* a signup that failed — must never look like success */
+.notify-err { margin-top: 12px; font-size: 14px; color: var(--crit); }
+.notify-err a { color: var(--crit); text-decoration: underline; }
