@@ -369,10 +369,11 @@
       });
     });
     el('revealBtn').addEventListener('click', function () {
-      state.example = false;
-      recompute(true);
-      el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-    });
+  state.example = false;
+  recompute(true);
+  el('results').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  if (window.plausible) plausible('calculate');
+});
     el('dlBtn').addEventListener('click', function () { offerCard(false); });
     el('shareBtn').addEventListener('click', function () { offerCard(true); });
     el('notifyForm').addEventListener('submit', function (e) {
