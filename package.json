@@ -6,7 +6,8 @@
   "scripts": {
     "start": "python -m http.server 8080",
     "build": "node build-artifact.mjs",
-    "build:countries": "node build-country-pages.mjs"
+    "build:countries": "node build-country-pages.mjs",
+    "build:guides": "node build-guide-pages.mjs"
   },
   "keywords": ["tax", "calculator", "effective-tax-rate", "vat", "pwa", "uk", "usa", "germany", "france", "netherlands", "ireland"],
   "license": "MIT",

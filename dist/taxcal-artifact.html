@@ -626,6 +626,11 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
 .notify-err { margin-top: 12px; font-size: 14px; color: var(--crit); }
 .notify-err a { color: var(--crit); text-decoration: underline; }
 
+/* The domain is long and unmemorable, so show it as readable, copyable text
+   wherever we ask someone to visit — not only as an underlined "click here". */
+.site-url { margin-top: 12px; font-size: 14px; color: var(--faint); }
+.site-url a { font-weight: 600; color: var(--brand-ink); word-break: break-all; }
+
 </style>
 
   <!-- Structured data: helps Google, Bing and AI search understand the tool -->
