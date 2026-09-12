@@ -19,5 +19,9 @@ api/.wrangler-test/
 api/.wrangler/
 
 # Full project report & handover — strategy, pricing, legal and security notes.
-# The repo is public; this stays local.
-PROJECT-HANDOVER.md
+# The repo is PUBLIC, so this must never be committed. The canonical copy lives
+# OUTSIDE this folder, at F:\Projects\PROJECT-HANDOVER TaxCal.md, precisely so a
+# stray `git add -A` cannot publish it. These patterns are a safety net in case a
+# copy ever lands in here under a slightly different name.
+*HANDOVER*.md
+*handover*.md
