@@ -1,0 +1,32 @@
+// Snapshot the ORIGINAL engine (assets/tax-data.js + assets/tax-engine.js at commit 8abc8d6)
+import { readFileSync, writeFileSync } from 'node:fs';
+const root = process.argv[2];
+const g = { window: {} }; global.window = g.window;
+const load = (f) => (0, eval)(readFileSync(root + '/assets/' + f, 'utf8'));
+load('tax-data.js'); load('tax-engine.js');
+const DATA = g.window.TAXCAL_DATA, E = g.window.TaxEngine;
+const spendFor = (gross) => { const s = {}; DATA.categories.forEach(c => { s[c.id] = Math.round((gross / 12 * c.def) / 10) * 10; }); return s; };
+const incomes = [0, 1, 5000, 10000, 12570, 12571, 15000, 20000, 30000, 35000, 40000, 45000, 50000, 50270, 50271, 55000, 59000, 60000, 63500, 75000, 90000, 100000, 100001, 120000, 125140, 125141, 150000, 200000, 300000, 600000, 1500000];
+const out = { meta: { source: 'assets/tax-data.js + assets/tax-engine.js @ 8abc8d6 (v18)', generated: '2026-10-02' }, cases: [] };
+const round = (x) => Math.round(x * 1e6) / 1e6;
+function snap(key, gross, status, region) {
+  const r = E.compute({ countryKey: key, gross, filingStatus: status, region, spend: spendFor(gross) });
+  return { key, gross, status, region: r.region,
+    direct: { income: round(r.direct.income), social: round(r.direct.social), state: round(r.direct.state), total: round(r.direct.total) },
+    indirect: { total: round(r.indirect.total), consumption: round(r.indirect.consumption), fuel: round(r.indirect.fuel) },
+    effRate: round(r.effRate), directRate: round(r.directRate),
+    savings: r.savings };
+}
+for (const key of DATA.order) {
+  const c = DATA.countries[key];
+  if (key === 'US') {
+    for (const st of Object.keys(DATA.usStates)) for (const s of ['single', 'mfj']) for (const y of [30000, 63500, 75000, 120000, 250000]) out.cases.push(snap(key, y, s, st));
+    for (const y of incomes) for (const s of ['single','mfj']) out.cases.push(snap(key, y, s, 'TX'));
+  } else if (key === 'CA') {
+    for (const p of Object.keys(DATA.caProvinces)) for (const y of [30000, 63500, 75000, 150000, 300000]) out.cases.push(snap(key, y, "single", p));
+  } else {
+    for (const y of incomes) out.cases.push(snap(key, y, 'single', null));
+  }
+}
+writeFileSync(process.argv[3], JSON.stringify(out));
+console.log('cases', out.cases.length);
