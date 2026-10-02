@@ -602,3 +602,13 @@ details.acc .body ul { margin:0; padding-left:18px; display:flex; flex-direction
    wherever we ask someone to visit — not only as an underlined "click here". */
 .site-url { margin-top: 12px; font-size: 14px; color: var(--faint); }
 .site-url a { font-weight: 600; color: var(--brand-ink); word-break: break-all; }
+
+
+/* India: new vs old regime (v19) */
+.regime-grid { display:grid; grid-template-columns:1fr; gap:12px; }
+@media (min-width: 480px){ .regime-grid { grid-template-columns:1fr 1fr; } }
+.regime { padding:14px 16px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--line); }
+.regime .rg-k { font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.regime .rg-v { font-family:var(--font-display); font-weight:800; font-size:28px; letter-spacing:-.02em; margin:6px 0 4px; color:var(--ink); }
+.regime .rg-s { font-size:12.5px; color:var(--muted); }
+.rules-line { font-size:12px; color:var(--faint); margin:12px 0 0; }

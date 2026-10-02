@@ -1,16 +1,52 @@
 {
   "name": "taxcal",
-  "version": "1.0.0",
-  "description": "See the tax you really pay — total tax-burden estimator (income tax + social + VAT/sales tax + fuel) for the UK, USA, Germany, France, Netherlands and Ireland. 2026 rates.",
+  "version": "2.0.0",
+  "description": "Tax.cal — estimate the total tax you really pay (income tax, social contributions, VAT/GST/sales tax and fuel duty) in 11 countries: UK, USA, Canada, Australia, Ireland, Germany, France, Netherlands, Spain, Italy and India. One deterministic engine powers the website and the Tax.cal ChatGPT plugin (MCP server).",
   "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "python -m http.server 8080",
+    "build:core": "node scripts/build-core.mjs",
     "build": "node build-artifact.mjs",
     "build:countries": "node build-country-pages.mjs",
     "build:guides": "node build-guide-pages.mjs",
-    "build:compare": "node build-compare-page.mjs"
+    "build:compare": "node build-compare-page.mjs",
+    "build:all": "node scripts/build-core.mjs && node build-country-pages.mjs && node build-guide-pages.mjs && node build-compare-page.mjs && node build-artifact.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "mcp:dev": "node mcp/dev-server.mjs",
+    "mcp:smoke": "node mcp/smoke.mjs",
+    "plugin:zip": "node scripts/build-plugin-zip.mjs"
   },
-  "keywords": ["tax", "calculator", "effective-tax-rate", "vat", "pwa", "uk", "usa", "germany", "france", "netherlands", "ireland"],
-  "license": "MIT",
-  "private": true
+  "keywords": [
+    "tax",
+    "calculator",
+    "effective-tax-rate",
+    "vat",
+    "gst",
+    "income-tax",
+    "india",
+    "new-tax-regime",
+    "mcp",
+    "chatgpt",
+    "pwa",
+    "uk",
+    "usa",
+    "canada",
+    "australia",
+    "ireland",
+    "germany",
+    "france",
+    "netherlands",
+    "spain",
+    "italy"
+  ],
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "ajv": "^8.20.0",
+    "esbuild": "^0.28.2"
+  }
 }

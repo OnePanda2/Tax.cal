@@ -7,7 +7,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const read = (f) => readFileSync(new URL(f, import.meta.url), 'utf8');
 const css = read('./styles.css');
-const js = [read('./assets/tax-data.js'), read('./assets/tax-engine.js'), read('./assets/app.js')].join('\n');
+// The shared tax core (generated bundle — run `npm run build:core` first) + the UI.
+const js = [read('./assets/tax-core.js'), read('./assets/app.js')].join('\n');
 
 let html = read('./index.html');
 
@@ -16,15 +17,14 @@ html = html.replace(/<!-- PWA:start -->[\s\S]*?<!-- PWA:end -->/g, '');
 
 // Inline CSS and JS.
 // NB: the replacement MUST be a function. As a plain string, `$` sequences are
-// interpreted as replacement patterns — and `symbol: '$'` in tax-data.js contains
+// interpreted as replacement patterns — and `symbol: '$'` in the tax data contains
 // `$'`, which means "everything after the match" and silently splices the tail of
 // the document into the middle of the data file. Broke US, Canada and Australia.
 html = html.replace(/<link rel="stylesheet" href="styles\.css(?:\?[^"]*)?">/, () => `<style>\n${css}\n</style>`);
 
-// inline JS (data + engine + app in order)
+// inline JS (core + app in order)
 html = html
-  .replace(/<script src="assets\/tax-data\.js(?:\?[^"]*)?"><\/script>\s*/, '')
-  .replace(/<script src="assets\/tax-engine\.js(?:\?[^"]*)?"><\/script>\s*/, '')
+  .replace(/<script src="assets\/tax-core\.js(?:\?[^"]*)?"><\/script>\s*/, '')
   .replace(/<script src="assets\/app\.js(?:\?[^"]*)?"><\/script>/, () => `<script>\n${js}\n</script>`);
 
 // Sanity check: the CSS and JS must survive inlining byte-for-byte. This is the

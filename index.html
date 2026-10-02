@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Tax.cal — the tax you really pay</title>
-  <meta name="description" content="See the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty in one number — and how much you could save. Free and private, covering 10 countries incl. the UK, USA, Canada and Australia. 2026 rates.">
+  <meta name="description" content="See the real share of your income that becomes tax — income tax, social contributions, VAT/GST/sales tax and fuel duty in one number. Free and private, covering 11 countries incl. India (new vs old regime), the UK, USA, Canada and Australia. 2026 rates.">
   <link rel="canonical" href="https://taxcal.siddheshthapa.com/">
   <meta name="robots" content="index, follow, max-image-preview:large">
 
@@ -33,7 +33,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=19">
 
   <!-- Structured data: helps Google, Bing and AI search understand the tool -->
   <script type="application/ld+json">
@@ -44,9 +44,9 @@
     "url": "https://taxcal.siddheshthapa.com/",
     "applicationCategory": "FinanceApplication",
     "operatingSystem": "Any (web)",
-    "description": "Estimate the real share of your income that becomes tax — income tax, social contributions, VAT/sales tax and fuel duty combined — plus how much you could save, for 10 countries: the UK, USA, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.",
+    "description": "Estimate the real share of your income that becomes tax — income tax, social contributions, VAT/GST/sales tax and fuel duty combined — for 11 countries: the UK, USA, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India (Tax Year 2026-27, new and old regime).",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "featureList": ["Real effective tax rate", "Hidden vs visible tax", "Cross-country comparison", "Shareable Tax Wrapped card", "No sign-up, your figures stay on your device"]
+    "featureList": ["Real effective tax rate", "Hidden vs visible tax", "India new vs old regime comparison", "Cross-country comparison", "Shareable Tax Wrapped card", "No sign-up, your figures stay on your device"]
   }
   </script>
   <script type="application/ld+json">
@@ -55,11 +55,11 @@
     "@type": "FAQPage",
     "mainEntity": [
       { "@type": "Question", "name": "How much tax do I really pay?", "acceptedAnswer": { "@type": "Answer", "text": "Your payslip shows income tax and social contributions, but that is only part of it. You also pay VAT or sales tax on almost everything you buy and heavy duties on fuel. Adding these together, most people's real effective tax rate is meaningfully higher than the figure on their payslip." } },
-      { "@type": "Question", "name": "What taxes does Tax.cal include?", "acceptedAnswer": { "@type": "Answer", "text": "Income tax, social contributions (National Insurance, FICA, USC/PRSI, and national social security), US state income tax, VAT or sales tax on your spending, and fuel duties." } },
-      { "@type": "Question", "name": "Which countries and tax year are supported?", "acceptedAnswer": { "@type": "Answer", "text": "Ten countries on 2026 tax-year rates: the United Kingdom, the United States (all 50 states plus DC), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy." } },
-      { "@type": "Question", "name": "Are the numbers exact?", "acceptedAnswer": { "@type": "Answer", "text": "No. They are transparent estimates based on published 2026 rates and reasonable assumptions about how spending is taxed. Tax.cal is not personalised tax advice." } },
+      { "@type": "Question", "name": "What taxes does Tax.cal include?", "acceptedAnswer": { "@type": "Answer", "text": "Income tax (including India's surcharge and 4% cess), social contributions (National Insurance, FICA, CPP/EI, USC/PRSI and national social security), US state and Canadian provincial income tax, VAT, GST or sales tax on your spending, and fuel duties." } },
+      { "@type": "Question", "name": "Which countries and tax year are supported?", "acceptedAnswer": { "@type": "Answer", "text": "Eleven countries on 2026 rules: the United Kingdom (2026/27), the United States (all 50 states plus DC), Canada (all provinces), Australia (2026-27), Ireland, Germany, France, the Netherlands, Spain, Italy and India (Tax Year 2026-27 under the Income-tax Act, 2025, with the new and old regimes)." } },
+      { "@type": "Question", "name": "Are the numbers exact?", "acceptedAnswer": { "@type": "Answer", "text": "No. Direct taxes follow each country's published 2026 rules for a single employee, with simplified or representative models where rules vary by region; the tax inside spending is an estimate. Every figure is labelled known rate, estimate or rough. Tax.cal is not personalised tax advice." } },
       { "@type": "Question", "name": "How is the \"you could keep up to\" figure worked out?", "acceptedAnswer": { "@type": "Answer", "text": "It is a typical-case model, not a personal finding. Tax.cal measures the marginal rate on your income, then applies it to the legal tax-advantaged contribution limits available in your country, such as a pension, 401(k), RRSP or superannuation. It shows the upper end of that range. Because Tax.cal does not know what you already contribute or claim, some or none of it may apply to you." } },
-      { "@type": "Question", "name": "Is my data stored?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything in the calculator is worked out in your browser, and no salary or spending data is sent to a server. The one exception is Tax.cal Plus, where you can choose to save your review behind a private link; even then no name, email or password is stored, and you can delete it yourself at any time." } }
+      { "@type": "Question", "name": "Is my data stored?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything in this calculator is worked out in your browser, and no salary or spending data is sent to a server. Tax.cal Plus lets you choose to save a review behind a private link (no name, email or password). If you use Tax.cal inside ChatGPT, the figures you give are sent to Tax.cal's calculation service to do the sum and are not retained." } }
     ]
   }
   </script>
@@ -133,6 +133,23 @@
         </div>
       </div>
 
+      <div id="indiaFields" class="hidden">
+        <div class="grid-2">
+          <div class="field">
+            <label for="inRegime">Tax regime</label>
+            <div class="control select-ctl"><select id="inRegime"><option value="new">New regime (default)</option><option value="old">Old regime</option></select></div>
+          </div>
+          <div class="field">
+            <label for="inAge">Age <span class="hint">· old regime only</span></label>
+            <div class="control select-ctl"><select id="inAge"><option value="below_60">Below 60</option><option value="60_to_79">60–79</option><option value="80_plus">80 or over</option></select></div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="inDeductions">Old-regime deductions <span class="hint">· per year, total of 80C, 80D, HRA exemption, home-loan interest…</span></label>
+          <div class="control"><span class="cur">₹</span><input id="inDeductions" type="number" inputmode="numeric" min="0" step="1000" placeholder="0"></div>
+        </div>
+      </div>
+
       <p class="hint" id="regionNote"></p>
 
       <div>
@@ -172,10 +189,21 @@
           <div class="sub" id="netLine" style="margin-top:6px"></div>
         </div>
       </div>
+      <p class="hint rules-line" id="rulesLine"></p>
       <div class="example-flag" id="exampleFlag">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
         A worked example. <b>Change the salary to see your own</b> — nothing is sent anywhere.
       </div>
+    </div>
+
+    <div class="card pad hidden" id="indiaCard" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">India · Tax Year 2026-27</span><h2>New regime vs old regime</h2></div></div>
+      <div class="regime-grid">
+        <div class="regime" id="regNew"></div>
+        <div class="regime" id="regOld"></div>
+      </div>
+      <p class="hint" id="regimeNote" style="margin-top:12px"></p>
+      <p class="hint" style="margin-top:6px">Includes the standard deduction, the section 156 rebate (up to ₹12 lakh of taxable income in the new regime), surcharge and the 4% Health and Education Cess. EPF and state professional tax are not taxes on income and are not included. <a href="country/india/">How India's tax works</a>.</p>
     </div>
 
     <div class="save-card" id="saveCard">
@@ -264,7 +292,7 @@
 
     <details class="acc"><summary>What's included, and how we estimate it <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
       <div class="body">
-        <p><strong>Direct tax</strong> (income tax, social contributions, and US state tax) uses each country's real 2026 brackets and thresholds — these are the figures on your payslip, and we compute them precisely for a single earner.</p>
+        <p><strong>Direct tax</strong> (income tax, social contributions, US state and Canadian provincial tax) follows each country's published 2026 rules for a single employee with no other income — the figures on your payslip. Where the real rules vary more than one calculator can capture (US states, Spanish and Italian regions) Tax.cal uses a simplified or representative model and labels it in the results.</p>
         <p><strong>Indirect tax</strong> (VAT/sales tax and fuel duty) is genuinely an estimate: a shop receipt mixes items taxed at different rates, so we apply a reasonable effective rate to each spending category rather than pretending to know your exact basket. Each line is labelled <em>known rate</em>, <em>estimate</em> or <em>rough</em> so you can see how much to trust it.</p>
         <ul>
           <li><strong>Fuel</strong> is taxed heavily and varies by country and state — treat it as a ballpark.</li>
@@ -273,7 +301,7 @@
         </ul>
           <p style="margin-top:12px">The full method, with every assumption spelled out and a list of what is deliberately left out:
             <a href="hidden-tax/">how we work out the tax that isn't on your payslip</a>.</p>
-          <p style="margin-top:8px">The same salary taxed in all ten countries, ranked: <a href="tax-by-country/">which country taxes you most</a>.</p>
+          <p style="margin-top:8px">The same salary taxed in all eleven countries: <a href="tax-by-country/">which country taxes you most</a>.</p>
       </div>
     </details>
     <details class="acc"><summary>Is this tax advice? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
@@ -284,10 +312,10 @@
       <p>Because Tax.cal doesn't know what you already contribute or claim, <strong>some or none of it may apply to you</strong>. If you already max out your pension, your realistic figure is near zero. It's there to show the size of the prize, not to tell you what you personally are missing.</p></div>
     </details>
     <details class="acc"><summary>Where does my data go? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-      <div class="body"><p>Nowhere. Every calculation happens in your browser. Your salary and spending are never sent to a server and nothing is saved except an optional theme preference. Close the tab and it's gone.</p><p>Tax.cal Plus is the one exception, and only if you ask for it: on that page you can press Save to keep your review behind a private link. Even then we store no name, no email and no password, and you can delete it yourself. See the <a href="privacy/">privacy page</a> for exactly what is held.</p></div>
+      <div class="body"><p>Nowhere. Every calculation on this page happens in your browser. Your salary and spending are never sent to a server and nothing is saved except an optional theme preference. Close the tab and it's gone.</p><p>Tax.cal Plus is the one exception here, and only if you ask for it: on that page you can press Save to keep your review behind a private link. Even then we store no name, no email and no password, and you can delete it yourself.</p><p>If you use Tax.cal inside ChatGPT, that is different: the figures you give are sent to Tax.cal's calculation service so it can do the sum, and are not retained. See the <a href="privacy/">privacy page</a> for exactly what is held.</p></div>
     </details>
     <details class="acc"><summary>Which countries and tax year? <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
-      <div class="body"><p>Ten countries, all on <strong>2026 tax-year</strong> rates (verified September 2026): the UK (England, Wales &amp; NI bands), the USA (all 50 states + DC, federal + state + FICA), Canada (all provinces), Australia, Ireland, Germany, France, the Netherlands, Spain and Italy.</p></div>
+      <div class="body"><p>Eleven countries on <strong>2026</strong> rules (verified 2 October 2026): the UK (2026/27, England, Wales &amp; NI bands), the USA (all 50 states + DC, federal + state + FICA), Canada (all provinces), Australia (2026-27), Ireland, Germany, France, the Netherlands, Spain, Italy and <strong>India</strong> — Tax Year 2026-27 under the new Income-tax Act, 2025, with the new and old regimes side by side.</p></div>
     </details>
   </section>
 
@@ -298,7 +326,11 @@
       <span>·</span>
       <span><a href="privacy/">Privacy</a></span>
       <span>·</span>
-      <span>UK · USA · Canada · Australia · Ireland · Germany · France · Netherlands · Spain · Italy</span>
+      <span>UK · USA · Canada · Australia · Ireland · Germany · France · Netherlands · Spain · Italy · India</span>
+      <span>·</span>
+      <span><a href="terms/">Terms</a></span>
+      <span>·</span>
+      <span><a href="support/">Support</a></span>
     </div>
   </footer>
 </main>
@@ -310,9 +342,8 @@
   <span>Join the early-access list</span>
 </a>
 
-<script src="assets/tax-data.js?v=18"></script>
-<script src="assets/tax-engine.js?v=18"></script>
-<script src="assets/app.js?v=18"></script>
+<script src="assets/tax-core.js?v=19"></script>
+<script src="assets/app.js?v=19"></script>
 <!-- PWA:start -->
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <!-- PWA:end -->

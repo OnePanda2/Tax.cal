@@ -78,6 +78,17 @@
       if (p.get('f')) c.filingStatus = p.get('f');
     }
     if (c && !DATA.countries[c.countryKey]) c = null;
+    // Plus has a researched question set for some countries only (not India
+    // yet). Arriving from the calculator with one of those selected shows the
+    // basics form with a note instead of a questionnaire that cannot start.
+    if (c && !QDEF.questions[c.countryKey]) {
+      var n = el('plusUnavailable');
+      if (n) {
+        n.textContent = 'Tax.cal Plus is not available for ' + DATA.countries[c.countryKey].name + ' yet. The calculator covers it in full; Plus questions cover the countries listed below.';
+        n.classList.remove('hidden');
+      }
+      c = null;
+    }
     return c;
   }
 
@@ -132,6 +143,7 @@
   function initBasics() {
     var cs = el('pCountry');
     DATA.order.forEach(function (k) {
+      if (!QDEF.questions[k]) return;   // only countries with a question set
       var c = DATA.countries[k];
       var o = document.createElement('option');
       o.value = k; o.textContent = c.flag + '  ' + c.name;

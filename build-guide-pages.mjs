@@ -10,19 +10,19 @@
  * Currently UK-only: the "why this rate" column is country-specific prose, so a
  * second country means a second REASONS block, not a loop over DATA.order.
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { compute, legacyCountry, getRules, CATEGORIES, ORDER } from './packages/tax-core/src/index.js';
 
-const g = { window: {} };
-global.window = g.window;
-const load = (f) => (0, eval)(readFileSync(new URL('./assets/' + f, import.meta.url), 'utf8'));
-load('tax-data.js'); load('tax-engine.js');
-const DATA = g.window.TAXCAL_DATA, ENGINE = g.window.TaxEngine;
+const DATA = { categories: CATEGORIES };
+const ENGINE = { compute };
+const NUM = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const nWord = NUM[ORDER.length] || String(ORDER.length);
 
 const SITE = 'https://taxcal.siddheshthapa.com';
 const KEY = 'UK';
 const SALARY = 45000;
 
-const c = DATA.countries[KEY], cur = c.currency;
+const c = legacyCountry(KEY), cur = c.currency;
 const money = (n) => new Intl.NumberFormat(cur.locale, { style: 'currency', currency: cur.code, maximumFractionDigits: 0 }).format(Math.round(n));
 const money2 = (n) => new Intl.NumberFormat(cur.locale, { style: 'currency', currency: cur.code, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
@@ -41,16 +41,10 @@ const run = (mult) => ENGINE.compute({ countryKey: KEY, gross: SALARY, filingSta
 const r = run(1);
 const levels = [1, 1.5, 2].map((m) => ({ spend: monthlyTotal(spendAt(m)), r: run(m) }));
 
-/* Why each category carries the rate it does. These describe Tax.cal's OWN
+/* Why each category carries the rate it does — read from the UK rule set, so
+   the page and the engine can never disagree. These describe Tax.cal's OWN
    assumption — they are not a statement of tax law and must not become one. */
-const REASONS = {
-  groceries: 'Most food sold in a supermarket is not standard-rated in the UK. This small figure is Tax.cal’s assumption about the rest of a typical trolley — household goods, confectionery, alcohol.',
-  dining: 'Standard-rated. On a price that already includes 20% VAT, the tax is one sixth of what you hand over.',
-  fuel: 'The largest single assumption on the page: fuel duty, plus VAT charged on top of it. It is a share of the pump price, not a published rate, and pump prices move.',
-  shopping: 'Mostly standard-rated, but not all of it — so Tax.cal uses a little under one sixth.',
-  utilities: 'Domestic energy is not charged at the standard rate; other bills generally are. This is a blend.',
-  entertainment: 'Standard-rated, so the same one sixth as eating out.'
-};
+const REASONS = c.catReason;
 const CONF = { high: 'known rate', med: 'estimate', low: 'rough' };
 
 const catRows = DATA.categories.map((cat) => {
@@ -111,7 +105,7 @@ const html = `<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../styles.css?v=18">
+<link rel="stylesheet" href="../styles.css?v=19">
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-Wj_1OavoJ4_-NVQlAh9IK.js"></script>
   <script>
@@ -217,8 +211,8 @@ const html = `<!doctype html>
       <p class="hint" style="margin:-4px 0 16px">Takes about twenty seconds. Nothing you type leaves your device.</p>
       <a class="btn" href="${SITE}/#c=UK" style="max-width:340px;margin:0 auto;text-decoration:none">Open the calculator
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      <p class="hint" style="margin:16px 0 0">The same method runs for ten countries — <a href="../country/uk/">see the UK summary</a>, or pick another from the calculator.</p>
-        <p class="hint" style="margin:8px 0 0">Or see the same method applied across all ten: <a href="../tax-by-country/">which country taxes you most</a>.</p>
+      <p class="hint" style="margin:16px 0 0">The same method runs for ${nWord} countries — <a href="../country/uk/">see the UK summary</a>, or pick another from the calculator.</p>
+        <p class="hint" style="margin:8px 0 0">Or see the same method applied across all ${nWord}: <a href="../tax-by-country/">which country taxes you most</a>.</p>
         <p class="site-url">or go straight to <a href="${SITE}/">taxcal.siddheshthapa.com</a></p>
     </div>
 

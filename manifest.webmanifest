@@ -1,7 +1,7 @@
 {
   "name": "Tax.cal — See the tax you really pay",
   "short_name": "Tax.cal",
-  "description": "See the total tax you really pay — income tax, social contributions, VAT/sales tax and fuel duty — as one honest number and one shareable card. Covers the UK, USA, Germany, France, Netherlands and Ireland. All estimates, nothing stored.",
+  "description": "See the total tax you really pay — income tax, social contributions, VAT/GST/sales tax and fuel duty — as one honest number and one shareable card. Covers 11 countries: the UK, USA, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India. All estimates, nothing stored.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

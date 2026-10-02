@@ -1,0 +1,12 @@
+{
+  "name": "@taxcal/tax-core",
+  "version": "2.0.0",
+  "description": "Tax.cal's deterministic tax engine and rule data — the single source of truth shared by the website, the build scripts and the MCP server.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "sideEffects": false
+}

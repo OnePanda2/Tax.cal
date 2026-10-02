@@ -17,6 +17,11 @@ taxmirror_handover_prompt.md
 # Cloudflare Worker local state
 api/.wrangler-test/
 api/.wrangler/
+mcp/.wrangler/
+.dev.vars
+
+# Build output that is not served (the plugin ZIP is rebuilt on demand)
+dist/*.zip
 
 # Full project report & handover — strategy, pricing, legal and security notes.
 # The repo is PUBLIC, so this must never be committed. The canonical copy lives

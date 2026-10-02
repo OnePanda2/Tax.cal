@@ -16,7 +16,7 @@
       being dressed up as advice.
 
    Amounts below are approximate ceilings for the 2026 tax year and need review
-   each year alongside assets/tax-data.js.
+   each year alongside the rule sets in packages/tax-core/src/rules.
    ========================================================================== */
 window.TaxCalPlus = (function () {
   'use strict';

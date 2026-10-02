@@ -9,13 +9,12 @@
 
    Run:  node build-compare-page.mjs   →   tax-by-country/index.html
    ========================================================================== */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { compute, convert, ORDER, getEntry, defaultSpending, FX } from './packages/tax-core/src/index.js';
 
-const g = { window: {} };
-global.window = g.window;   // the asset files assign to window
-const load = (f) => (0, eval)(readFileSync(new URL('./assets/' + f, import.meta.url), 'utf8'));
-load('tax-data.js'); load('tax-engine.js');
-const DATA = g.window.TAXCAL_DATA, ENGINE = g.window.TaxEngine;
+const NUM = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+const N_COUNTRIES = ORDER.length;
+const nWord = NUM[N_COUNTRIES] || String(N_COUNTRIES);
 
 const SITE = 'https://taxcal.siddheshthapa.com';
 const SLUG = 'tax-by-country';
@@ -28,12 +27,13 @@ const noDot = (s) => String(s).replace(/\.\s*$/, '');
 /* Build one row per country: the same £50,000 converted at approximate rates,
    with spending set to the app's own default share of gross so the comparison
    is like-for-like rather than picking flattering numbers per country. */
-const rows = DATA.order.map((k) => {
-  const c = DATA.countries[k];
-  const gross = Math.round(ENGINE.convert(BASE_GBP, 'GBP', c.currency.code) / 500) * 500;
-  const spend = {};
-  DATA.categories.forEach((cat) => { spend[cat.id] = Math.round((gross / 12) * cat.def / 10) * 10; });
-  const r = ENGINE.compute({ countryKey: k, gross, filingStatus: 'single', region: c.regionDefault, spend });
+const rows = ORDER.map((k) => {
+  const c = getEntry(k).profile;
+  // INR amounts are rounded to the nearest ₹10,000; others to 500.
+  const step = c.currency.code === 'INR' ? 10000 : 500;
+  const gross = Math.round(convert(BASE_GBP, 'GBP', c.currency.code) / step) * step;
+  const spend = defaultSpending(gross);
+  const r = compute({ countryKey: k, gross, filingStatus: 'single', region: c.regionDefault, spend });
   const fmt = new Intl.NumberFormat(c.currency.locale, { style: 'currency', currency: c.currency.code, maximumFractionDigits: 0 });
   return {
     key: k, name: c.name, flag: c.flag, note: c.note,
@@ -41,8 +41,7 @@ const rows = DATA.order.map((k) => {
     direct: r.directRate, eff: r.effRate,
     hiddenPts: r.hidden / r.gross,
     consumptionName: c.consumptionName,
-    slug: { UK: 'uk', US: 'usa', CA: 'canada', AU: 'australia', IE: 'ireland',
-            DE: 'germany', FR: 'france', NL: 'netherlands', ES: 'spain', IT: 'italy' }[k]
+    slug: c.slug
   };
 }).sort((a, b) => b.eff - a.eff);
 
@@ -56,8 +55,9 @@ const euro = rows.filter((r) => ['DE', 'FR', 'NL', 'ES', 'IT', 'IE'].includes(r.
 const anglo = rows.filter((r) => ['US', 'CA', 'AU'].includes(r.key));
 const avg = (a) => a.reduce((s, r) => s + r.hiddenPts, 0) / a.length;
 
-const title = `Which country taxes you most? The same salary in 10 countries (2026)`;
-const desc = `The same £${BASE_GBP.toLocaleString()} salary, converted and run through ten countries' 2026 tax rules — including the VAT and fuel duty that never appears on a payslip. ${top.name} takes ${pct(top.eff, 0)}, ${bottom.name} ${pct(bottom.eff, 0)}.`;
+const india = rows.find((r) => r.key === 'IN');
+const title = `Which country taxes you most? The same salary in ${N_COUNTRIES} countries (2026)`;
+const desc = `The same £${BASE_GBP.toLocaleString()} salary, converted and run through ${nWord} countries' 2026 tax rules — including the VAT and fuel duty that never appears on a payslip. ${top.name} takes ${pct(top.eff, 0)}, ${bottom.name} ${pct(bottom.eff, 0)}.`;
 
 const faq = [
   ['Is this the same as comparing the cost of living?',
@@ -67,9 +67,11 @@ const faq = [
   ['Does a higher rate mean a worse deal?',
    `This page cannot tell you that. ${esc(top.name)} appears at the top of the table, and a large part of what it collects funds healthcare that people elsewhere pay for separately out of the income the table shows them keeping. A tax rate on its own is not a verdict.`],
   ['How exact are these figures?',
-   `The direct tax — income tax, social contributions, state or provincial tax — comes from each country's published 2026 brackets and is accurate for a single earner with no other income. The indirect portion is an estimate, because a real shopping basket mixes items taxed at different rates. The method is written up separately.`],
+   `The direct tax — income tax, social contributions, state or provincial tax — follows each country's published 2026 rules for a single earner with no other income, with representative regions where rules vary. The indirect portion is an estimate, because a real shopping basket mixes items taxed at different rates. The method is written up separately.`],
   ['Who is this calculated for?',
-   `One person, employed, no children, no pension contributions beyond whatever is mandatory, and spending set to the same share of gross pay in every country. Change any of those and the ranking can change with it.`]
+   `One person, employed, no children, no pension contributions beyond whatever is mandatory, and spending set to the same share of gross pay in every country. Change any of those and the ranking can change with it.`],
+  ['Why does India look the way it does here?',
+   `Because £${BASE_GBP.toLocaleString()} converts to about ${esc(india ? india.salary : '')} — a very high salary in India, well inside its 30% slab and the surcharge-free top of the new regime. At typical Indian salaries the picture is completely different: under the new regime a salary up to ₹12.75 lakh pays no income tax at all. The India page shows tax at common Indian salaries.`]
 ];
 
 const faqLd = {
@@ -106,7 +108,7 @@ const html = `<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../styles.css?v=18">
+<link rel="stylesheet" href="../styles.css?v=19">
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-Wj_1OavoJ4_-NVQlAh9IK.js"></script>
   <script>
@@ -150,8 +152,8 @@ const html = `<!doctype html>
 <main class="wrap guide">
   <section class="hero">
     <p class="eyebrow">Comparison · 2026 rates</p>
-    <h1>The same salary, ten countries</h1>
-    <p class="lede">One salary of <strong>£${BASE_GBP.toLocaleString()}</strong>, converted and run through ten countries' tax rules — counting not just income tax and social contributions but the <strong>${esc(rows[0].consumptionName.toLowerCase())} and fuel duty</strong> that never shows up on a payslip.</p>
+    <h1>The same salary, ${nWord} countries</h1>
+    <p class="lede">One salary of <strong>£${BASE_GBP.toLocaleString()}</strong>, converted and run through ${nWord} countries' tax rules — counting not just income tax and social contributions but the <strong>${esc(rows[0].consumptionName.toLowerCase())} and fuel duty</strong> that never shows up on a payslip.</p>
   </section>
 
   <div class="card pad" style="margin-top:20px">
@@ -170,7 +172,7 @@ const html = `<!doctype html>
         </tbody>
       </table>
     </div>
-    <p class="hint" style="margin-top:14px"><b>Direct tax</b> is income tax, social contributions and any state or provincial tax — computed from published 2026 brackets. <b>Real rate</b> adds the estimated tax inside spending. <b>Hidden</b> is the difference between the two, in percentage points.</p>
+    <p class="hint" style="margin-top:14px"><b>Direct tax</b> is income tax, social contributions and any state or provincial tax — computed from each country's published 2026 rules (US: California; Canada: Ontario; India: new regime). <b>Real rate</b> adds the estimated tax inside spending. <b>Hidden</b> is the difference between the two, in percentage points. Salaries converted at ECB reference rates of ${FX.date}.</p>
   </div>
 
   <section class="section">
@@ -183,7 +185,7 @@ const html = `<!doctype html>
   <section class="section">
     <div class="sec-title"><div><span class="kicker">Read this before you quote the table</span><h2>What it does not tell you</h2></div></div>
     <div class="caveat">
-      <p><b>It is not a cost-of-living comparison.</b> One salary is converted at approximate exchange rates and taxed under ten sets of rules. What the money buys afterwards is a different question entirely, and this page does not touch it.</p>
+      <p><b>It is not a cost-of-living comparison.</b> One salary is converted at approximate exchange rates and taxed under ${nWord} sets of rules. What the money buys afterwards is a different question entirely, and this page does not touch it.</p>
     </div>
     <div class="caveat">
       <p><b>It is not a verdict on value.</b> ${esc(top.name)} sits at the top, and a large share of what it collects funds healthcare that people lower down the table pay for separately out of the income shown as theirs to keep. A rate on its own settles nothing.</p>
@@ -198,7 +200,7 @@ const html = `<!doctype html>
 
   <section class="section">
     <div class="sec-title"><div><span class="kicker">Method</span><h2>Where these numbers come from</h2></div></div>
-    <p>Direct tax uses each country's real 2026 brackets and thresholds, and is exact for the filer described above. The indirect side is genuinely an estimate: a shopping basket mixes items taxed at different rates, so one effective rate stands in for each spending category, and fuel is the roughest figure on the page.</p>
+    <p>Direct tax uses each country's published 2026 rules for the filer described above, with a representative region where rules vary (California, Ontario, Milan, a representative Spanish regional scale). The indirect side is genuinely an estimate: a shopping basket mixes items taxed at different rates, so one effective rate stands in for each spending category, and fuel is the roughest figure on the page.</p>
     <p>Some things are deliberately left out — council and property taxes, alcohol and tobacco duty, employer-side social contributions, and the business taxes buried inside prices. Every number above is therefore a <b>floor</b>, not a ceiling.</p>
     <p>The full method, assumption by assumption, is written up here: <a href="../hidden-tax/">how we work out the tax that isn't on your payslip</a>.</p>
   </section>

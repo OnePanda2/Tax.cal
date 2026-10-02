@@ -24,9 +24,9 @@
   }
   function pct(x, dp) { return (x * 100).toFixed(dp == null ? 1 : dp) + '%'; }
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
-  // "the United Kingdom" / "the Netherlands", but bare "Germany".
+  // "the United Kingdom" / "the Netherlands", but bare "Germany" — from the engine's country profile.
   function cn0(r) {
-    return (['UK', 'US', 'NL'].indexOf(r.countryKey) > -1 ? 'the ' : '') + r.country.name;
+    return (r.country.article ? r.country.article + ' ' : '') + r.country.name;
   }
 
   /* ---- populate selects -------------------------------------------------- */
@@ -68,13 +68,22 @@
     var key = el('country').value;
     var spend = {};
     DATA.categories.forEach(function (cat) { spend[cat.id] = Number(el('spend_' + cat.id).value) || 0; });
-    return {
+    var input = {
       countryKey: key,
       gross: Number(el('salary').value) || 0,
       filingStatus: el('filing').value,
       region: el('region').value,
       spend: spend
     };
+    if (key === 'IN') {
+      input.regime = el('inRegime').value;
+      input.ageBand = el('inAge').value;
+      input.residency = 'resident';
+      // One total for the old regime (80C, 80D, HRA exemption, home-loan
+      // interest…). The engine still applies the standard deduction itself.
+      input.deductions = { other: Number(el('inDeductions').value) || 0 };
+    }
+    return input;
   }
 
   /* ---- country-dependent UI ---------------------------------------------- */
@@ -86,6 +95,7 @@
     el('regionFields').classList.toggle('hidden', !hasRegion);
     el('filingField').classList.toggle('hidden', key !== 'US');
     if (hasRegion) { el('regionLabel').textContent = c.regionLabel || 'Region'; populateRegion(key); }
+    el('indiaFields').classList.toggle('hidden', key !== 'IN');
     var note = el('regionNote');
     if (c.note) { note.textContent = c.note; note.classList.remove('hidden'); }
     else note.classList.add('hidden');
@@ -156,7 +166,17 @@
     // savings — the value story. Leads with the high end, but framed as a typical-case
     // model (not a personal finding) so the claim stays defensible.
     // "the United Kingdom / United States / Netherlands", but bare "Germany", "France", …
-    var sv = r.savings, cn = (['UK', 'US', 'NL'].indexOf(r.countryKey) > -1 ? 'the ' : '') + r.country.name;
+    var sv = r.savings, cn = cn0(r);
+    // No illustrative ceiling for India: the default new regime has almost no
+    // deductions, so the regime comparison below replaces it.
+    el('saveCard').classList.toggle('hidden', !sv);
+    renderIndia(r);
+    var rl = el('rulesLine');
+    if (rl) rl.textContent = 'Rules: ' + r.taxYearLabel + ' · ' + r.ruleVersion + ' · last verified ' + fmtDate(r.lastVerified) + '. Estimates, not tax advice.';
+    if (!sv) {
+      el('notifyPitch').innerHTML = 'Tax.cal Plus is not available for ' + esc(r.country.name) + ' yet. Join the early-access list and we will tell you when it is.';
+    }
+    if (sv) {
     el('saveHigh').textContent = money(sv.high, cur);
     el('saveSub').innerHTML = "That's around <b>" + money(sv.monthly, cur) + ' a month</b>. It\'s what someone earning what you '
       + 'earn could keep by making full use of the legal tax-advantaged allowances in ' + cn + ' — most people never use all of them.';
@@ -166,6 +186,7 @@
     el('notifyPitch').innerHTML = 'The figure above is what\'s <i>typically</i> possible at your income. Tax.cal Plus asks you a '
       + 'short set of questions about your real situation — what you already contribute, how you\'re paid, what you can claim — '
       + 'then tells you which of it you can actually use, and what each move is worth to you. In development — join the early-access list.';
+    }
 
     // split bar
     var seen = r.visible, unseen = r.hidden, tot = seen + unseen || 1;
@@ -223,6 +244,34 @@
     updateDeepLink(r);
   }
 
+  /* ---- India: new vs old regime ------------------------------------------ */
+  function fmtDate(iso) {
+    var p = String(iso || '').split('-'); if (p.length !== 3) return iso || '';
+    var mo = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return Number(p[2]) + ' ' + mo[Number(p[1]) - 1] + ' ' + p[0];
+  }
+  function renderIndia(r) {
+    var card = el('indiaCard'); if (!card) return;
+    if (r.countryKey !== 'IN' || !r.india) { card.classList.add('hidden'); return; }
+    card.classList.remove('hidden');
+    var cur = r.currency, I = r.india;
+    function cell(id, t, label, chosen) {
+      el(id).innerHTML = '<div class="rg-k">' + label + (chosen ? ' <span class="conf high">your choice</span>' : '') + '</div>'
+        + '<div class="rg-v tnum">' + money(t.tax, cur) + '</div>'
+        + '<div class="rg-s">' + money(t.monthly, cur) + '/month · ' + pct(t.effRate) + ' of salary</div>'
+        + '<div class="rg-s">Taxable income ' + money(t.taxable, cur) + (t.deductions ? ' after ' + money(t.deductions, cur) + ' of deductions' : '') + '</div>';
+    }
+    cell('regNew', I.new, 'New regime', I.regime === 'new');
+    cell('regOld', I.old, 'Old regime', I.regime === 'old');
+    var d = I.oldMinusNew, note;
+    if (Math.abs(d) < 1) note = 'Both regimes come to the same tax on these figures.';
+    else if (d > 0) note = 'On these figures the old regime costs ' + money(d, cur) + ' a year more.';
+    else note = 'On these figures the old regime costs ' + money(-d, cur) + ' a year less.';
+    var be = ENGINE.indiaBreakeven(r.gross, { ageBand: el('inAge').value });
+    if (be != null && be > 0) note += ' The old regime only matches the new one with about ' + money(be, cur) + ' of total deductions and exemptions.';
+    el('regimeNote').textContent = note + ' Illustrative, not advice on which regime to choose.';
+  }
+
   /* ---- deep link (for country landing pages / sharing) ------------------- */
   function updateDeepLink(r) {
     if (!window.history || !history.replaceState) return;
@@ -243,6 +292,9 @@
   function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
   function drawShareCard(r) {
     var cv = el('shareCanvas'); if (!cv) return;
+    // Every string comes from the engine's share-card model, so the card can
+    // never print a field the engine does not return.
+    var m = ENGINE.shareCardModel(r);
     var W = 1080, H = 1350; cv.width = W; cv.height = H;
     var x = cv.getContext('2d');
     var g = x.createLinearGradient(0, 0, W, H);
@@ -256,16 +308,16 @@
     x.textBaseline = 'alphabetic';
     // wordmark
     x.fillStyle = '#EAF2F1'; x.font = '800 46px "Bricolage Grotesque", sans-serif';
-    x.fillText('Tax.cal', 96, 130);
+    x.fillText(m.wordmark, 96, 130);
     x.fillStyle = '#7FB8AE'; x.font = '500 30px "IBM Plex Sans", sans-serif';
-    x.fillText(r.country.flag + '  ' + r.country.name + (r.countryKey === 'US' ? ' · ' + r.usState : ''), 96, 178);
+    x.fillText(m.countryLine, 96, 178);
 
     // ring
     var cx = W / 2, cy = 560, rad = 210, lw = 46;
     x.lineCap = 'round';
     x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = lw;
     x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2); x.stroke();
-    var start = -Math.PI / 2, end = start + Math.max(0, Math.min(r.effRate, 1)) * Math.PI * 2;
+    var start = -Math.PI / 2, end = start + m.ringFraction * Math.PI * 2;
     var ag = x.createLinearGradient(cx - rad, cy, cx + rad, cy);
     ag.addColorStop(0, '#F59E0B'); ag.addColorStop(1, '#F97316');
     x.strokeStyle = ag; x.lineWidth = lw;
@@ -273,13 +325,13 @@
     // center
     x.textAlign = 'center';
     x.fillStyle = '#F7B54A'; x.font = '800 150px "Bricolage Grotesque", sans-serif';
-    x.fillText(pct(r.effRate, 0), cx, cy + 40);
+    x.fillText(m.rate, cx, cy + 40);
     x.fillStyle = '#9FC3BC'; x.font = '600 30px "IBM Plex Sans", sans-serif';
-    x.fillText('OF MY INCOME GOES TO TAX', cx, cy + 108);
+    x.fillText(m.rateCaption, cx, cy + 108);
 
     // headline
     x.fillStyle = '#EAF2F1'; x.font = '800 52px "Bricolage Grotesque", sans-serif';
-    x.fillText('That’s ' + money(r.taxTotal, r.currency) + ' a year', cx, 900);
+    x.fillText(m.headline, cx, 900);
 
     // split chips
     var chipY = 980, cw = 400, ch = 120, gap = 40;
@@ -290,15 +342,14 @@
       x.fillStyle = '#8FB2AC'; x.font = '600 26px "IBM Plex Sans", sans-serif'; x.fillText(label, px + 30, chipY + 48);
       x.fillStyle = col; x.font = '800 44px "Bricolage Grotesque", sans-serif'; x.fillText(val, px + 30, chipY + 96);
     }
-    chip(cx - cw - gap / 2, 'Tax you see', money(r.visible, r.currency), '#5BE0B0');
-    chip(cx + gap / 2, 'Tax you don’t', money(r.hidden, r.currency), '#F7B54A');
+    chip(cx - cw - gap / 2, m.seenLabel, m.seenValue, '#5BE0B0');
+    chip(cx + gap / 2, m.hiddenLabel, m.hiddenValue, '#F7B54A');
 
     // freedom day
-    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     x.textAlign = 'center'; x.fillStyle = '#B9D6D0'; x.font = '500 30px "IBM Plex Sans", sans-serif';
-    x.fillText('I work until ' + r.taxFreedomDay.getDate() + ' ' + months[r.taxFreedomDay.getMonth()] + ' just to pay it.', cx, 1210);
+    x.fillText(m.freedomLine, cx, 1210);
     x.fillStyle = '#5E8580'; x.font = '500 24px "IBM Plex Sans", sans-serif';
-    x.fillText('Estimate · check yours at taxcal.siddheshthapa.com', cx, 1275);
+    x.fillText(m.footer, cx, 1275);
     x.textAlign = 'left';
   }
 
@@ -378,6 +429,8 @@
       syncCountryUI(); prefillSpend(false); recompute(false); markActivated();
     });
     el('filing').addEventListener('change', function () { recompute(false); });
+    ['inRegime', 'inAge'].forEach(function (id) { el(id).addEventListener('change', function () { recompute(false); markActivated(); }); });
+    el('inDeductions').addEventListener('input', function () { debouncedRecompute(); markActivated(); });
     el('region').addEventListener('change', function () { recompute(false); });
     el('salary').addEventListener('input', function () {
       state.example = false; prefillSpend(false); debouncedRecompute(); markActivated();
