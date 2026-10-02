@@ -32,14 +32,21 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const { request } = e;
   if (request.method !== 'GET') return;
-  // Network-first for the HTML document so updates show up; cache-first for other assets.
+  // Network-first for pages so updates show up. Each page is cached under its
+  // own URL: this used to store every page as ./index.html, so after reading
+  // the privacy page or a country page online, the calculator opened offline
+  // showed that page instead. Offline, a page we have seen is served as it
+  // was (query strings such as ?utm_source are ignored); anything else falls
+  // back to the calculator.
   if (request.mode === 'navigate') {
     e.respondWith(
       fetch(request).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put('./index.html', copy));
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy));
+        }
         return res;
-      }).catch(() => caches.match('./index.html'))
+      }).catch(() => caches.match(request, { ignoreSearch: true }).then((hit) => hit || caches.match('./index.html')))
     );
     return;
   }

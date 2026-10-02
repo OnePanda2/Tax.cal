@@ -22,6 +22,7 @@ const SOURCE = {
   required: ['title', 'publisher', 'url']
 };
 const LINK = { type: 'object', properties: { label: STR, url: STR }, required: ['label', 'url'] };
+const PERIOD = { type: 'object', description: 'First and last day of the tax year (ISO dates).', properties: { start: STR, end: STR }, required: ['start', 'end'] };
 const DEFAULTS = {
   type: 'array',
   items: { type: 'object', properties: { field: STR, value: {}, material: { type: 'boolean' }, note: STR }, required: ['field', 'material', 'note'] }
@@ -95,7 +96,7 @@ const CALCULATE_TAX = {
     required: ['country', 'country_name', 'tax_year', 'tax_year_label', 'currency', 'gross_income', 'taxable_income', 'direct_tax', 'social_contributions', 'regional_tax', 'total_direct_tax', 'indirect_tax_estimate', 'total_estimated_tax', 'effective_rate', 'net_income', 'monthly_net_income', 'breakdown', 'defaults_applied', 'notes', 'confidence', 'assumptions', 'exclusions', 'sources', 'rule_version', 'last_verified', 'engine_version', 'disclaimer', 'learn_more'],
     properties: {
       country: { type: 'string', enum: COUNTRY_ENUM }, country_name: STR,
-      tax_year: STR, tax_year_label: STR, legal_basis: STR, currency: { type: 'string', enum: CURRENCY_ENUM },
+      tax_year: STR, tax_year_label: STR, tax_year_period: PERIOD, legal_basis: STR, currency: { type: 'string', enum: CURRENCY_ENUM },
       inputs: { type: 'object' },
       defaults_applied: DEFAULTS,
       gross_income: NUM, taxable_income: NUM,
@@ -164,7 +165,7 @@ const COMPARE_TAX_REGIMES = {
     type: 'object',
     required: ['country', 'tax_year', 'tax_year_label', 'currency', 'gross_income', 'regimes', 'difference', 'old_regime_breakeven_deductions', 'explanation', 'eligibility_caveats', 'defaults_applied', 'assumptions', 'sources', 'rule_version', 'last_verified', 'disclaimer', 'learn_more'],
     properties: {
-      country: { type: 'string', enum: ['IN'] }, country_name: STR, tax_year: STR, tax_year_label: STR, legal_basis: STR, currency: { type: 'string', enum: ['INR'] },
+      country: { type: 'string', enum: ['IN'] }, country_name: STR, tax_year: STR, tax_year_label: STR, tax_year_period: PERIOD, legal_basis: STR, currency: { type: 'string', enum: ['INR'] },
       gross_income: NUM, inputs: { type: 'object' }, defaults_applied: DEFAULTS,
       regimes: { type: 'object', properties: { new: REGIME_OUT, old: REGIME_OUT }, required: ['new', 'old'] },
       difference: { type: 'object', properties: { old_minus_new: NUM, lower_estimated_tax: { type: 'string', enum: ['new', 'old', 'equal'] } }, required: ['old_minus_new', 'lower_estimated_tax'] },
@@ -204,14 +205,14 @@ const GET_TAX_RULES = {
     properties: {
       lookup: { type: 'string', enum: ['country', 'overview'] },
       topic: STR, engine_version: STR,
-      country: { type: 'string', enum: COUNTRY_ENUM }, country_name: STR, tax_year: STR, tax_year_label: STR,
+      country: { type: 'string', enum: COUNTRY_ENUM }, country_name: STR, tax_year: STR, tax_year_label: STR, tax_year_period: PERIOD,
       status: { type: 'string', enum: ['current', 'legacy'] }, legal_basis: STR, currency: STR,
       rule_version: STR, last_verified: STR,
-      supported_tax_years: { type: 'array', items: { type: 'object', properties: { tax_year: STR, label: STR, status: STR } } },
+      supported_tax_years: { type: 'array', items: { type: 'object', properties: { tax_year: STR, label: STR, period: PERIOD, status: STR } } },
       countries: {
         type: 'array',
         description: 'Overview only: every supported country and the freshness of its rules.',
-        items: { type: 'object', required: ['country', 'tax_year', 'rule_version', 'last_verified'], properties: { country: STR, country_name: STR, currency: STR, tax_year: STR, tax_year_label: STR, status: STR, rule_version: STR, last_verified: STR, supported_tax_years: STR_LIST, confidence: { type: 'object' } } }
+        items: { type: 'object', required: ['country', 'tax_year', 'rule_version', 'last_verified'], properties: { country: STR, country_name: STR, currency: STR, tax_year: STR, tax_year_label: STR, tax_year_period: PERIOD, status: STR, rule_version: STR, last_verified: STR, supported_tax_years: STR_LIST, confidence: { type: 'object' } } }
       },
       income_tax: {}, social_contributions: {}, regional_tax: {}, regions: { type: 'array' }, indirect_tax: { type: 'object' }, scope: { type: 'object' },
       terminology: { type: 'object' },

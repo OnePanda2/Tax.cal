@@ -31,7 +31,7 @@ test('the package meets OpenAI’s listing, review and skill requirements', () =
 });
 
 test('the package check catches the problems it is meant to catch', () => {
-  assert.ok(scanText('x.md', 'key: sk-abcdefghijklmnopqrstuvwxyz123456').length);
+  assert.ok(scanText('x.md', 'key: ' + ['sk', 'abcdefghijklmnopqrstuvwxyz123456'].join('-')).length);   // built at runtime so no key-shaped string sits in the repo
   assert.ok(scanText('x.md', 'password: hunter2').length);
   assert.ok(scanText('x.md', 'see /home/alice/notes').length);
   assert.ok(scanText('x.md', 'C:\\Users\\alice\\plugin').length);

@@ -1,6 +1,6 @@
 /* ============================================================================
    Blog post #2 — /tax-by-country/
-   "The same salary, ten countries"
+   "The same salary, eleven countries"
 
    Every figure comes from the live engine at build time, for the same reason
    build-country-pages.mjs and build-guide-pages.mjs do: a hand-written table

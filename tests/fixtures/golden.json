@@ -1,0 +1,140 @@
+{
+  "about": "Golden figures for the direct-tax engine. Each case records the inputs, the expected outputs, where the figure comes from, the date it was checked against that source, and the tolerance. source_type: official_table / official_worked_example = the figure is printed by the authority; statutory_hand_calculation = worked by hand from the cited rates and thresholds, with the steps in 'method'. Tolerances are exact (0) or one cent of rounding; never wide enough to hide an error. Indirect-tax estimates are not golden figures (see tests/engine-regression.test.mjs).",
+  "cases": [
+    {
+      "id": "in-budget-table-slab-tax",
+      "country": "IN", "tax_year": "2026-27",
+      "call": "regime_tax", "args": { "regime": "new", "residency": "non_resident", "age_band": "below_60" },
+      "table": [[800000, 20000], [900000, 30000], [1000000, 40000], [1100000, 50000], [1200000, 60000], [1600000, 120000], [2000000, 200000], [2400000, 300000], [5000000, 1080000]],
+      "field": "slabTax",
+      "tolerance": 0,
+      "source_ids": ["pib-12-lakh", "itd-s202"],
+      "source_type": "official_table",
+      "source_published": "2025-02-01",
+      "checked": "2026-10-02",
+      "method": "Tax on total income under the new-regime slabs, before rebate and cess, as tabulated for Budget 2025-26; section 202 of the 2025 Act carries the same slabs into Tax Year 2026-27."
+    },
+    {
+      "id": "in-12-75-lakh-salary-nil",
+      "country": "IN", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "IN", "gross_income": 1275000, "include_indirect_estimate": false },
+      "expect": { "taxable_income": 1200000, "total_direct_tax": 0 },
+      "tolerance": 0,
+      "source_ids": ["pib-12-lakh", "itd-s156", "itd-s19"],
+      "source_type": "official_worked_example",
+      "source_published": "2025-02-01",
+      "checked": "2026-10-02",
+      "method": "₹12.75 lakh salary − ₹75,000 standard deduction = ₹12 lakh taxable; the rebate (up to ₹60,000) cancels the ₹60,000 slab tax."
+    },
+    {
+      "id": "in-15-lakh-new-regime",
+      "country": "IN", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "IN", "gross_income": 1500000, "include_indirect_estimate": false },
+      "expect": { "taxable_income": 1425000, "total_direct_tax": 97500 },
+      "tolerance": 0,
+      "source_ids": ["itd-s202", "itd-s19", "itd-s156", "finance-act-2026"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Taxable 14,25,000: 4L×0 + 4L×5% + 4L×10% + 2.25L×15% = 93,750; above ₹12 lakh so no rebate; cess 4% = 3,750; total 97,500."
+    },
+    {
+      "id": "in-15-lakh-old-regime-deductions",
+      "country": "IN", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "IN", "gross_income": 1500000, "regime": "old", "old_regime_deductions": { "section_80c": 150000, "section_80d": 25000 }, "include_indirect_estimate": false },
+      "expect": { "taxable_income": 1275000, "total_direct_tax": 202800 },
+      "tolerance": 0,
+      "source_ids": ["finance-act-2026", "itd-s19", "it-act-2025"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "15,00,000 − 50,000 standard deduction − 1,75,000 deductions = 12,75,000; 2.5L×5% + 5L×20% + 2.75L×30% = 1,95,000; cess 7,800; total 2,02,800."
+    },
+    {
+      "id": "in-surcharge-marginal-relief-50-85-lakh",
+      "country": "IN", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "IN", "gross_income": 5085000, "include_indirect_estimate": false },
+      "expect": { "taxable_income": 5010000, "total_direct_tax": 1133600 },
+      "tolerance": 0,
+      "source_ids": ["finance-act-2026", "itd-s202"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Taxable 50,10,000: slab tax 10,83,000; 10% surcharge 1,08,300 is limited by marginal relief to tax at ₹50 lakh (10,80,000) + 10,000 = 10,90,000; cess 4% = 43,600; total 11,33,600."
+    },
+    {
+      "id": "uk-45000",
+      "country": "UK", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "UK", "gross_income": 45000, "include_indirect_estimate": false },
+      "expect": { "direct_tax": 6486, "social_contributions": 2594.4 },
+      "tolerance": 0.01,
+      "source_ids": ["hmrc-it-rates", "hmrc-employer-2026-27"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Income tax: (45,000 − 12,570) × 20% = 6,486. Class 1 NI: (45,000 − 12,570) × 8% = 2,594.40."
+    },
+    {
+      "id": "uk-125140-taper",
+      "country": "UK", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "UK", "gross_income": 125140, "include_indirect_estimate": false },
+      "expect": { "direct_tax": 42516, "social_contributions": 4513.4 },
+      "tolerance": 0.01,
+      "source_ids": ["hmrc-it-rates", "hmrc-employer-2026-27"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Personal allowance fully withdrawn; taxable 125,140: 37,700×20% + 87,440×40% = 42,516. NI: 37,700×8% + 74,870×2% = 4,513.40."
+    },
+    {
+      "id": "us-120000-single-california",
+      "country": "US", "tax_year": "2026",
+      "call": "calculate_tax", "args": { "country": "US", "gross_income": 120000, "filing_status": "single", "region": "CA", "include_indirect_estimate": false },
+      "expect": { "direct_tax": 17570, "regional_tax": 6770.86, "social_contributions": 10740 },
+      "tolerance": 0.01,
+      "source_ids": ["irs-rp-2025-32", "ssa-cola-2026", "ftb-tax-news", "edd-sdi-2026"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Federal: taxable 103,900 (std deduction 16,100): 12,400×10% + 38,000×12% + 53,500×22% = 17,570. FICA 7.65% = 9,180; CA SDI 1.3% = 1,560. California: 2026 single schedule on 114,100 less the exemption credit."
+    },
+    {
+      "id": "ca-75000-ontario",
+      "country": "CA", "tax_year": "2026",
+      "call": "calculate_tax", "args": { "country": "CA", "gross_income": 75000, "region": "ON", "include_indirect_estimate": false },
+      "expect": { "direct_tax": 8258.6, "regional_tax": 4446.06 },
+      "tolerance": 0.01,
+      "source_ids": ["cra-t4127-122"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "T4127 annual method: federal tax 8,258.60 after the BPA, Canada employment amount and CPP/EI credits; Ontario tax 3,696.06 plus the 750 Ontario Health Premium."
+    },
+    {
+      "id": "au-90000",
+      "country": "AU", "tax_year": "2026-27",
+      "call": "calculate_tax", "args": { "country": "AU", "gross_income": 90000, "include_indirect_estimate": false },
+      "expect": { "taxable_income": 89000, "direct_tax": 17220, "social_contributions": 1780 },
+      "tolerance": 0.01,
+      "source_ids": ["ato-rates", "ato-standard-deduction", "ato-lito"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Taxable 89,000 after the $1,000 standard deduction: 26,800×15% + 44,000×30% = 17,220 (LITO is nil above $66,667). Medicare levy 2% = 1,780."
+    },
+    {
+      "id": "de-55000-childless",
+      "country": "DE", "tax_year": "2026",
+      "call": "calculate_tax", "args": { "country": "DE", "gross_income": 55000, "include_indirect_estimate": false },
+      "expect": { "direct_tax": 8070, "social_contributions": 11962.5 },
+      "tolerance": 0.01,
+      "source_ids": ["estg-32a", "breg-bbg-2026", "bmg-beitraege", "bmg-pflege", "drv-werte"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "zvE 42,679 after the Arbeitnehmer-Pauschbetrag, Sonderausgaben-Pauschbetrag and deductible social contributions; §32a 2026 zone-3 formula gives 8,070 (no solidarity surcharge below the Freigrenze). Employee contributions: pension 9.3%, unemployment 1.3%, health 7.3% + 1.45%, care 1.8% + 0.6% childless."
+    },
+    {
+      "id": "fr-45000",
+      "country": "FR", "tax_year": "2026",
+      "call": "calculate_tax", "args": { "country": "FR", "gross_income": 45000, "include_indirect_estimate": false },
+      "expect": { "direct_tax": 3068.08, "social_contributions": 9378.11 },
+      "tolerance": 0.01,
+      "source_ids": ["economie-lf2026", "urssaf-taux", "urssaf-pss"],
+      "source_type": "statutory_hand_calculation",
+      "checked": "2026-10-02",
+      "method": "Net taxable salary 36,904.05 less the 10% allowance = 33,213.65; barème 2026 (0/11/30%): (29,579 − 11,600)×11% + (33,213.65 − 29,579)×30% = 3,068.08."
+    }
+  ]
+}

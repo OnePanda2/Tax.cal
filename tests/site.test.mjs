@@ -100,3 +100,8 @@ test('terms and support pages exist, are linked from the home page and listed in
     assert.ok(read(`${page}/index.html`).includes('styles.css?v=' + read('sw.js').match(/taxcal-v(\d+)/)[1]), `${page} uses the current stylesheet`);
   }
 });
+
+test('docs/TAX_RULE_SOURCES.md is generated from the current rule data (run `npm run build:docs`)', async () => {
+  const { render, OUT: DOC } = await import('../scripts/build-docs.mjs');
+  assert.equal(readFileSync(DOC, 'utf8'), render());
+});

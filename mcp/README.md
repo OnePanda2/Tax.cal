@@ -50,7 +50,7 @@ To run it inside Cloudflare's own runtime (workerd), use `npx wrangler@4 dev --c
 
 - **Inputs are never stored or logged.** Each request writes one JSON log line with operational fields only: route, HTTP status, protocol era and version, a known method name, the tool name, the validated country code, success or failure, an error code and the duration. Salaries, spending, deductions and any free text never reach the logs. `tests/mcp.test.mjs` checks this.
 - **Strict validation.** Every argument is untrusted. Unknown keys, wrong types, negative or absurd amounts, oversized strings and prototype keys (`__proto__`, `constructor`) are rejected with a clear error. Material fields (US filing status and state, Canadian province) are asked for and never defaulted silently.
-- **HTTP guards.** POST only (other methods get 405). Bodies are capped at 32 KB (413), whether or not `Content-Length` is sent. The server requires `Content-Type: application/json` (415) and an `Accept` header that allows JSON (406). Browser `Origin`s must be on an allow-list (403); ChatGPT connects server-to-server and sends none. Rate limiting returns 429 with `Retry-After`. Unexpected failures get a generic 500 that echoes nothing.
+- **HTTP guards.** POST only (other methods get 405). Bodies are capped at 32 KB (413), whether or not `Content-Length` is sent, and must arrive within 10 seconds (408). The server requires `Content-Type: application/json` (415) and an `Accept` header that allows JSON (406). Browser `Origin`s must be on an allow-list (403); ChatGPT connects server-to-server and sends none. Rate limiting returns 429 with `Retry-After`. Unexpected failures get a generic 500 that echoes nothing.
 - **Headers.** `Cache-Control: no-store`, `nosniff`, `Content-Security-Policy: default-src 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, HSTS. No CORS headers, because no browser needs to read these responses.
 - **No secrets in the repo.** The only secret-like value, the OpenAI domain-verification token, is set with `wrangler secret put`.
 
@@ -60,7 +60,11 @@ You need the Cloudflare account that already runs `taxcal-plus-api`, which uses 
 
 ```bash
 npx wrangler@4 login
-npx wrangler@4 deploy --config mcp/wrangler.toml
+# staging first
+npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
+npm run mcp:smoke -- https://taxcal-mcp-staging.onepanda2.workers.dev/mcp
+# then production
+npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
 npm run mcp:smoke -- https://taxcal-mcp.onepanda2.workers.dev/mcp
 ```
 
@@ -69,9 +73,11 @@ If Wrangler prints a different URL, change `taxcal-plugin/mcp.json` to match it,
 **OpenAI domain verification.** The OpenAI Platform shows a token when you submit the app. Store it as a secret:
 
 ```bash
-npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml
+npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml --env=""
 curl https://taxcal-mcp.onepanda2.workers.dev/.well-known/openai-apps-challenge   # prints the token
 ```
+
+**Monitoring.** `.github/workflows/mcp-health.yml` runs the smoke test against production every six hours once the repository variable `MCP_URL` is set (Settings → Secrets and variables → Actions → Variables), and GitHub emails you if it fails.
 
 **Logs.** `npx wrangler@4 tail taxcal-mcp` streams the argument-free log lines. Workers Logs (persistent) is off by default. You can enable it under `[observability]` in `wrangler.toml` without changing the privacy position, because the lines contain no inputs.
 

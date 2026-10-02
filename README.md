@@ -1,136 +1,203 @@
 # Tax.cal
 
-**See the tax you really pay.** A fast, private, installable web app (PWA) that estimates
-someone's *total* tax burden — income tax + social contributions + VAT/sales tax + fuel
-duty — as one effective rate, then shows a shareable "Tax Wrapped" card.
+**See the tax you really pay.** Tax.cal estimates someone's *total* tax burden on a salary: income tax, social contributions, state, provincial or regional tax, and the VAT, GST, sales tax and fuel duty inside everyday spending. It shows them as one effective rate, with a shareable "Tax Wrapped" card.
 
-Built for **the UK, USA (all 50 states + DC), Canada (all provinces), Australia, Ireland,
-Germany, France, the Netherlands, Spain and Italy**, on **2026** tax-year rates. Everything
-runs in the browser — no login, no backend, nothing stored.
+It is used in two ways, both powered by one deterministic tax engine:
 
-The results lead with a **"you could keep up to £X a year"** estimate — the value story that
-sells the subscription. It's grounded in the user's marginal rate × their country's main
-tax-advantaged allowance (pension/RRSP/super/…), shown as an honest "up to" figure and clearly
-labelled an estimate. Edit the caps in `assets/tax-data.js` (`SAVINGS_CAP`) or the model in
-`assets/tax-engine.js` (`estimateSavings`).
+- **The website**, https://taxcal.siddheshthapa.com, is a fast, installable web app (PWA) that calculates entirely in the browser.
+- **The Tax.cal plugin for ChatGPT** uses an MCP server that runs the same engine, so ChatGPT can answer tax questions with sourced, versioned figures instead of doing the arithmetic itself.
 
-> ⚠️ **Estimates only.** Direct tax uses each country's real 2026 brackets; indirect tax
-> (VAT/sales tax, fuel) is a transparent estimate with confidence labels. Not tax advice.
+> ⚠️ **Estimates only, not tax advice.** Direct taxes are calculated from each country's published rules. Indirect tax is a transparent estimate with confidence labels. Tax.cal never files returns or makes payments.
 
-**Live demo:** https://claude.ai/code/artifact/181ad1d5-323d-4dc2-8437-12374e016081
+## Supported countries
 
----
+| Country | Tax year | Notes |
+|---|---|---|
+| 🇬🇧 United Kingdom | 2026/27 | England, Wales, Northern Ireland (Scotland not supported) |
+| 🇺🇸 United States | 2026 | Federal + FICA + all 50 states and DC. California exact; other states a proxy |
+| 🇨🇦 Canada | 2026 | Federal + every province and territory, including Quebec (QPP, QPIP, abatement) |
+| 🇦🇺 Australia | 2026-27 | Residents; LITO and Medicare levy |
+| 🇮🇪 Ireland | 2026 | PAYE, USC and PRSI |
+| 🇩🇪 Germany | 2026 | §32a tariff, solidarity surcharge, social insurance |
+| 🇫🇷 France | 2026 | Barème, décote, salary contributions |
+| 🇳🇱 Netherlands | 2026 | Box 1 with the general and labour credits |
+| 🇪🇸 Spain | 2026 | Representative state + regional IRPF scale |
+| 🇮🇹 Italy | 2026 | IRPEF with the 2026 credits; Milan/Lombardy surcharges |
+| 🇮🇳 India | Tax Year 2026-27 | New regime (default) and old regime; legacy FY 2025-26 (AY 2026-27) |
+
+Every rule set has a version (for example `IN-2026-27-v1`), its tax-year period, the date it was last verified, and its sources. The full list is [docs/TAX_RULE_SOURCES.md](docs/TAX_RULE_SOURCES.md), generated from the code.
+
+## India
+
+Tax.cal implements the **Income-tax Act, 2025**, in force from 1 April 2026, which uses a single **tax year** instead of "previous year" and "assessment year". It covers:
+
+- Tax Year 2026-27 for a salaried individual, resident or non-resident;
+- the new regime (§202) and the old regime side by side;
+- the ₹75,000 / ₹50,000 standard deduction;
+- the §156 rebate (no tax up to ₹12 lakh of taxable income, so up to ₹12.75 lakh of salary) with marginal relief;
+- surcharge with marginal relief, and 4% cess;
+- old-regime deductions at their statutory caps;
+- the deductions at which the two regimes cost the same;
+- monthly tax and take-home pay.
+
+"AY 2026-27" is recognised as FY 2025-26 under the 1961 Act and is never confused with Tax Year 2026-27. Business income, capital gains, HUFs, firms, companies, foreign income, TDS, GST filing and return preparation are out of scope and refused clearly. GST and fuel duty are category estimates. Details: [docs/INDIA_TAX_MODEL.md](docs/INDIA_TAX_MODEL.md).
+
+## How calculations work
+
+All rules and arithmetic live in **`packages/tax-core`**:
+
+```
+packages/tax-core/src/
+  rules/<country>.js   rates, thresholds, credits, caps, sources, versions, assumptions, exclusions
+  calc/<country>.js    pure calculators (gross → taxable → tax, line by line)
+  engine.js            website results (direct + indirect, effective rate, share card)
+  api.js               the four tool operations used by the MCP server
+  validate.js          strict validation of untrusted input
+  categories.js, fx.js spending profile; dated ECB exchange rates (comparisons only)
+```
+
+The browser bundle `assets/tax-core.js` is built from it with esbuild (`npm run build:core`). The MCP server imports it directly. There is one source of truth, and a test fails if the bundle is out of date.
+
+### What is precise, and what is estimated
+
+- **Calculated from the law, high confidence:** national income tax and employee social contributions for the stated profile (single employee, salary only). India's slabs, rebate, surcharge and cess. California's state tax.
+- **Simplified, medium confidence:** France (one tax part), Spain (a representative regional scale), Italy (Milan surcharges; cash bonuses below €20k not modelled), Canadian provincial credits.
+- **Proxy, low confidence:** US state income tax outside California (federal taxable income on the state's single schedule).
+- **Estimated, low to medium confidence:** the tax inside spending (VAT, GST, sales tax, fuel duty). This is spending × an effective rate per category, computed tax-inclusively. Without the user's spending, a typical-household profile is used and reported.
+- **Not included:** local and city income taxes, church tax, student loans, pension contributions, credits for dependants, and anything beyond salary income.
+
+Each result reports confidence **per component**, never as a single score.
+
+## The website
+
+- Pick a country (and a state, province or Indian regime), enter a salary, adjust monthly spending, and see direct and indirect tax, the effective rate, tax freedom day, tips, a comparison with other countries, and the Tax Wrapped share card.
+- Calculations run **in the browser**: nothing is sent anywhere. The only data on the device is the theme preference.
+- Country pages (`/country/<slug>/`, including `/country/india/`), the hidden-tax guide and the tax-by-country comparison are generated from the engine.
+- Deep links: `#c=IN`, `#c=US&s=CA`, `#c=CA&s=QC`.
+- It works offline as a PWA (`sw.js`, cache `taxcal-vNN`).
+- **Tax.cal Plus** is a questionnaire for reviewing your situation. It stores your answers only if you press Save, behind a private link (`api/`, Cloudflare Worker + D1). It covers the original ten countries.
+- **"You could keep up to …"** is an illustrative ceiling: your marginal rate × your country's main tax-advantaged allowance. It is labelled as a typical case, not advice, and is not shown for India.
+
+## The MCP server
+
+`mcp/` is a stateless, read-only MCP server on Cloudflare Workers (free plan). It speaks the MCP 2026-07-28 revision (with `server/discover`) and the 2025 revisions (with `initialize`), and returns JSON only. Its tools are:
+
+| Tool | Purpose |
+|---|---|
+| `calculate_tax` | Tax, take-home pay and breakdown for one salary and country |
+| `compare_tax_regimes` | India: new vs old regime and the break-even deductions |
+| `get_tax_rules` | The rules, assumptions, sources and versions (one country, or an overview) |
+| `compare_countries` | One salary across countries (tax rules, not cost of living) |
+
+All are annotated read-only, idempotent and closed-world, with output schemas. Inputs are strictly validated. Missing material inputs (a US filing status or state, a Canadian province) are asked for, never guessed. Details: [mcp/README.md](mcp/README.md) and [docs/PLUGIN_ARCHITECTURE.md](docs/PLUGIN_ARCHITECTURE.md).
+
+## The plugin
+
+`taxcal-plugin/` is a portable [Agent Plugins](https://agent-plugins.org/) package with OpenAI's extension. It contains:
+
+- `plugin.json`: the listing, starter prompts, review test cases and release notes;
+- `mcp.json`: the server URL;
+- `skills/tax-cal-analysis`: the workflow the model follows;
+- the logo.
+
+`npm run plugin:zip` builds the upload ZIP after checking OpenAI's limits and scanning for secrets. There is no embedded UI in v1. Each answer includes at most one link to Tax.cal.
+
+## Privacy
+
+| Surface | What happens to your figures |
+|---|---|
+| Website calculator | Calculated in your browser. Nothing leaves your device |
+| Tax.cal Plus | Stays on your device unless you press Save; then stored behind a private link you can delete. No name, email or password |
+| ChatGPT plugin | Sent to Tax.cal's calculation service to compute the answer and **not retained**. The service has no database, and its logs contain only the tool, the country code, the outcome and the duration, never your figures |
+
+Analytics are aggregate only. The website uses Plausible (no cookies). The plugin counts calculations by tool and country from those log lines. No salary or other tax detail is ever an analytics dimension. Full policy: https://taxcal.siddheshthapa.com/privacy/.
 
 ## Run it locally
 
-It's a static site — any web server works. Because it registers a service worker, use
-`http://` (not `file://`):
+```bash
+npm ci                     # dev tools only: esbuild, ajv, MCP SDK clients
+npm start                  # website on http://localhost:8080 (python -m http.server)
+npm run mcp:dev            # MCP server on http://127.0.0.1:8787/mcp
+npm run mcp:smoke          # end-to-end check of the MCP server
+```
+
+Use `http://`, not `file://`, because the site registers a service worker.
+
+## Test
 
 ```bash
-python -m http.server 8080
+npm test
 ```
 
-Then open http://localhost:8080 . (`npx serve`, VS Code Live Server, etc. all work too.)
+The suite covers:
 
-## Deploy it
+- **Regression:** the existing ten countries against a baseline.
+- **Golden figures:** official tables and hand calculations, each with its source, date and tolerance.
+- **Bracket edges:** every bracket table just below, at and just above each threshold.
+- **India:** slabs, rebate and marginal relief, surcharge, cess, regimes, years and scope.
+- **Validation:** negative, NaN, absurd, malformed, prototype-pollution and oversized input.
+- **The MCP server:** both protocol eras, header checks, HTTP guards, output schemas, the official SDK v1 and v2 clients, and log privacy.
+- **The plugin package:** schemas, OpenAI limits, review cases checked against the tools, and the ZIP.
+- **The website:** bundle freshness, country pages, sitemap, share card, privacy wording and the generated docs.
 
-This repo is served by **GitHub Pages** at **https://taxcal.siddheshthapa.com**. No build step is
-required — Pages serves the multi-file site from the repo root, so pushing to `main` deploys.
+CI runs it on every push (`.github/workflows/ci.yml`).
 
-Two things make that work and should not be deleted:
+## Update tax rules
 
-1. **`CNAME`** in the repo root, containing `taxcal.siddheshthapa.com`.
-2. A DNS record on `siddheshthapa.com`: `CNAME  taxcal  →  onepanda2.github.io`.
+Follow [docs/UPDATING_TAX_RULES.md](docs/UPDATING_TAX_RULES.md). In short:
 
-Then in the repo: **Settings → Pages → Source: Deploy from a branch → `main` / `(root)`**, and tick
-*Enforce HTTPS* once the certificate is issued (can take up to an hour on first setup).
+1. Edit `packages/tax-core/src/rules/<country>.js` from official sources.
+2. Bump the rule version and `lastVerified`.
+3. Update the hand-calculated tests.
+4. Run `npm test`, then `npm run build:all`.
+5. Bump the service-worker cache.
+6. Redeploy the MCP server.
+7. Check the plugin's answers.
 
-The domain appears in `index.html` (canonical + og:url + og:image + JSON-LD), `robots.txt`,
-`sitemap.xml`, `build-country-pages.mjs` (`SITE`) and the share-card text in `assets/app.js`.
-If it ever changes, update all five and re-run both build scripts.
+## Deploy
 
-### Single-file option
-`npm run build` (or `node build-artifact.mjs`) produces:
-- `dist/index.single.html` — the entire app in one file. Drop it anywhere.
-- `dist/taxcal-artifact.html` — the body-only version used for the claude.ai Artifact.
+**Website (GitHub Pages).** Pushing `main` deploys: Pages serves the repo root. Keep `CNAME` (`taxcal.siddheshthapa.com`), `.nojekyll` and the DNS record `CNAME taxcal → onepanda2.github.io`. The IndexNow workflow pings search engines on each push. The domain appears in `index.html`, `robots.txt`, `sitemap.xml`, the build scripts (`SITE`), `packages/tax-core/src/api.js` and `share.js`.
 
----
+**Single-file builds.** `npm run build` writes `dist/index.single.html` (the whole app in one file) and `dist/taxcal-artifact.html` (the body-only Artifact build).
 
-## Project layout
+**MCP server (Cloudflare).**
 
-```
-index.html              # markup + SEO (meta, Open Graph, JSON-LD schema)
-styles.css              # all styles (theme-aware: light/dark)
-assets/
-  tax-data.js           # ← RATES LIVE HERE: VAT/sales %, US states, categories, tips
-  tax-engine.js         # ← BRACKETS LIVE HERE: income-tax tables + the math
-  app.js                # UI wiring, the ring, the share card, comparison
-manifest.webmanifest    # PWA install metadata
-sw.js                   # offline service worker (bump CACHE when you change files)
-robots.txt / sitemap.xml
-icons/                  # app icons + og-image.png (regen with scripts if needed)
-build-artifact.mjs      # inlines everything into dist/
+```bash
+npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
+npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
 ```
 
-## Updating for a new tax year
+This deploys to `https://taxcal-mcp.onepanda2.workers.dev/mcp`. After deploying, run `npm run mcp:smoke -- <url>`, and set the repository variable `MCP_URL` to enable the six-hourly health check.
 
-Almost everything is data. Each April/January when rates change:
+**Plus API.** See [api/README.md](api/README.md).
 
-1. **Income-tax brackets** → `assets/tax-engine.js`, the tables at the top
-   (`US_FED`, `DE_IT`, `FR_IT`, `NL_B`, `IE_USC`, and the `ukIncomeTax` / `ieIncomeTax`
-   functions). Each is dated and validated against published take-home figures.
-2. **VAT / sales-tax %, fuel-tax share, category assumptions, US state rates, tips**
-   → `assets/tax-data.js`.
-3. Bump `CACHE = 'taxcal-vN'` in `sw.js` so returning users get the update.
-4. `node build-artifact.mjs` to refresh the single-file / artifact builds.
+## Submit the plugin
 
-**Add a country:** add an entry to `COUNTRIES` in `tax-data.js` and a `case` in
-`directTaxFor()` in `tax-engine.js`. **Add/adjust a US state:** edit `US_STATES` in
-`tax-data.js` (`none` / `flat` / `graduated`).
+Follow [docs/OPENAI_SUBMISSION.md](docs/OPENAI_SUBMISSION.md). It covers organization verification, deploying the server, domain verification, building the ZIP, the walkthrough video, the test cases and the reviewer notes. No reviewer account is needed, because the tools need no sign-in.
 
-## Email capture (Formspree) — live
+## Email capture (Formspree)
 
-The "Join the early-access list" form POSTs to **Formspree**, already wired up in
-`assets/app.js`:
+The early-access form posts to Formspree (`CONFIG.formspree` in `assets/app.js`) with the selected country, so sign-ups show which markets are interested. If the endpoint is blanked out, the form degrades gracefully.
 
-```js
-var CONFIG = { formspree: 'https://formspree.io/f/mjyveryv' };
-```
+## Distribution and SEO
 
-Signups arrive in the Formspree dashboard and by email. Each submission also carries the
-selected **`country`**, so you can see which market the interest is coming from — that's the
-signal that tells you where the inbound funnel is actually working.
+- `WebApplication` and `FAQPage` JSON-LD, canonical URLs, social metadata, `sitemap.xml` and `robots.txt`.
+- One genuinely useful page per country, with worked examples and an FAQ (including India: new vs old regime, ₹12 lakh, Tax Year 2026-27), plus `/hidden-tax/` and `/tax-by-country/`.
+- Fast and light: no framework, one stylesheet. The only third-party script is Plausible's cookieless counter.
 
-The free Formspree plan caps submissions per month; if the form starts filling up, that's a
-good problem and the moment to upgrade or move to Buttondown/ConvertKit (just swap the `fetch`
-target). If the endpoint is ever blanked out, the form degrades gracefully — it thanks the user
-and stores the address in their own browser only.
+Next steps: Search Console and Bing Webmaster Tools (Bing powers ChatGPT search), directory listings (Product Hunt, Show HN, Indie Hackers, AlternativeTo), and PageSpeed checks.
 
----
+## Docs
 
-## Distribution — the inbound/SEO plan
-
-This app is built to be found via search, per the DissectMac playbook in this folder
-(`dissectmac-international-users-playbook.pdf`). What's already done for you:
-
-- ✅ **Schema markup** — `WebApplication` + `FAQPage` JSON-LD in `index.html`.
-- ✅ **Answer-the-question content** near the top (for Google AI Overviews / ChatGPT / Perplexity).
-- ✅ **Fast & light** — no framework, no third-party scripts, system-ish fonts, one CSS file.
-- ✅ **sitemap.xml + robots.txt**, mobile-first, theme-aware, semantic HTML.
-
-What to do next (a weekend's work):
-
-1. **Set up Google Search Console + Bing Webmaster Tools** on day one; submit `sitemap.xml`.
-   (Bing powers ChatGPT search.)
-2. **Write one page per search query.** The stubs are already in `sitemap.xml` under
-   `/country/<name>/` — e.g. *"how much tax do I really pay in the UK / Germany / USA."*
-   Each should answer that one question and link into the calculator (deep-links work:
-   `index.html#c=DE`, `#c=US&s=CA`, etc.).
-3. **Directory listings** (one-time, permanent backlinks): Product Hunt, Hacker News (Show HN),
-   Indie Hackers, BetaList, AlternativeTo, SaaSHub, Slant. Write a unique description for each.
-4. **Check PageSpeed** at https://pagespeed.web.dev (aim for ~100). Optionally self-host the
-   Google Font instead of linking it for the last few points.
-5. Consider the free **claude-seo** Claude Code plugin from the playbook to audit the site.
+| Document | What it covers |
+|---|---|
+| [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Architecture decisions, audit findings, status |
+| [docs/TAX_RULE_SOURCES.md](docs/TAX_RULE_SOURCES.md) | Every rule set, source, assumption and exclusion (generated) |
+| [docs/INDIA_TAX_MODEL.md](docs/INDIA_TAX_MODEL.md) | The India model in depth |
+| [docs/PLUGIN_ARCHITECTURE.md](docs/PLUGIN_ARCHITECTURE.md) | Engine, MCP server, plugin, security, versions, cost |
+| [docs/UPDATING_TAX_RULES.md](docs/UPDATING_TAX_RULES.md) | The annual update procedure |
+| [docs/OPENAI_SUBMISSION.md](docs/OPENAI_SUBMISSION.md) | Submission checklist, reviewer script |
+| [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) | What changed, by release |
 
 ---
 

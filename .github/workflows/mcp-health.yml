@@ -1,0 +1,27 @@
+name: MCP health
+
+# Checks the deployed Tax.cal MCP server every six hours: /health, both
+# protocol eras, a real calculation, a missing-input error and the HTTP guards
+# (mcp/smoke.mjs). GitHub emails the repository owner when a scheduled run
+# fails. It does nothing until the repository variable MCP_URL is set to the
+# production endpoint, e.g. https://taxcal-mcp.onepanda2.workers.dev/mcp.
+# No secrets are used and no user data is involved.
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: ${{ vars.MCP_URL != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node mcp/smoke.mjs "${{ vars.MCP_URL }}"

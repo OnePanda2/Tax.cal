@@ -306,6 +306,14 @@ test(`request bodies over ${MAX_BODY_BYTES} bytes are refused with 413, with or 
   assert.equal(r.status, 413);
 });
 
+test('a body that never finishes arriving times out with 408 instead of holding the request', async () => {
+  const stalled = new ReadableStream({ start(c) { c.enqueue(new TextEncoder().encode('{"jsonrpc":"2.0",')); } });   // never closes
+  const started = Date.now();
+  const r = await worker.fetch(new Request(BASE + '/mcp', { method: 'POST', headers: { 'content-type': 'application/json' }, body: stalled, duplex: 'half' }), { BODY_TIMEOUT_MS: '50' }, {});
+  assert.equal(r.status, 408);
+  assert.ok(Date.now() - started < 2000);
+});
+
 test('rate limiting: the Cloudflare binding is honoured, with an in-memory fallback', async () => {
   const ping = { jsonrpc: '2.0', id: 1, method: 'ping' };
   const limited = await post(ping, {}, { RATE_LIMITER: { limit: async () => ({ success: false }) } });

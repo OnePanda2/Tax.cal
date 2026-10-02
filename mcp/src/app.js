@@ -85,20 +85,30 @@ function originAllowed(request, env) {
   return list.includes(origin);
 }
 
-/* Read the body with a hard cap, whether or not Content-Length is sent. */
-async function readBody(request) {
+/* Read the body with a hard cap, whether or not Content-Length is sent, and
+   a deadline, so a client trickling bytes cannot hold a request open. */
+export const BODY_TIMEOUT_MS = 10000;
+async function readBody(request, timeoutMs = BODY_TIMEOUT_MS) {
   const len = request.headers.get('content-length');
   if (len && Number(len) > MAX_BODY_BYTES) return { tooLarge: true };
   if (!request.body) return { text: '' };
   const reader = request.body.getReader();
   const chunks = [];
   let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > MAX_BODY_BYTES) { try { await reader.cancel(); } catch {} return { tooLarge: true }; }
-    chunks.push(value);
+  let timer;
+  const deadline = new Promise((resolve) => { timer = setTimeout(() => resolve({ timedOut: true }), timeoutMs); });
+  try {
+    for (;;) {
+      const step = await Promise.race([reader.read(), deadline]);
+      if (step.timedOut) { try { await reader.cancel(); } catch {} return { timedOut: true }; }
+      const { done, value } = step;
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) { try { await reader.cancel(); } catch {} return { tooLarge: true }; }
+      chunks.push(value);
+    }
+  } finally {
+    clearTimeout(timer);
   }
   const all = new Uint8Array(size);
   let off = 0;
@@ -132,7 +142,10 @@ async function mcp(request, env, started) {
   if (!(await allowed(request, env))) {
     return { res: json({ jsonrpc: '2.0', id: null, error: { code: -32000, message: 'Too many requests. Please retry in a minute.' } }, 429, { 'Retry-After': '60' }), log: { route: 'mcp', status: 429 } };
   }
-  const body = await readBody(request);
+  const body = await readBody(request, Number(env.BODY_TIMEOUT_MS) || BODY_TIMEOUT_MS);
+  if (body.timedOut) {
+    return { res: json({ jsonrpc: '2.0', id: null, error: { code: INVALID_REQUEST, message: 'Request body was not received in time.' } }, 408), log: { route: 'mcp', status: 408 } };
+  }
   if (body.tooLarge) {
     return { res: json({ jsonrpc: '2.0', id: null, error: { code: INVALID_REQUEST, message: `Request body exceeds ${MAX_BODY_BYTES} bytes.` } }, 413), log: { route: 'mcp', status: 413 } };
   }

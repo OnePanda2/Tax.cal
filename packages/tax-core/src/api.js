@@ -58,6 +58,8 @@ function scopeLabel(key, R) {
 }
 const ayFor = (fy) => { const a = Number(fy.slice(0, 4)) + 1; return `${a}-${String(a + 1).slice(2)}`; };
 
+const periodOf = (R) => ({ start: R.period.start, end: R.period.end });
+
 function sourcesOut(R) {
   return R.sources.map((s) => ({ title: s.title, publisher: s.publisher, url: s.url, covers: s.covers }));
 }
@@ -144,7 +146,7 @@ export const calculateTax = wrap((args) => {
 
   const result = {
     country: key, country_name: e.profile.name,
-    tax_year: R.taxYear, tax_year_label: R.taxYearLabel, legal_basis: R.legalBasis,
+    tax_year: R.taxYear, tax_year_label: R.taxYearLabel, tax_year_period: periodOf(R), legal_basis: R.legalBasis,
     currency: e.profile.currency.code,
     inputs: {
       gross_income: gross, income_type: 'employment',
@@ -240,7 +242,7 @@ export const compareTaxRegimes = wrap((args) => {
   else points.push('On these inputs no realistic amount of old-regime deductions brings the old regime down to the new regime’s tax.');
 
   return {
-    country: key, country_name: 'India', tax_year: R.taxYear, tax_year_label: R.taxYearLabel, legal_basis: R.legalBasis,
+    country: key, country_name: 'India', tax_year: R.taxYear, tax_year_label: R.taxYearLabel, tax_year_period: periodOf(R), legal_basis: R.legalBasis,
     currency: 'INR', gross_income: r2(gross),
     inputs: { gross_income: gross, residency: ia.residency, age_band: ia.ageBand, old_regime_deductions: ia.deductions },
     defaults_applied: defaults,
@@ -295,7 +297,7 @@ function rulesOverview(topic) {
       const R = getRules(k);
       return {
         country: k, country_name: e.profile.name, currency: e.profile.currency.code,
-        tax_year: R.taxYear, tax_year_label: R.taxYearLabel, status: R.status,
+        tax_year: R.taxYear, tax_year_label: R.taxYearLabel, tax_year_period: periodOf(R), status: R.status,
         rule_version: R.ruleVersion, last_verified: R.lastVerified,
         supported_tax_years: Object.keys(e.rules),
         confidence: { ...R.confidence }
@@ -376,10 +378,10 @@ export const getTaxRules = wrap((args) => {
   const result = {
     lookup: 'country',
     country: key, country_name: e.profile.name,
-    tax_year: R.taxYear, tax_year_label: R.taxYearLabel, status: R.status, legal_basis: R.legalBasis,
+    tax_year: R.taxYear, tax_year_label: R.taxYearLabel, tax_year_period: periodOf(R), status: R.status, legal_basis: R.legalBasis,
     currency: e.profile.currency.code,
     rule_version: R.ruleVersion, last_verified: R.lastVerified, engine_version: ENGINE_VERSION,
-    supported_tax_years: Object.keys(e.rules).map((y) => ({ tax_year: y, label: e.rules[y].taxYearLabel, status: e.rules[y].status })),
+    supported_tax_years: Object.keys(e.rules).map((y) => ({ tax_year: y, label: e.rules[y].taxYearLabel, period: periodOf(e.rules[y]), status: e.rules[y].status })),
     topic,
     ...rulesSection(key, R, topic),
     confidence: { ...R.confidence },

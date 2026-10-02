@@ -229,28 +229,39 @@ model in `docs/INDIA_TAX_MODEL.md`).
 
 ## 13. Deployment plan
 
-1. `npm test` green; `npm run build:all` regenerates bundle, pages and single-file builds.
+1. `npm test` green; `npm run build:all` regenerates the bundle, pages, single-file builds
+   and `docs/TAX_RULE_SOURCES.md`.
 2. Website: push to `main` (GitHub Pages). CI (`.github/workflows/ci.yml`) runs the tests
    on every push and pull request.
-3. MCP: `cd mcp && npx wrangler deploy --env staging`, smoke-test with
-   `npm run mcp:smoke -- <url>`, then `npx wrangler deploy` →
+3. MCP: `npx wrangler@4 deploy --config mcp/wrangler.toml --env staging`, smoke-test with
+   `npm run mcp:smoke -- <url>`, then `--env=""` for production →
    `https://taxcal-mcp.onepanda2.workers.dev/mcp` (Workers Free plan; no database).
+   `.github/workflows/mcp-health.yml` re-runs the smoke test every six hours once the
+   repository variable `MCP_URL` is set.
 4. Plugin: `npm run plugin:zip` → upload `dist/taxcal-plugin.zip` in the OpenAI dashboard
    (see `docs/OPENAI_SUBMISSION.md`).
 
 | Step | Status |
 | --- | --- |
 | Audit + research + this plan | done |
-| Shared core + bug fixes + regression tests | in progress |
-| India | pending |
-| MCP server | pending |
-| Plugin package + skill + docs | pending |
-| Privacy/terms/support pages, README, stale-claim sweep | pending |
-| Production deploy of the MCP Worker | needs the owner's Cloudflare login |
-| OpenAI submission | needs the owner's verified OpenAI organisation |
+| Shared core + bug fixes + regression tests | done (`packages/tax-core`, B1–B13 fixed or documented) |
+| India | done (Tax Year 2026-27 + legacy FY 2025-26, both regimes, `/country/india/`) |
+| MCP server | done (`mcp/`; tested with the official SDK v1 and v2 clients and inside workerd) |
+| Plugin package + skill + docs | done (`taxcal-plugin/`, `docs/`) |
+| Privacy/terms/support pages, README, stale-claim sweep | done |
+| Golden tests with sources + every bracket edge | done (`tests/golden.test.mjs`) |
+| Production deploy of the MCP Worker | needs the owner's Cloudflare login (`docs/OPENAI_SUBMISSION.md` §2) |
+| OpenAI submission | needs the owner's verified OpenAI organisation and a walkthrough video (§1, §5) |
 
 ---
 
 ### Changelog
 
 * 2026-10-02 — Plan written; baseline fixture of the v18 engine committed.
+* 2026-10-02 — Shared engine (`packages/tax-core`) replaces `assets/tax-data.js` and
+  `assets/tax-engine.js`; all ten countries re-verified (v2 rule sets); India added.
+* 2026-10-02 — MCP server (`mcp/`), dual protocol era (2026-07-28 and 2025), strict
+  validation, argument-free logging, rate limiting and security headers.
+* 2026-10-02 — Plugin package (`taxcal-plugin/`), skill, submission files, privacy page
+  for the three surfaces, `/terms/`, `/support/`, golden tests, generated source list,
+  staging environment and health workflow.

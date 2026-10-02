@@ -1,6 +1,6 @@
 # Tax.cal MCP server (the ChatGPT plugin's backend) — Cloudflare Workers, free plan.
 #
-#   Deploy:  npx wrangler@4 deploy --config mcp/wrangler.toml
+#   Deploy:  npx wrangler@4 deploy --config mcp/wrangler.toml --env=""   (production)
 #   URL:     https://taxcal-mcp.onepanda2.workers.dev/mcp
 #
 # Stateless and read-only: no D1, no KV, no Durable Objects, no outbound
@@ -27,5 +27,22 @@ simple = { limit = 300, period = 60 }
 # OPENAI_APPS_CHALLENGE (the domain-verification token shown in the OpenAI
 # Platform dashboard) is deliberately NOT declared here: a [vars] entry would
 # override the secret on every deploy. Set it only with
-#   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml
+#   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml --env=""
 # Until it is set, /.well-known/openai-apps-challenge answers 404.
+
+# Staging: same code, separate Worker and rate-limit counters.
+#   npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
+#   → https://taxcal-mcp-staging.onepanda2.workers.dev/mcp
+# vars and ratelimits are not inherited by environments, so they are repeated.
+[env.staging]
+name = "taxcal-mcp-staging"
+workers_dev = true
+
+[env.staging.vars]
+ALLOWED_ORIGINS = "https://chatgpt.com,https://chat.openai.com"
+RATE_LIMIT_PER_MINUTE = "300"
+
+[[env.staging.ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "2602"
+simple = { limit = 300, period = 60 }

@@ -35,6 +35,7 @@ const server = await serve();
 const base = 'http://127.0.0.1:' + server.address().port;
 const browser = await chromium.launch();
 const page = await browser.newPage();
+page.setDefaultTimeout(8000);
 const errors = [];
 page.on('pageerror', (e) => errors.push('pageerror: ' + e.message));
 page.on('console', (m) => { if (m.type() === 'error' && !/plausible|fonts\.g|net::ERR/.test(m.text())) errors.push('console: ' + m.text()); });
@@ -95,7 +96,51 @@ check(!plusCountries.includes('IN') && plusCountries.length === 10, 'Plus offers
 await page.goto(base + '/tax-by-country/');
 check(/India/.test(await page.content()), 'tax-by-country includes India');
 
+// Every original country still renders a sensible result (with a region where one is required).
+for (const [c, s, sym] of [['UK', '', '£'], ['US', 'NY', '$'], ['CA', 'ON', '$'], ['AU', '', '$'], ['IE', '', '€'], ['DE', '', '€'], ['FR', '', '€'], ['NL', '', '€'], ['ES', '', '€'], ['IT', '', '€']]) {
+  await page.goto('about:blank');
+  await page.goto(base + '/index.html#c=' + c + (s ? '&s=' + s : ''));
+  await page.waitForTimeout(150);
+  await page.waitForFunction(() => /\d/.test(document.getElementById('heroBig').textContent));
+  const hero = await page.textContent('#heroBig');
+  const sub = await page.textContent('#heroSub');
+  check(hero.includes(sym) && !/NaN|undefined/.test(hero + sub), `${c}${s ? ' ' + s : ''} renders a ${sym} result (${hero.trim()})`);
+}
+
+// Legal and help pages load without errors and link to each other.
+for (const [path, heading] of [['/privacy/', 'What we store'], ['/terms/', 'Estimates to help you'], ['/support/', 'Something look']]) {
+  await page.goto(base + path);
+  check((await page.textContent('h1')).includes(heading), `${path} renders`);
+}
+check(/For the ChatGPT integration, your tax inputs are sent to Tax\.cal's calculation service/.test(await (await page.goto(base + '/privacy/')).text()), 'privacy page states the ChatGPT data flow');
+
+// PWA: the service worker installs, controls the page, and the app works offline —
+// and visiting other pages online must not replace the cached home page. "Offline"
+// means the server is really gone: Playwright's offline emulation does not reach
+// the service worker's own fetches.
+const ctx = await browser.newContext();
+await ctx.route(/^(?!http:\/\/127\.0\.0\.1)/, (r) => r.abort());   // also covers the service worker's own fetches
+const pwa = await ctx.newPage();
+pwa.setDefaultTimeout(8000);
+pwa.on('pageerror', (e) => errors.push('pwa pageerror: ' + e.message));
+await pwa.goto(base + '/index.html');
+await pwa.evaluate(() => navigator.serviceWorker.ready);
+await pwa.reload();
+check(await pwa.evaluate(() => !!navigator.serviceWorker.controller), 'service worker controls the page');
+check(await pwa.evaluate(async () => (await caches.keys()).includes('taxcal-v19')), 'cache taxcal-v19 created');
+await pwa.goto(base + '/privacy/');
+await pwa.goto(base + '/country/india/');
+server.closeAllConnections(); await new Promise((r) => server.close(r));   // the network is now gone
+await pwa.goto(base + '/index.html');
+await pwa.waitForTimeout(300);
+check((await pwa.textContent('#heroBig').catch(() => '')).includes('£'), 'offline: the calculator still loads and computes');
+await pwa.goto(base + '/');
+check(!!(await pwa.$('#heroBig')), 'offline: / is the calculator, not the last page visited');
+await pwa.goto(base + '/country/india/');
+check(/Income tax on common salaries/.test(await pwa.content()), 'offline: a visited country page is available');
+await ctx.close();
+
 check(errors.length === 0, 'no page errors (' + errors.join(' | ') + ')');
-await browser.close(); server.close();
+await browser.close();
 if (fails.length) { console.error('\nFAILED:\n - ' + fails.join('\n - ')); process.exit(1); }
 console.log('\nbrowser smoke: all checks passed');
