@@ -1,16 +1,16 @@
 # Tax.cal — Full Project Report & Handover
 
-**Written 11 September 2026.** Everything known about this project as of that date.
-Assume the conversation that produced it no longer exists — this file is the record.
+**Written 11 September 2026. Last updated 2 October 2026** (§17d). Everything known about this
+project as of that date. Assume the conversation that produced it no longer exists — this file
+is the record. **Update it at the end of every working session.**
 
-> **This file lives OUTSIDE the repository, on purpose.**
-> Canonical location: `F:\Projects\Handovers\PROJECT-HANDOVER TaxCal.md`
-> The project itself is at `F:\Projects\Tax.Cal`, and that repo is **public**. This
-> document contains business strategy, pricing reasoning, unresolved legal exposure
-> and security notes, none of which should be published — so it is kept one directory
-> up, where a stray `git add -A` cannot reach it. The repo's `.gitignore` also matches
-> `*HANDOVER*.md` as a second line of defence.
-> **Keep a copy somewhere you will not lose it — this is the only record.**
+> **Location changed 2 October 2026.** Siddhesh uploaded this file to the repository root
+> (`PROJECT-HANDOVER TaxCal.md`, commit `eeb23ad`), and it is now the copy that gets updated.
+> It was previously kept outside the repo at `F:\Projects\Handovers\` because the repo is
+> **public** and this document contains business strategy, pricing reasoning, unresolved legal
+> exposure and security notes. **Everything in it is now publicly readable**, including through
+> git history even if the file is later deleted. That trade-off is Siddhesh's call; do not put
+> secrets, credentials or anything you would not publish in here.
 
 ---
 
@@ -18,8 +18,13 @@ Assume the conversation that produced it no longer exists — this file is the r
 
 Tax.cal is a website that shows someone their **real** total tax burden — not just
 income tax, but social contributions plus the VAT/sales tax and fuel duty buried in
-their spending — as a single percentage. It covers **10 countries**. It is free,
-runs entirely in the browser, and is built to be found through search.
+their spending — as a single percentage. It covers **11 countries** (India added
+2 October 2026). It is free, runs entirely in the browser, and is built to be found
+through search.
+
+**Since 2 October 2026 there is a second surface: a ChatGPT plugin** (MCP server on
+Cloudflare Workers + an Agent Plugins package) that runs the *same* tax engine. It is
+**built and tested but not yet deployed or submitted** — see §17d and §16.
 
 On top of that sits **Tax.cal Plus**: a questionnaire that asks about the user's
 actual situation and returns a ranked list of legal ways they might pay less tax.
@@ -46,9 +51,11 @@ that nobody has visited yet.
 | Main site | https://taxcal.siddheshthapa.com | live |
 | Plus questionnaire | https://taxcal.siddheshthapa.com/plus/ | live, free, `noindex` |
 | Privacy policy | https://taxcal.siddheshthapa.com/privacy/ | live |
-| Country pages | `/country/{uk,usa,canada,australia,ireland,germany,france,netherlands,spain,italy}/` | live, indexed |
-| Sitemap | https://taxcal.siddheshthapa.com/sitemap.xml | live, 11 URLs |
+| Terms / Support | `/terms/`, `/support/` | live (added 2 Oct 2026) |
+| Country pages | `/country/{uk,usa,canada,australia,ireland,germany,france,netherlands,spain,italy,india}/` | live, indexed |
+| Sitemap | https://taxcal.siddheshthapa.com/sitemap.xml | live, 17 URLs |
 | API (Cloudflare Worker) | https://taxcal-plus-api.onepanda2.workers.dev | live |
+| MCP server (ChatGPT plugin backend) | https://taxcal-mcp.onepanda2.workers.dev/mcp | **not deployed yet** |
 | Repository | https://github.com/OnePanda2/Tax.cal | **public** |
 | Demo artifact (claude.ai) | https://claude.ai/code/artifact/181ad1d5-323d-4dc2-8437-12374e016081 | live |
 | Questionnaire spec (claude.ai) | https://claude.ai/code/artifact/fe5f3504-b2b5-406d-b4bb-d1c73e637df0 | live |
@@ -70,6 +77,12 @@ the personal site is never overwritten. **Do not deploy Tax.cal to the apex or w
   `taxcal-plus-api` and the D1 database `taxcal-plus`
   (id `a85a81c3-b404-46c3-aacd-562b4842752a`, created with `--location weur`, i.e.
   Western Europe, because that is where the customers are).
+- **Cloudflare, second Worker (2 Oct 2026, not yet deployed)** — `taxcal-mcp` (and
+  `taxcal-mcp-staging`), config `mcp/wrangler.toml`. Stateless, **no database**. Uses the
+  Workers Rate Limiting binding. One secret, `OPENAI_APPS_CHALLENGE` (OpenAI domain
+  verification token), set with `wrangler secret put` — never in `[vars]` (see §15 bug 3).
+- **OpenAI Platform** — needed for the plugin submission: a **verified organization** and the
+  `api.apps.write` permission. Not set up yet.
 - **Formspree** — form endpoint `https://formspree.io/f/mjyveryv`, receives waitlist
   signups plus the selected country.
 - **Plausible** — privacy-friendly analytics, added 12 September 2026. Site registered
@@ -125,6 +138,16 @@ privacy-page address is a typo, GDPR requests and paying customers both land now
 ---
 
 ## 4. Repository map — every tracked file
+
+> **Superseded 2 October 2026.** `assets/tax-data.js` and `assets/tax-engine.js` no longer
+> exist. All tax rules and arithmetic now live in **`packages/tax-core/`** (`rules/<cc>.js` data
+> with sources and versions, `calc/<cc>.js` maths, `engine.js`, `api.js`, `validate.js`), bundled
+> by esbuild into `assets/tax-core.js` for the browser. New top-level pieces: `mcp/` (MCP server),
+> `taxcal-plugin/` (ChatGPT plugin package), `docs/` (sources, India model, architecture, update
+> procedure, OpenAI submission checklist, release notes), `tests/` (120 tests, CI in
+> `.github/workflows/ci.yml`), `scripts/`, `terms/`, `support/`, `CLAUDE.md`. `package.json` now
+> has dev dependencies (esbuild, ajv, MCP SDK clients) — still **no runtime dependencies** in the
+> site. Service-worker cache is **v19**. The map below is the September layout, kept for history.
 
 ```
 .gitignore              excludes: the DissectMac PDF (third-party copyright),
@@ -208,7 +231,7 @@ cross-country comparison, a "tax freedom day", 3 country-specific tips, a sharea
    from category-level effective-rate assumptions, each carrying a confidence label
    (high/med/low) shown in the UI. Explicitly labelled as approximation.
 
-### The bracket tables (`assets/tax-engine.js`, top of file)
+### The bracket tables (historical — now in `packages/tax-core/src/rules/`)
 
 ```
 US_FED, DE_IT, FR_IT, NL_B, IE_USC, CA_FED (+ CA_BPA 16452),
@@ -408,8 +431,12 @@ enhancement, never a dependency.
 **UK, USA, Canada, Australia, Ireland, Germany, France, Netherlands, Spain, Italy.**
 
 **India was deliberately removed** partway through the project. Siddhesh's instruction:
-*"Remove India from the target market list completely."* Do not reintroduce it without
-his say-so.
+*"Remove India from the target market list completely."*
+
+**Reversed 2 October 2026 on Siddhesh's instruction:** India is back as country #11 in the
+calculator and the ChatGPT plugin, treated as a possible acquisition market (Tax Year 2026-27,
+Income-tax Act 2025, new vs old regime). Plus has **no India question set** yet. No
+"India gets it free" logic — every supported user gets the same core calculation.
 
 Canada, Australia, Spain and Italy were added on his explicit instruction:
 *"Anything that catches the attention of our first customer online and makes them pay,
@@ -687,6 +714,11 @@ before money changes hands.** This document is not legal advice.
 
 ## 12. Maintenance — updating for a new tax year
 
+> **Superseded 2 October 2026: follow `docs/UPDATING_TAX_RULES.md`** (11 steps: official sources →
+> `packages/tax-core/src/rules/<cc>.js` → sources/versions/`period`/`lastVerified` → hand-calculated
+> tests → `npm test` → `npm run build:all` → bump `sw.js` + `?v=` → redeploy MCP → verify plugin →
+> update plugin docs). The Plus `LIMITS` step below still applies. The rest is historical.
+
 Almost everything is data. Each April/January when rates change:
 
 1. **Income-tax brackets** → `assets/tax-engine.js`, the tables at the top. Each is
@@ -746,6 +778,15 @@ and Search Console.
 
 **The Worker:** from `api/`, `npx wrangler deploy`.
 
+**The MCP server (ChatGPT plugin), from the repo root:**
+`npx wrangler@4 deploy --config mcp/wrangler.toml --env staging`, smoke-test with
+`npm run mcp:smoke -- https://taxcal-mcp-staging.onepanda2.workers.dev/mcp`, then
+`--env=""` for production. Set the GitHub repository variable `MCP_URL` to turn on the
+six-hourly health-check workflow (`.github/workflows/mcp-health.yml`).
+
+**Before any push to `main` (since 2 Oct 2026):** `npm test` must be fully green and
+`npm run build:all` run, regenerated files committed. CI runs the tests on every push.
+
 **Local preview:** `python -m http.server 8765 --bind 127.0.0.1` from the project root.
 For a local worker, `npx wrangler dev --local --port 8787` and add **`?api=local`** to
 the page URL — without that flag local pages talk to the **production** worker and
@@ -757,13 +798,19 @@ would write rows to the live database.
 
 All are labelled as estimates in-app, but a future maintainer should know:
 
+*(Updated 2 October 2026 — several were fixed in the engine rewrite.)*
+
 - **UK:** England/Wales/NI bands only — **Scotland is not modelled.**
 - **US:** Single and Married-filing-jointly only; **no Head of Household**; no local
-  city taxes (e.g. NYC).
-- **Canada:** Quebec's QPP is approximated as CPP.
-- **Italy:** regional/municipal *addizionali* approximated as a flat 1.9%.
-- **Spain:** state + regional combined into one table; regional variation not modelled.
-- **France:** a flat 10% professional-expense abatement is assumed.
+  city taxes (e.g. NYC). State tax outside California is a **proxy**, labelled low confidence.
+- **Canada:** Quebec now uses QPP/QPIP and the federal abatement (fixed). Provincial
+  low-income reductions are not modelled.
+- **Italy:** surcharges at Milan/Lombardy rates; below €20k tax is overstated (cash bonuses
+  not modelled).
+- **Spain:** a representative state + regional scale; regional variation not modelled.
+- **France:** one tax part (single); barème on net taxable salary with the décote (fixed).
+- **India:** salaried individuals only — no business income, capital gains, HUF, foreign
+  income, TDS or ITR.
 - Cross-country comparison converts at **approximate** FX rates and shows direct tax only.
 - Indirect tax is a category-level effective-rate estimate, with confidence labels.
 - Country landing pages are content + CTA; they do not embed the calculator.
@@ -838,6 +885,23 @@ These cost real time to find. Each is a trap that will recur.
 
 11. **Grammar in generated pages:** "in United Kingdom" → "in the United Kingdom". A
    `the` helper handles UK/US/NL in both the page generator and `plus-app.js`.
+
+12. **FX table had no CAD or AUD (2 Oct 2026, shipped and indexed).** `convert()` fell back to
+   `1`, so Canada and Australia were compared at **US-dollar parity** on the comparison bars,
+   country pages and `/tax-by-country/`. Now dated ECB rates, and an unknown currency throws.
+
+13. **Share card printed "United States · undefined"** — it read `r.usState`, which the engine
+   never returned. The card now draws from `shareCardModel(r)`, tested.
+
+14. **Service worker cached every page as the home page (2 Oct 2026).** Navigations were stored
+   under `./index.html`, so offline the calculator opened as whichever page was visited last
+   (privacy, a country page). Each page is now cached under its own URL; proven by a browser
+   test that actually stops the server.
+
+15. **Cloudflare's runtime refuses a Worker whose entry module has non-handler exports.**
+   `mcp/src/worker.js` exported constants and workerd failed to start — Node never showed it.
+   The entry now exports only `{ fetch }`. **Always smoke-test a Worker in `wrangler dev`,
+   not just in Node.**
 
 ---
 
@@ -985,7 +1049,15 @@ whole content line is cut, not softened.
 **Blocking nothing, but genuinely outstanding:**
 
 1. **Verify the contact email discrepancy** (§3). Highest priority; it is a one-letter
-   difference that breaks both GDPR requests and paying customers.
+   difference that breaks both GDPR requests and paying customers. (Still open 2 Oct 2026;
+   `/support/` links to the privacy contact line, so one fix covers both.)
+1a. **ChatGPT plugin — deploy and submit** (added 2 Oct 2026). Follow
+   `docs/OPENAI_SUBMISSION.md`: wrangler login → deploy staging → smoke → deploy production →
+   set `MCP_URL` → test in ChatGPT developer mode → record a ~3-min walkthrough video (script
+   in the doc) → verify the OpenAI org → upload `dist/taxcal-plugin.zip` (`npm run plugin:zip`)
+   → domain verification via `OPENAI_APPS_CHALLENGE` → submit. No reviewer account needed.
+1b. **`/terms/` has no governing-law clause** and has not been reviewed by anyone qualified.
+1c. **Decide whether this handover file should stay in the public repo** (see the header).
 2. **Confirm 2FA is on** for GitHub and Cloudflare.
 3. **GitHub Support request** — the history rewrite removed two private strategy docs
    from `main`, but commit `3e3cb27`'s raw URLs still returned content, because GitHub
@@ -1027,7 +1099,9 @@ something looks broken, retry before debugging.
   mid-project and expected the correction to be acted on, not argued with.
 - He cares about his **GitHub contribution graph**. All commits are authored as
   `siddeshthapa02@gmail.com` and are verified as linked to `OnePanda2`. Contribution
-  days on record: 2026-09-06, 2026-09-08, 2026-09-09. **Never rewrite history without
+  days on record: 2026-09-06, 2026-09-08, 2026-09-09, 2026-09-12, 2026-09-13,
+  2026-09-16, 2026-10-02. Commits made by Claude set `GIT_AUTHOR_NAME/EMAIL` to this
+  identity so they count. **Never rewrite history without
   checking the impact and taking a backup bundle first.**
 - **Speed matters to him**: *"We'll do whatever helps us get our first customer as soon
   as possible."* Weigh that against correctness, and say so when they conflict.
@@ -1082,26 +1156,62 @@ actually loaded first.
   has actually received it can only be seen in Bing Webmaster Tools → IndexNow, which
   needs Siddhesh's sign-in.
 
+## 17d. 2 October 2026 — shared engine, India, ChatGPT plugin
+
+Seven commits to `main` (`a5767d7` … `c63d463`, plus this handover update). Siddhesh asked for
+Tax.cal to become two surfaces — the website and a ChatGPT plugin — on one deterministic engine,
+with India added, everything sourced, and the plugin ready to submit.
+
+1. **One engine.** `packages/tax-core` replaced `tax-data.js`/`tax-engine.js`. Every rule set
+   carries `ruleVersion` (e.g. `IN-2026-27-v1`), `period`, `lastVerified`, sources, assumptions,
+   exclusions and per-component confidence. `docs/TAX_RULE_SOURCES.md` is generated from it.
+2. **All ten countries re-verified for 2026** — Germany had 2025 values labelled 2026; France,
+   Italy and Spain charged income tax on gross pay; Canada lacked credits and Quebec's
+   abatement; Australia lacked LITO and the $1,000 work deduction; Ireland's PRSI rise was
+   applied all year; UK taper fixed; plus the FX and share-card bugs (§15 12–13).
+3. **India** (#11): Tax Year 2026-27 under the Income-tax Act, 2025, plus the legacy FY 2025-26
+   (AY 2026-27) rule set; new vs old regime, rebate and surcharge marginal relief, 4% cess,
+   break-even deductions, GST/fuel estimates, `/country/india/`. ₹15L → ₹97,500;
+   ₹20L → new ₹1,92,400 vs old ₹4,13,400.
+4. **MCP server** (`mcp/`): 4 read-only tools (`calculate_tax`, `compare_tax_regimes`,
+   `get_tax_rules`, `compare_countries`), MCP 2026-07-28 and 2025 protocols, strict validation,
+   **never logs or stores inputs**, rate limit, 32 KB / 10 s body limits, security headers.
+   Verified with the official MCP SDK clients and inside Cloudflare's runtime.
+5. **Plugin package** (`taxcal-plugin/`): manifest, skill, 5 positive + 3 negative review cases,
+   logo; `npm run plugin:zip` checks OpenAI's limits and scans for secrets.
+6. **Privacy page** now separates website / Plus / ChatGPT and states: *"For the ChatGPT
+   integration, your tax inputs are sent to Tax.cal's calculation service to perform the
+   requested calculation. Tax.cal does not retain those inputs for ordinary calculation
+   requests."* New `/terms/` and `/support/`.
+7. **Tests: 120**, CI green; browser smoke test 40+ checks incl. offline PWA.
+8. **Cost:** still ~$0/month (GitHub Pages + Cloudflare Workers free plan).
+
+**Analytics for the plugin, privacy-safe:** the MCP server's one log line per request
+(tool, country code, ok/error code) *is* the analytics — usage by country, India share,
+error and unsupported rates. Repeat usage is deliberately unmeasurable (no user id).
+
+**What to build next:** deploy + submit the plugin; an India question set for Plus; Scottish
+bands; exact US state schedules; an Indian HRA calculator.
+
 ## 18. HANDOVER PROMPT — paste this into a new session
 
 ```
 I'm Siddhesh, solo founder of Tax.cal. You're picking up a project that is already
 live and shipped. Before doing anything, read the full project record at:
 
-    F:\Projects\Handovers\PROJECT-HANDOVER TaxCal.md
+    PROJECT-HANDOVER TaxCal.md   (repository root)
 
-It is deliberately kept OUTSIDE the repo (F:\Projects\Tax.Cal) because the repo is
-public and that file contains pricing, legal and security notes. It is the complete
-record and this chat has no prior context.
+It is the complete record and this chat has no prior context. Also read CLAUDE.md.
 
 Quick orientation:
 - Tax.cal shows people their REAL total tax burden (income tax + social contributions
-  + VAT/sales tax + fuel duty) across 10 countries, free, entirely client-side.
+  + VAT/sales tax + fuel duty) across 11 countries (incl. India), free, client-side.
+  One engine in packages/tax-core also powers a ChatGPT plugin (mcp/, taxcal-plugin/).
 - Tax.cal Plus is a bespoke per-country questionnaire (50 base questions across 10
   countries) feeding an 88-rule engine that returns a ranked list of legal ways to pay
   less tax. It is currently FREE and UNGATED.
-- The only revenue path is a manual "concierge" offer: the user emails me and I review
-  their answers by hand for ~£29. There is NO payment gateway and that is deliberate.
+- There is currently NO revenue path: the concierge offer was removed on 12 Sep 2026
+  (§7). There is NO payment gateway and that is deliberate.
 - Live at https://taxcal.siddheshthapa.com, repo github.com/OnePanda2/Tax.cal (PUBLIC),
   backend is a Cloudflare Worker + D1.
 
@@ -1113,13 +1223,15 @@ Non-negotiables, all explained in the handover file:
 3. If storage behaviour changes, the privacy copy changes in the SAME commit.
 4. Never build a client-side paywall. If we sell automated findings, the rules engine
    moves into the Worker first. See the TRIGGER section.
-5. Don't reintroduce India as a target market.
-6. Bump sw.js CACHE on every asset change, and run both build scripts before pushing.
+5. India is back (2 Oct 2026) — keep it, with no special "free for India" logic.
+6. Bump sw.js CACHE and every ?v= together on asset changes; run `npm test` (green)
+   and `npm run build:all` before pushing main.
+7. The model never does tax arithmetic; the MCP server never logs or stores inputs.
 
 Talk to me bluntly and concisely. Explain the why, not just the what. Tell me when
 I'm wrong. My priority is getting the first paying customer.
 
-Start by reading PROJECT-HANDOVER.md, then tell me what you think the single highest-
+Start by reading PROJECT-HANDOVER TaxCal.md, then tell me what you think the single highest-
 value next action is and why.
 ```
 

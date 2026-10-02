@@ -4,7 +4,7 @@ Read this first in every session.
 
 ## Every session
 
-1. **Update the handover file at the end of every working session.** This is the owner's standing request. The canonical copy lives outside this repository, on the owner's machine at `F:\Projects\Handovers\PROJECT-HANDOVER TaxCal.md`. It holds strategy, pricing, legal and security notes, so it must **never** be committed: the repository is public, and `.gitignore` blocks `*HANDOVER*.md` as a safety net. If you cannot reach that path (for example in a cloud session), write the update to a gitignored file in the working directory, such as `HANDOVER-UPDATE-YYYY-MM-DD.md`, send it to the owner, and tell them to merge it into the canonical file.
+1. **Update the handover file at the end of every working session.** This is the owner's standing request. The handover is `PROJECT-HANDOVER TaxCal.md` at the repository root (the owner placed it there on 2 October 2026; it was previously kept outside the repo). Update its relevant sections and add a dated session section, then commit it with the session's work. The repository is public, so never write secrets or credentials into it.
 2. **Commit to `main` as the owner**, so the work shows on the owner's GitHub contribution graph. Set the author with `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` to the identity on the owner's existing commits (`git log -1 --format='%an <%ae>' main`). Pushing `main` deploys the website (GitHub Pages) and triggers IndexNow, so push only after the checks below pass.
 3. **Before every push to `main`:** run `npm test` (it must be fully green) and `npm run build:all`. Commit any regenerated files (`assets/tax-core.js`, `country/`, `hidden-tax/`, `tax-by-country/`, `dist/*.html`, `docs/TAX_RULE_SOURCES.md`).
 
