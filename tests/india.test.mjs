@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { getRules, regimeTax, regimeFromSalary, calculateTax, compareTaxRegimes, getTaxRules, breakevenDeductions } from '../packages/tax-core/src/index.js';
 import { capOldDeductions } from '../packages/tax-core/src/calc/in.js';
+import { groupIN } from '../packages/tax-core/src/util.js';
 import { close } from './helpers.mjs';
 
 const R = getRules('IN', '2026-27');
@@ -186,4 +187,13 @@ test('India indirect tax: GST categories and the petrol share are transparent es
   close(cats.dining.effectiveRate, 5 / 105, 0.0005);
   assert.equal(cats.fuel.confidence, 'low');
   for (const c of Object.values(cats)) assert.ok(c.reason.length > 40);
+});
+
+test('Indian digit grouping matches en-IN formatting without needing Intl', () => {
+  for (const n of [0, 7, 999, 1000, 75000, 99999, 100000, 708334, 1234567, 12345678, 123456789, 1e11, -1500000, 49999.6]) {
+    assert.equal(groupIN(n), Math.round(n).toLocaleString('en-IN'), String(n));
+  }
+  const r = compareTaxRegimes({ gross_income: 2000000 }).result;
+  assert.match(r.explanation[0], /₹75,000 standard deduction/);
+  assert.match(r.explanation.join(' '), /₹7,08,334/);
 });

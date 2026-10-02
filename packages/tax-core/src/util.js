@@ -34,6 +34,15 @@ export function formatMoney(amount, currency, digits = 0) {
   }
 }
 
+/* Indian digit grouping (12,34,567) without Intl: server-side text then needs
+   no ICU start-up, which costs ~12 ms of CPU on the first call. */
+export function groupIN(n) {
+  const s = String(Math.round(Math.abs(n)));
+  const last3 = s.slice(-3);
+  const rest = s.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',');
+  return (n < 0 ? '-' : '') + (rest ? rest + ',' + last3 : last3);
+}
+
 export const pct = (x, dp = 1) => (x * 100).toFixed(dp) + '%';
 
 /* Deep-freeze rule data so no caller can mutate the single source of truth. */

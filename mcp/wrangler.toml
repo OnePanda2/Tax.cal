@@ -1,0 +1,31 @@
+# Tax.cal MCP server (the ChatGPT plugin's backend) — Cloudflare Workers, free plan.
+#
+#   Deploy:  npx wrangler@4 deploy --config mcp/wrangler.toml
+#   URL:     https://taxcal-mcp.onepanda2.workers.dev/mcp
+#
+# Stateless and read-only: no D1, no KV, no Durable Objects, no outbound
+# requests. Nothing in this file is secret.
+name = "taxcal-mcp"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+# Browser Origins allowed to call /mcp. ChatGPT connects server-to-server and
+# sends no Origin header, so this list only matters for browser-based clients.
+[vars]
+ALLOWED_ORIGINS = "https://chatgpt.com,https://chat.openai.com"
+RATE_LIMIT_PER_MINUTE = "300"
+
+# Flood guard (requires Wrangler >= 4.36). Counts are per Cloudflare location
+# and per client IP; ChatGPT traffic arrives from OpenAI's servers, so the
+# limit is generous. namespace_id only has to be unique within the account.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "2601"
+simple = { limit = 300, period = 60 }
+
+# OPENAI_APPS_CHALLENGE (the domain-verification token shown in the OpenAI
+# Platform dashboard) is deliberately NOT declared here: a [vars] entry would
+# override the secret on every deploy. Set it only with
+#   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml
+# Until it is set, /.well-known/openai-apps-challenge answers 404.

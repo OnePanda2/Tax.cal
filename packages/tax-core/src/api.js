@@ -11,14 +11,16 @@ import { CATEGORIES, defaultSpending } from './categories.js';
 import { FX, convert } from './fx.js';
 import { ENGINE_VERSION, runDirect, indirectEstimate, getRules, minConfidence } from './engine.js';
 import { regimeFromSalary, breakevenDeductions } from './calc/in.js';
+import { groupIN } from './util.js';
 import * as V from './validate.js';
 
 export const SITE = 'https://taxcal.siddheshthapa.com';
 const UTM = 'utm_source=chatgpt&utm_medium=plugin';
 const DISCLAIMER = 'Estimate for information only — not tax, legal or financial advice. Tax.cal does not file returns or make payments. Check important decisions with the tax authority or a qualified professional.';
 
-const r2 = (x) => Math.round(x * 100) / 100;
-const r4 = (x) => Math.round(x * 10000) / 10000;
+// Rounded for output; `|| 0` turns -0 into 0 so JSON text and objects agree.
+const r2 = (x) => Math.round(x * 100) / 100 || 0;
+const r4 = (x) => Math.round(x * 10000) / 10000 || 0;
 
 /* JSON-safe copy of rule data: Infinity (open-ended bands) becomes null. */
 function jsonify(v) {
@@ -222,11 +224,11 @@ export const compareTaxRegimes = wrap((args) => {
   const be = breakevenDeductions(R, input);
 
   const points = [];
-  points.push(`The new regime allows a ₹${nw.standardDeduction.toLocaleString('en-IN')} standard deduction and wider, lower slabs; the old regime allows ₹${old.standardDeduction.toLocaleString('en-IN')} plus deductions such as 80C, 80D, HRA and home-loan interest.`);
+  points.push(`The new regime allows a ₹${groupIN(nw.standardDeduction)} standard deduction and wider, lower slabs; the old regime allows ₹${groupIN(old.standardDeduction)} plus deductions such as 80C, 80D, HRA and home-loan interest.`);
   if (ia.residency === 'resident') points.push('Residents get a rebate that removes all tax up to ₹12 lakh of taxable income in the new regime, and up to ₹5 lakh in the old regime.');
   else points.push('As a non-resident, no rebate applies in either regime.');
   if (be === 0) points.push('The old regime is already lower or equal with the deductions supplied.');
-  else if (be != null) points.push(`On these inputs the old regime would only match the new regime with about ₹${be.toLocaleString('en-IN')} of total deductions and exemptions.`);
+  else if (be != null) points.push(`On these inputs the old regime would only match the new regime with about ₹${groupIN(be)} of total deductions and exemptions.`);
   else points.push('On these inputs no realistic amount of old-regime deductions brings the old regime down to the new regime’s tax.');
 
   return {
