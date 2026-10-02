@@ -79,3 +79,24 @@ test('the service worker cache and asset versions were bumped together', () => {
   assert.ok(read('index.html').includes(`assets/app.js?v=${v}`));
   assert.ok(read('plus/index.html').includes(`assets/tax-core.js?v=${v}`));
 });
+
+test('the privacy page separates the website, Plus and ChatGPT, with the agreed ChatGPT wording', () => {
+  const p = read('privacy/index.html');
+  assert.ok(p.includes('For the ChatGPT integration, your tax inputs are sent to Tax.cal\'s calculation service to perform the requested calculation. Tax.cal does not retain those inputs for ordinary calculation requests.'));
+  const kickers = ['The calculator on this website', 'Tax.cal Plus', 'Tax.cal in ChatGPT'].map((k) => p.indexOf(`<span class="kicker">${k}</span>`));
+  assert.ok(kickers.every((i) => i > 0), 'one section per surface');
+  // "Nothing leaves your device" is claimed for the browser calculator only.
+  assert.equal(p.split('Nothing leaves your device').length - 1, 1);
+  assert.ok(p.indexOf('Nothing leaves your device') < kickers[1]);
+});
+
+test('terms and support pages exist, are linked from the home page and listed in the sitemap', () => {
+  const home = read('index.html');
+  const sitemap = read('sitemap.xml');
+  for (const page of ['privacy', 'terms', 'support']) {
+    assert.ok(existsSync(new URL(`${page}/index.html`, root)), page);
+    assert.ok(home.includes(`href="${page}/"`), `home links ${page}`);
+    assert.ok(sitemap.includes(`https://taxcal.siddheshthapa.com/${page}/`), `sitemap ${page}`);
+    assert.ok(read(`${page}/index.html`).includes('styles.css?v=' + read('sw.js').match(/taxcal-v(\d+)/)[1]), `${page} uses the current stylesheet`);
+  }
+});

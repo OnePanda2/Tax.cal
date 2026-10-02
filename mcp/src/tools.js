@@ -185,28 +185,34 @@ const GET_TAX_RULES = {
   name: 'get_tax_rules',
   title: 'Look up Tax.cal’s tax rules',
   description: [
-    'Return the rules Tax.cal uses for one country and tax year: income-tax rates and thresholds, deductions, credits and rebates, social contributions, regional tax, the indirect-tax category assumptions, supported scope, assumptions, exclusions, official sources, the rule version and the date the rules were last verified.',
-    'Use it to answer “what does Tax.cal support?”, “when were these rules checked?” or “how is VAT/GST estimated?”. It performs no calculation on the user’s figures.'
+    'Return the rules Tax.cal uses: income-tax rates and thresholds, deductions, credits and rebates, social contributions, regional tax, the indirect-tax category assumptions, supported scope, assumptions, exclusions, official sources, the rule version and the date the rules were last verified.',
+    'With a country: that country’s full rules for one tax year (lookup "country"). Without a country: an overview of every supported country with its tax year, rule version and last-verified date, plus the assumptions shared by all countries and, for topic "indirect_tax", how VAT/GST/sales tax is estimated (lookup "overview").',
+    'Use it to answer “what does Tax.cal support?”, “when were these rules checked?” or “what assumptions does Tax.cal use for indirect tax?”. It performs no calculation on the user’s figures.'
   ].join(' '),
   inputSchema: {
     type: 'object',
     additionalProperties: false,
-    required: ['country'],
     properties: {
-      country: { type: 'string', enum: COUNTRY_ENUM, description: 'Country code.' },
-      tax_year: { type: 'string', description: TAX_YEAR_DESC },
+      country: { type: 'string', enum: COUNTRY_ENUM, description: 'Country code. Omit for the cross-country overview.' },
+      tax_year: { type: 'string', description: TAX_YEAR_DESC + ' Needs a country.' },
       topic: { type: 'string', enum: ['all', 'income_tax', 'social_contributions', 'regional_tax', 'indirect_tax', 'scope', 'sources'], description: 'Limit the answer to one part of the rules (default "all").' }
     }
   },
   outputSchema: {
     type: 'object',
-    required: ['country', 'country_name', 'tax_year', 'tax_year_label', 'status', 'currency', 'rule_version', 'last_verified', 'supported_tax_years', 'topic', 'confidence', 'assumptions', 'exclusions', 'sources'],
+    required: ['lookup', 'topic', 'engine_version', 'assumptions', 'exclusions', 'sources', 'learn_more'],
     properties: {
+      lookup: { type: 'string', enum: ['country', 'overview'] },
+      topic: STR, engine_version: STR,
       country: { type: 'string', enum: COUNTRY_ENUM }, country_name: STR, tax_year: STR, tax_year_label: STR,
       status: { type: 'string', enum: ['current', 'legacy'] }, legal_basis: STR, currency: STR,
-      rule_version: STR, last_verified: STR, engine_version: STR,
+      rule_version: STR, last_verified: STR,
       supported_tax_years: { type: 'array', items: { type: 'object', properties: { tax_year: STR, label: STR, status: STR } } },
-      topic: STR,
+      countries: {
+        type: 'array',
+        description: 'Overview only: every supported country and the freshness of its rules.',
+        items: { type: 'object', required: ['country', 'tax_year', 'rule_version', 'last_verified'], properties: { country: STR, country_name: STR, currency: STR, tax_year: STR, tax_year_label: STR, status: STR, rule_version: STR, last_verified: STR, supported_tax_years: STR_LIST, confidence: { type: 'object' } } }
+      },
       income_tax: {}, social_contributions: {}, regional_tax: {}, regions: { type: 'array' }, indirect_tax: { type: 'object' }, scope: { type: 'object' },
       terminology: { type: 'object' },
       confidence: { type: 'object' }, assumptions: STR_LIST, exclusions: STR_LIST,

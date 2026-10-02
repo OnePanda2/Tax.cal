@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Support · Tax.cal</title>
+  <meta name="description" content="Help with Tax.cal on the web and in ChatGPT: what it covers, how its estimates work, how to report a wrong figure, and how to reach us.">
+  <link rel="canonical" href="https://taxcal.siddheshthapa.com/support/">
+  <link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../styles.css?v=19">
+
+  <!-- Privacy-friendly analytics by Plausible -->
+  <script async src="https://plausible.io/js/pa-Wj_1OavoJ4_-NVQlAh9IK.js"></script>
+  <script>
+    window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+    plausible.init()
+  </script>
+</head>
+<body>
+<script>try{var t=localStorage.getItem('taxcal_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="../index.html" style="text-decoration:none;color:inherit">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#0694A2"/></linearGradient></defs><rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)"/><g fill="none" stroke-width="7.4" stroke-linecap="round"><circle cx="32" cy="32" r="15.5" stroke="#fff"/><path d="M32 16.5 A15.5 15.5 0 0 1 45.4 40.2" stroke="#F59E0B"/></g></svg>
+      Tax<span class="dot">.cal</span>
+    </a>
+    <span class="head-spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle light or dark theme"></button>
+  </div>
+</header>
+
+<main>
+  <section class="wrap">
+    <div class="hero">
+      <p class="eyebrow">Support</p>
+      <h1>Something look <span class="u">off</span>? Tell us.</h1>
+      <p class="lede">Help for the calculator on this website and for the Tax.cal app in ChatGPT. Both use the same tax engine and the same rules, so a figure should match wherever you see it.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:22px">
+      <div class="sec-title"><div><span class="kicker">Report a problem</span><h2>A wrong figure, a broken page, an outdated rule</h2></div></div>
+      <p class="hint">Open an issue on <a href="https://github.com/OnePanda2/Tax.cal/issues">GitHub</a>. The most useful report includes:</p>
+      <ul class="plain-list" style="margin-top:12px">
+        <li>the country, region and tax year</li>
+        <li>the <b>rule version</b> and <b>last verified</b> date shown with the result (for example <i>IN-2026-27-v1</i>)</li>
+        <li>the figure you expected and where it comes from, ideally an official calculator or the law</li>
+      </ul>
+      <p class="hint" style="margin-top:12px">GitHub issues are public, so use a round example salary rather than your own. For anything private, use the contact details in the <a href="../privacy/#contactLine">privacy policy</a>.</p>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">Questions</span><h2>Common questions</h2></div></div>
+      <details class="acc"><summary>What does Tax.cal cover?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>Tax on a salary for one person in the UK (England, Wales and Northern Ireland), the US (federal tax and every state), Canada (every province), Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India. It covers income tax, social contributions and state, provincial or regional tax, plus an estimate of the VAT, GST or sales tax inside your spending. It does not cover business or freelance income, capital gains, investment or foreign income, or companies.</p></div></details>
+      <details class="acc"><summary>How accurate is it?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>Direct taxes are calculated from each country's published rates and thresholds for the stated tax year, and each part comes with a confidence level. The tax inside spending is always an estimate, because it depends on what you buy. Treat every result as an estimate and check important decisions with the tax authority or a professional. The <a href="../terms/">terms</a> explain this.</p></div></details>
+      <details class="acc"><summary>Why does the ChatGPT app ask for my filing status or state?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>Because they change the answer. A US filing status or state, or a Canadian province, changes the tax a lot, so Tax.cal asks rather than guessing. Smaller defaults, such as India's new regime or a typical spending profile, are used and always named in the answer.</p></div></details>
+      <details class="acc"><summary>India: what is "Tax Year 2026-27", and how is it different from AY 2026-27?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>From 1 April 2026 the Income-tax Act, 2025 replaces the "previous year" and "assessment year" pair with a single tax year. Tax Year 2026-27 is income from 1 April 2026 to 31 March 2027. AY 2026-27 is the old-law assessment of income earned in FY 2025-26. Tax.cal supports both. For a salaried person, the slabs, rebate and cess are the same in both.</p></div></details>
+      <details class="acc"><summary>Does Tax.cal store my salary?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>Not from the calculator, which runs entirely in your browser, and not from the ChatGPT app, which sends your figures to our calculation service only to work out the answer and does not keep or log them. Tax.cal Plus stores your answers only if you press Save. The <a href="../privacy/">privacy policy</a> has the details.</p></div></details>
+      <details class="acc"><summary>Can Tax.cal file my return or pay my tax?<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary><div class="body"><p>No. Tax.cal only calculates and explains. Use your tax authority's official service, such as GOV.UK, the IRS or India's e-filing portal, or a professional.</p></div></details>
+    </div>
+
+    <div class="card pad" style="margin-top:16px">
+      <div class="sec-title"><div><span class="kicker">How it works</span><h2>Methods and sources</h2></div></div>
+      <ul class="plain-list">
+        <li><a href="../hidden-tax/">How Tax.cal estimates the tax inside spending</a></li>
+        <li><a href="../tax-by-country/">The same salary in every supported country</a></li>
+        <li><a href="https://github.com/OnePanda2/Tax.cal/blob/main/docs/TAX_RULE_SOURCES.md">Every rule and its official source</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot wrap">
+  <div class="disc"><strong>Estimates only.</strong> Tax.cal gives an approximate, educational view of your tax position. It is not tax, financial or legal advice.</div>
+  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Calculator</a></span><span>·</span><span><a href="../privacy/">Privacy</a></span><span>·</span><span><a href="../terms/">Terms</a></span></div>
+</footer>
+
+<script>
+document.getElementById('themeBtn').addEventListener('click', function () {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var dark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var next = dark ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('taxcal_theme', next); } catch (e) {}
+});
+</script>
+</body>
+</html>

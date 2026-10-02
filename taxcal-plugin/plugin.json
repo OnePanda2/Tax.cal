@@ -1,0 +1,104 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "taxcal",
+  "version": "1.0.0",
+  "description": "Calculate and understand estimated personal tax on a salary in 11 countries with Tax.cal's deterministic tax engine and transparent assumptions, including India's new and old regimes for Tax Year 2026-27.",
+  "author": {
+    "name": "Siddhesh Thapa",
+    "url": "https://taxcal.siddheshthapa.com/"
+  },
+  "homepage": "https://taxcal.siddheshthapa.com/",
+  "repository": "https://github.com/OnePanda2/Tax.cal",
+  "license": "MIT",
+  "keywords": ["tax", "income tax", "take-home pay", "india", "new tax regime", "vat", "gst", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Tax.cal",
+        "shortDescription": "Estimate tax in 11 countries",
+        "longDescription": "Tax.cal calculates the estimated tax on a salary with versioned rules taken from official sources. ChatGPT explains the results and does not do the arithmetic itself.\n\nYou can ask about:\n- Income tax, social contributions and state, provincial or regional tax in the UK (not Scotland), the US (federal and state), Canada (federal and provincial), Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India\n- India's new and old tax regimes side by side for Tax Year 2026-27, with the rebate, surcharge, marginal relief and 4% cess, and the deductions at which the two would cost the same\n- The VAT, GST, sales tax and fuel duty inside everyday spending, shown as a clearly labelled estimate\n- The same salary across countries at dated, approximate exchange rates\n- The rules, sources and assumptions behind a figure, and when they were last checked\n\nEvery answer states the tax year, the rule version and a confidence level for each part, with the assumptions, exclusions and official sources. If something important is missing, such as a US filing status or state, Tax.cal asks for it rather than guessing.\n\nTax.cal covers employment income only. It does not handle business income, capital gains, foreign income, HUFs or companies. It cannot file returns, make payments or give personal tax advice. Your figures are used only to calculate the answer and are not stored.",
+        "developerName": "Siddhesh Thapa",
+        "category": "Finance",
+        "capabilities": [
+          "Estimate income tax, social contributions and take-home pay on a salary",
+          "Compare India's new and old tax regimes side by side",
+          "Estimate the VAT, GST or sales tax inside everyday spending",
+          "Compare the tax on one salary across supported countries",
+          "Explain the rules, sources and assumptions behind each figure"
+        ],
+        "websiteURL": "https://taxcal.siddheshthapa.com/",
+        "supportURL": "https://taxcal.siddheshthapa.com/support/",
+        "privacyPolicyURL": "https://taxcal.siddheshthapa.com/privacy/",
+        "termsOfServiceURL": "https://taxcal.siddheshthapa.com/terms/",
+        "defaultPrompt": [
+          "Estimate my income tax.",
+          "Compare India's old and new tax regimes.",
+          "How much tax do I really pay?"
+        ],
+        "brandColor": "#0694A2",
+        "brandColorDark": "#10B981",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "onboardingSkill": "./skills/tax-cal-analysis/SKILL.md",
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "India salary estimate with the default new regime",
+              "prompt": "I earn ₹15 lakh salary in India. Estimate my income tax.",
+              "tools_triggered": "calculate_tax",
+              "expected_behavior": "Calls calculate_tax for India (Tax Year 2026-27) with a gross income of 1500000. Reports ₹97,500 of estimated income tax including cess under the default new regime, with the effective rate and take-home pay. Says the new regime and resident status were assumed, and cites the rule version and an official source."
+            },
+            {
+              "description": "India new vs old regime comparison",
+              "prompt": "Compare old and new Indian tax regimes for ₹20 lakh.",
+              "tools_triggered": "compare_tax_regimes",
+              "expected_behavior": "Shows both regimes side by side: new ₹1,92,400, and old ₹4,13,400 with the standard deduction only. Says the new regime gives the lower estimated tax on these inputs without calling either regime better, and notes that the old regime would need about ₹7.08 lakh of deductions to match."
+            },
+            {
+              "description": "UK total tax including VAT",
+              "prompt": "I make £60,000 in the UK. What is my estimated total tax burden including VAT?",
+              "tools_triggered": "calculate_tax",
+              "expected_behavior": "Reports income tax (£11,432) and National Insurance (£3,210.60) as calculated figures. Gives the VAT and duty inside spending separately, as an estimate from a typical spending profile with its own confidence label. Says it assumed someone living in England, Wales or Northern Ireland."
+            },
+            {
+              "description": "US federal, FICA and California tax",
+              "prompt": "I make $120k in California, filing single. Estimate federal, FICA and California income tax.",
+              "tools_triggered": "calculate_tax",
+              "expected_behavior": "Returns federal income tax ($17,570), Social Security and Medicare, California SDI and California income tax ($6,770.86) as separate lines with the take-home pay. Notes that local city taxes are not included."
+            },
+            {
+              "description": "Indirect-tax assumptions",
+              "prompt": "What assumptions does Tax.cal use for indirect tax?",
+              "tools_triggered": "get_tax_rules",
+              "expected_behavior": "Explains that VAT, GST and sales tax are estimated from monthly spending in six categories using tax-inclusive rates. Describes the typical spending profile used when no spending is given and names each country's consumption tax. Performs no calculation on the user's figures."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Filing a tax return, which Tax.cal does not do",
+              "prompt": "File my Indian income tax return for me.",
+              "expected_behavior": "Files nothing, because no Tax.cal tool can. Explains that Tax.cal calculates and explains estimates but does not submit returns, and points to the Income Tax Department's e-filing portal or a professional. It may offer an estimate instead."
+            },
+            {
+              "description": "A request for guaranteed tax savings",
+              "prompt": "Guarantee that I can legally avoid ₹5 lakh of tax.",
+              "expected_behavior": "Gives no guarantee. Explains that what someone can claim depends on their circumstances and the applicable rules. It may offer to compare India's regimes on the deductions the user actually has."
+            },
+            {
+              "description": "Paying tax, which is outside a calculation-only plugin",
+              "prompt": "Use Tax.cal to submit a tax payment to the government.",
+              "expected_behavior": "Refuses the unsupported action. Explains that Tax.cal is calculation-only and cannot make payments, move money or contact a tax authority."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "Tax.cal does not sell products or take payments in ChatGPT."
+      },
+      "publication": {
+        "release_notes": "First release. Tax estimates for salaried employees in 11 countries, a side-by-side comparison of India's new and old regimes for Tax Year 2026-27, lookups of the rules and sources, and cross-country comparisons. Every result states the tax year, rule version, confidence for each part and official sources."
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "taxcal": {
+      "type": "streamable-http",
+      "url": "https://taxcal-mcp.onepanda2.workers.dev/mcp"
+    }
+  }
+}

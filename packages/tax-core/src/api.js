@@ -50,6 +50,14 @@ function learnMore(key, region) {
   return { label: 'Explore the full interactive calculator on Tax.cal', url: `${SITE}/?${UTM}#${hash}` };
 }
 
+/* "India Tax Year 2026-27", "India FY 2025-26 (AY 2026-27)", "Germany 2026" */
+function scopeLabel(key, R) {
+  const name = COUNTRIES[key].profile.name;
+  if (key !== 'IN') return `${name} ${R.taxYear}`;
+  return R.status === 'legacy' ? `India FY ${R.taxYear} (AY ${ayFor(R.taxYear)})` : `India Tax Year ${R.taxYear}`;
+}
+const ayFor = (fy) => { const a = Number(fy.slice(0, 4)) + 1; return `${a}-${String(a + 1).slice(2)}`; };
+
 function sourcesOut(R) {
   return R.sources.map((s) => ({ title: s.title, publisher: s.publisher, url: s.url, covers: s.covers }));
 }
@@ -84,7 +92,7 @@ export const calculateTax = wrap((args) => {
     throw new V.InputError('missing_input', `I need the gross annual income in ${e.profile.currency.code} (before tax).`, { field: 'gross_income' });
   }
   const gross = V.amount(args.gross_income, 'gross_income', V.maxIncome(key), `annual amount in ${e.profile.currency.code}`);
-  V.incomeType(args.income_type);
+  V.incomeType(args.income_type, scopeLabel(key, R));
   const status = V.filingStatus(key, args.filing_status);
   const region = V.region(key, args.region);
 
@@ -257,6 +265,62 @@ export const compareTaxRegimes = wrap((args) => {
 
 /* ---- get_tax_rules ------------------------------------------------------ */
 const TOPICS = ['all', 'income_tax', 'social_contributions', 'regional_tax', 'indirect_tax', 'scope', 'sources'];
+const INDIRECT_METHOD = 'Rates are shares of TAX-INCLUSIVE spending: a 20% VAT is 1/6 (16.7%) of what you pay. Categories mix items taxed at different rates, so these are estimates.';
+const TYPICAL_PROFILE = () => CATEGORIES.map((cat) => ({ category: cat.id, share_of_monthly_gross: cat.def }));
+
+/* Without a country: what Tax.cal covers, how fresh each rule set is, and the
+   assumptions shared by every country. */
+const OVERVIEW_ASSUMPTIONS = [
+  'One individual employee with salary or wage income only.',
+  'Direct tax applies each country’s statutory rates, thresholds, deductions and credits for the stated tax year. Regional tax is modelled where a country needs it: US states, Canadian provinces, a representative Spanish regional scale and Milan’s Italian surcharges.',
+  'Indirect tax (VAT, GST, sales tax and fuel duty) is an estimate: monthly spending in six categories × an effective rate per category, computed tax-inclusively. Without the user’s spending, a typical-household profile is used and reported.',
+  'Exchange rates are used only to compare one salary across countries. They are dated ECB reference rates and approximate.'
+];
+const OVERVIEW_EXCLUSIONS = [
+  'Self-employment, business, rental, pension and investment income, and capital gains.',
+  'Companies, partnerships, trusts and Indian HUFs and firms.',
+  'Filing returns, paying tax, TDS/GST/VAT filings or any submission to a tax authority.',
+  'Local and city income taxes, and personal circumstances such as dependants, unless a country option says otherwise.',
+  'Personal tax, legal or financial advice.'
+];
+
+function rulesOverview(topic) {
+  const want = (t) => topic === 'all' || topic === t;
+  const out = {
+    lookup: 'overview',
+    topic,
+    engine_version: ENGINE_VERSION,
+    countries: ORDER.map((k) => {
+      const e = COUNTRIES[k];
+      const R = getRules(k);
+      return {
+        country: k, country_name: e.profile.name, currency: e.profile.currency.code,
+        tax_year: R.taxYear, tax_year_label: R.taxYearLabel, status: R.status,
+        rule_version: R.ruleVersion, last_verified: R.lastVerified,
+        supported_tax_years: Object.keys(e.rules),
+        confidence: { ...R.confidence }
+      };
+    })
+  };
+  if (want('indirect_tax')) {
+    out.indirect_tax = {
+      method: INDIRECT_METHOD,
+      categories: CATEGORIES.map((cat) => ({ category: cat.id, label: cat.label })),
+      typical_spending_profile: TYPICAL_PROFILE(),
+      by_country: ORDER.map((k) => {
+        const I = getRules(k).indirectTax;
+        return { country: k, name: I.name, standard_rate: I.standardRate ?? null, model: (I.model || 'category_effective_rates').replace(/-/g, '_') };
+      }),
+      note: 'Category rates, reasons and confidence differ by country: ask for one country with topic "indirect_tax" for the full table.'
+    };
+  }
+  out.assumptions = [...OVERVIEW_ASSUMPTIONS];
+  out.exclusions = [...OVERVIEW_EXCLUSIONS];
+  out.sources = [{ title: FX.source.title, publisher: FX.source.publisher, url: FX.source.url, covers: 'Approximate exchange rates for cross-country comparisons only' }];
+  out.notes = ['Each country’s official sources (tax authorities and legislation) are listed when you look up that country.'];
+  out.learn_more = { label: 'How Tax.cal estimates hidden taxes', url: `${SITE}/hidden-tax/?${UTM}` };
+  return out;
+}
 
 function rulesSection(key, R, topic) {
   const e = COUNTRIES[key];
@@ -276,7 +340,7 @@ function rulesSection(key, R, topic) {
   if (want('indirect_tax')) {
     const I = R.indirectTax;
     out.indirect_tax = {
-      name: I.name, standard_rate: I.standardRate ?? null, model: I.model || 'category_effective_rates',
+      name: I.name, standard_rate: I.standardRate ?? null, model: (I.model || 'category_effective_rates').replace(/-/g, '_'),
       basis: I.basis || null,
       categories: CATEGORIES.map((cat) => {
         const c = I.categories[cat.id];
@@ -289,8 +353,8 @@ function rulesSection(key, R, topic) {
           reason: c.reason
         };
       }),
-      method: 'Rates are shares of TAX-INCLUSIVE spending: a 20% VAT is 1/6 (16.7%) of what you pay. Categories mix items taxed at different rates, so these are estimates.',
-      typical_spending_profile: CATEGORIES.map((cat) => ({ category: cat.id, share_of_monthly_gross: cat.def }))
+      method: INDIRECT_METHOD,
+      typical_spending_profile: TYPICAL_PROFILE()
     };
   }
   if (want('scope')) out.scope = R.scope || { supported: ['Single employee with salary income'], unsupported: R.exclusions };
@@ -300,12 +364,17 @@ function rulesSection(key, R, topic) {
 export const getTaxRules = wrap((args) => {
   V.plainObject(args, 'arguments');
   V.onlyKeys(args, ['country', 'tax_year', 'topic'], null);
+  const topic = args.topic === undefined ? 'all' : V.oneOf(args.topic, 'topic', TOPICS);
+  if (args.country === undefined) {
+    if (args.tax_year !== undefined) throw new V.InputError('missing_input', 'Which country is that tax year for?', { field: 'country', allowed: [...ORDER] });
+    return rulesOverview(topic);
+  }
   const key = V.country(args.country);
   const e = COUNTRIES[key];
   const ty = V.taxYear(key, args.tax_year);
   const R = getRules(key, ty.year);
-  const topic = args.topic === undefined ? 'all' : V.oneOf(args.topic, 'topic', TOPICS);
   const result = {
+    lookup: 'country',
     country: key, country_name: e.profile.name,
     tax_year: R.taxYear, tax_year_label: R.taxYearLabel, status: R.status, legal_basis: R.legalBasis,
     currency: e.profile.currency.code,

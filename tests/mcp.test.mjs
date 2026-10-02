@@ -90,6 +90,7 @@ CALLS.push(
   ['compare_countries', { gross_income: 2500000, currency: 'INR', countries: ['IN', 'UK', 'US'], include_indirect_estimate: true }]
 );
 for (const topic of ['income_tax', 'social_contributions', 'regional_tax', 'indirect_tax', 'scope', 'sources']) CALLS.push(['get_tax_rules', { country: 'IN', topic }]);
+CALLS.push(['get_tax_rules', {}], ['get_tax_rules', { topic: 'indirect_tax' }], ['get_tax_rules', { country: 'IN', tax_year: 'AY 2026-27' }]);
 
 test(`all ${CALLS.length} sample calls validate against inputSchema and outputSchema`, () => {
   for (const [name, args] of CALLS) {

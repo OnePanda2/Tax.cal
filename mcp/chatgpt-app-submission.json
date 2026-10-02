@@ -1,0 +1,128 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Tax.cal",
+    "subtitle": "Estimate tax in 11 countries",
+    "description": "Tax.cal calculates estimated tax on a salary in the UK, US, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India with deterministic, versioned rules, and explains each figure with its tax year, rule version, confidence for each part, assumptions and official sources. It compares India's new and old regimes for Tax Year 2026-27, estimates the VAT, GST or sales tax inside spending as a labelled estimate, compares one salary across countries, and looks up the rules behind any figure. It is calculation-only: it does not file returns, make payments or give personal advice.",
+    "category": "FINANCE"
+  },
+  "tools": {
+    "calculate_tax": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Computes a tax estimate from the arguments and Tax.cal's built-in rule tables and stores nothing; the server keeps only an operational log line with no arguments.",
+        "open_world_justification": "Makes no outbound requests and cannot post, send or change anything on the internet or in any third-party system.",
+        "destructive_justification": "There is nothing to delete, overwrite or revoke, and the same arguments always return the same result."
+      }
+    },
+    "compare_tax_regimes": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Computes India's new- and old-regime tax for the given salary and deductions from built-in rules and stores nothing.",
+        "open_world_justification": "Makes no outbound requests; it cannot file, submit or change anything with a tax authority or any other system.",
+        "destructive_justification": "Only returns a side-by-side calculation; there is nothing it can delete, overwrite or make irreversible."
+      }
+    },
+    "get_tax_rules": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns Tax.cal's built-in rule data, assumptions and source list; it reads no user data and changes nothing.",
+        "open_world_justification": "Serves bundled reference data only and makes no outbound requests.",
+        "destructive_justification": "A pure lookup with no state to delete, overwrite or revoke."
+      }
+    },
+    "compare_countries": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Computes direct tax for one salary across countries from built-in rules and dated, bundled exchange rates, and stores nothing.",
+        "open_world_justification": "Uses bundled exchange rates and makes no outbound requests or changes to any external system.",
+        "destructive_justification": "Only returns comparison figures; there is nothing to delete, overwrite or revoke."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "India salary estimate with the default new regime",
+      "user_prompt": "I earn ₹15 lakh salary in India. Estimate my income tax.",
+      "file_attachment_urls": null,
+      "tools_triggered": "calculate_tax",
+      "expected_output": "Calls calculate_tax for India (Tax Year 2026-27) with a gross income of 1500000. Reports ₹97,500 of estimated income tax including cess under the default new regime, with the effective rate and take-home pay. Says the new regime and resident status were assumed, and cites the rule version and an official source.",
+      "expected_output_url": null
+    },
+    {
+      "description": "India new vs old regime comparison",
+      "user_prompt": "Compare old and new Indian tax regimes for ₹20 lakh.",
+      "file_attachment_urls": null,
+      "tools_triggered": "compare_tax_regimes",
+      "expected_output": "Shows both regimes side by side: new ₹1,92,400, and old ₹4,13,400 with the standard deduction only. Says the new regime gives the lower estimated tax on these inputs without calling either regime better, and notes that the old regime would need about ₹7.08 lakh of deductions to match.",
+      "expected_output_url": null
+    },
+    {
+      "description": "UK total tax including VAT",
+      "user_prompt": "I make £60,000 in the UK. What is my estimated total tax burden including VAT?",
+      "file_attachment_urls": null,
+      "tools_triggered": "calculate_tax",
+      "expected_output": "Reports income tax (£11,432) and National Insurance (£3,210.60) as calculated figures. Gives the VAT and duty inside spending separately, as an estimate from a typical spending profile with its own confidence label. Says it assumed someone living in England, Wales or Northern Ireland.",
+      "expected_output_url": null
+    },
+    {
+      "description": "US federal, FICA and California tax",
+      "user_prompt": "I make $120k in California, filing single. Estimate federal, FICA and California income tax.",
+      "file_attachment_urls": null,
+      "tools_triggered": "calculate_tax",
+      "expected_output": "Returns federal income tax ($17,570), Social Security and Medicare, California SDI and California income tax ($6,770.86) as separate lines with the take-home pay. Notes that local city taxes are not included.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Indirect-tax assumptions",
+      "user_prompt": "What assumptions does Tax.cal use for indirect tax?",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_tax_rules",
+      "expected_output": "Explains that VAT, GST and sales tax are estimated from monthly spending in six categories using tax-inclusive rates. Describes the typical spending profile used when no spending is given and names each country's consumption tax. Performs no calculation on the user's figures.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Filing a tax return, which Tax.cal does not do",
+      "user_prompt": "File my Indian income tax return for me.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Files nothing, because no Tax.cal tool can. Explains that Tax.cal calculates and explains estimates but does not submit returns, and points to the Income Tax Department's e-filing portal or a professional. It may offer an estimate instead.",
+      "expected_output_url": null
+    },
+    {
+      "description": "A request for guaranteed tax savings",
+      "user_prompt": "Guarantee that I can legally avoid ₹5 lakh of tax.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Gives no guarantee. Explains that what someone can claim depends on their circumstances and the applicable rules. It may offer to compare India's regimes on the deductions the user actually has.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Paying tax, which is outside a calculation-only plugin",
+      "user_prompt": "Use Tax.cal to submit a tax payment to the government.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "Refuses the unsupported action. Explains that Tax.cal is calculation-only and cannot make payments, move money or contact a tax authority.",
+      "expected_output_url": null
+    }
+  ]
+}

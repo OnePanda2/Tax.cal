@@ -150,12 +150,14 @@ export const UNSUPPORTED_INCOME = {
   interest: 'interest income'
 };
 
-export function incomeType(v) {
+/* supported: e.g. "India Tax Year 2026-27", so the message says what IS covered. */
+export function incomeType(v, supported) {
   if (v === undefined) return 'employment';
   const s = str(v, 'income_type').toLowerCase();
   if (s === 'employment' || s === 'salary' || s === 'wages') return 'employment';
   if (UNSUPPORTED_INCOME[s]) {
-    throw new InputError('unsupported_scope', `Tax.cal currently calculates salary/employment income only; ${UNSUPPORTED_INCOME[s]} is not supported. For that, use the tax authority's own tools or a qualified professional.`, { field: 'income_type', allowed: ['employment'] });
+    const lead = supported ? `${supported} is supported, but this calculation currently supports salaried individual income only` : 'Tax.cal currently calculates salary/employment income only';
+    throw new InputError('unsupported_scope', `${lead}, not ${UNSUPPORTED_INCOME[s]}. For that, use the tax authority's own tools or a qualified professional.`, { field: 'income_type', allowed: ['employment'] });
   }
   throw new InputError('invalid_input', 'income_type must be "employment".', { field: 'income_type', allowed: ['employment'] });
 }

@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Privacy at Tax.cal</title>
-  <meta name="description" content="Exactly what Tax.cal stores, what it does not, and how to delete anything you have saved.">
+  <meta name="description" content="Exactly what Tax.cal stores and what it does not — for the calculator on this website, Tax.cal Plus and the Tax.cal app in ChatGPT — and how to delete anything you have saved.">
   <link rel="canonical" href="https://taxcal.siddheshthapa.com/privacy/">
   <link rel="icon" href="../icons/favicon.svg" type="image/svg+xml">
   <meta name="theme-color" content="#0b1220">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="../styles.css?v=18">
+  <link rel="stylesheet" href="../styles.css?v=19">
 
   <!-- Privacy-friendly analytics by Plausible -->
   <script async src="https://plausible.io/js/pa-Wj_1OavoJ4_-NVQlAh9IK.js"></script>
@@ -39,11 +39,11 @@
     <div class="hero">
       <p class="eyebrow">Privacy</p>
       <h1>What we store, and what we <span class="u">don't</span>.</h1>
-      <p class="lede">Short version: the calculator stores nothing at all. The Plus questionnaire stores nothing unless you press Save, and even then it holds no name, no email and no password — just your answers behind a private link you can delete yourself.</p>
+      <p class="lede">Short version: the calculator on this website stores nothing at all. The Plus questionnaire stores nothing unless you press Save, and even then it holds no name, no email and no password, only your answers behind a private link you can delete yourself. The Tax.cal app in ChatGPT sends the figures you give it to our calculation service to work out the answer, and does not keep them.</p>
     </div>
 
     <div class="card pad" style="margin-top:22px">
-      <div class="sec-title"><div><span class="kicker">The calculator</span><h2>Nothing leaves your device</h2></div></div>
+      <div class="sec-title"><div><span class="kicker">The calculator on this website</span><h2>Nothing leaves your device</h2></div></div>
       <p class="hint">Your salary, your spending and every figure on the results page are calculated in your browser using JavaScript that ships with the page. None of it is transmitted to us or to anyone else. Close the tab and it is gone.</p>
       <p class="hint" style="margin-top:10px">The only thing kept on your device is your light/dark theme preference, in your browser's own storage. It never reaches us.</p>
     </div>
@@ -68,6 +68,19 @@
       <p class="hint" style="margin-top:10px">If you have lost your link, we genuinely cannot help you recover it or delete that specific review — we have no way to identify which record is yours. That is the deliberate cost of not holding your identity. It will expire on its own.</p>
     </div>
 
+    <div class="card pad" style="margin-top:16px" id="chatgpt">
+      <div class="sec-title"><div><span class="kicker">Tax.cal in ChatGPT</span><h2>Sent to calculate, not kept</h2></div></div>
+      <p class="hint">The ChatGPT app works differently from the calculator on this website, so "nothing leaves your device" does not apply to it. <b>For the ChatGPT integration, your tax inputs are sent to Tax.cal's calculation service to perform the requested calculation. Tax.cal does not retain those inputs for ordinary calculation requests.</b></p>
+      <p class="hint" style="margin-top:10px">ChatGPT passes the service only the figures it needs for your question: for example the country, your salary, a US filing status and state, India's regime and deductions, or your monthly spending. The service works out the answer, sends it back and forgets it:</p>
+      <ul class="plain-list" style="margin-top:12px">
+        <li>There is no database and no account. Nothing you send is saved.</li>
+        <li>Your salary, spending, deductions and other figures are <b>never written to our logs</b>. Each request leaves one line of operational facts so we can keep the service running and count usage: which tool ran, the country code, whether it worked, the type of any error, and how long it took.</li>
+        <li>The network address a request comes from (for ChatGPT, OpenAI's servers) is used only to limit floods of requests, and is not stored by us.</li>
+        <li>ChatGPT may attach technical details to a request, such as language settings. The service does not use, log or store them.</li>
+      </ul>
+      <p class="hint" style="margin-top:14px">Your conversation itself, meaning what you type in ChatGPT and its replies, is handled by OpenAI under <a href="https://openai.com/policies/privacy-policy/">OpenAI's privacy policy</a>. Tax.cal only receives the inputs ChatGPT passes to its tools. The service runs on <b>Cloudflare</b>, which processes each request in transit like any hosting provider.</p>
+    </div>
+
     <div class="card pad" style="margin-top:16px">
       <div class="sec-title"><div><span class="kicker">The waiting list</span><h2>Your email, if you give it</h2></div></div>
       <p class="hint">If you join the early-access list, we store the email address you typed and the country selected in the calculator, so we know which markets people are writing in from. That is handled by <b>Formspree</b>, which processes the submission and forwards it to us.</p>
@@ -78,7 +91,8 @@
       <div class="sec-title"><div><span class="kicker">Who else touches it</span><h2>Our suppliers</h2></div></div>
       <ul class="plain-list">
         <li><b>GitHub Pages</b> serves the website itself and, like any web server, sees the requests your browser makes for pages and images.</li>
-        <li><b>Cloudflare</b> runs the service that stores saved reviews.</li>
+        <li><b>Cloudflare</b> runs the service that stores saved Plus reviews, and the calculation service used by the ChatGPT app, which stores nothing.</li>
+        <li><b>OpenAI</b> runs ChatGPT. If you use Tax.cal inside ChatGPT, your conversation is processed by OpenAI under its own terms.</li>
         <li><b>Formspree</b> handles early-access sign-ups.</li>
         <li><b>Plausible</b> counts page views so we can see which countries people are visiting from.</li>
         <li><b>Google Fonts</b> serves the typefaces used on these pages.</li>
@@ -91,6 +105,7 @@
       <p class="hint">We use <b>Plausible</b> to count how many people visit and which pages they land on. We need this to know whether anyone is finding the site at all, and which countries to build for next.</p>
       <p class="hint" style="margin-top:10px">It is deliberately the least invasive option we could find. It sets <b>no cookies</b>, creates no persistent identifier, and cannot follow you to other websites. It records the page you viewed, where you arrived from, and your rough country, device type and browser — then discards your IP address rather than storing it. Nothing it collects can be traced back to you, and we could not single you out in it even if we wanted to.</p>
       <p class="hint" style="margin-top:10px">What it does <b>not</b> see: anything you type. Your salary, your spending and your questionnaire answers are never sent to it. Those stay on your device, exactly as described above.</p>
+      <p class="hint" style="margin-top:10px">For the ChatGPT app we count calculations by tool and country from the operational log lines described above, for example "a calculation for India". That count never includes your figures, and we do not use any detail of your taxes as an analytics dimension.</p>
       <p class="hint" style="margin-top:10px">Plausible is an EU company and stores its data in the EU. If you would rather not be counted at all, any browser-level ad or tracker blocker will stop it, and the site works perfectly well without it.</p>
     </div>
 
@@ -103,14 +118,14 @@
     <div class="card pad" style="margin-top:16px">
       <div class="sec-title"><div><span class="kicker">Contact</span><h2>How to reach us</h2></div></div>
       <p class="hint" id="contactLine">Email <a href="mailto:siddheshthapa02@gmail.com">siddheshthapa02@gmail.com</a>. Tax.cal is operated by <b>Siddhesh Thapa</b>, based in <b>India</b>. We will answer any request about your data within 30 days.</p>
-      <p class="hint" style="margin-top:10px">Last updated: 12 September 2026.</p>
+      <p class="hint" style="margin-top:10px">Last updated: 2 October 2026.</p>
     </div>
   </section>
 </main>
 
 <footer class="foot wrap">
   <div class="disc"><strong>Estimates only.</strong> Tax.cal gives an approximate, educational view of your tax position. It is not tax, financial or legal advice.</div>
-  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Calculator</a></span></div>
+  <div class="row2"><span>© 2026 Tax.cal</span><span>·</span><span><a href="../index.html">Calculator</a></span><span>·</span><span><a href="../terms/">Terms</a></span><span>·</span><span><a href="../support/">Support</a></span></div>
 </footer>
 
 <script>

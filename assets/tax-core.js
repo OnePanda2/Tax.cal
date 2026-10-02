@@ -1282,6 +1282,10 @@
       lines.push({ key: "state_income_tax", label: (US_STATES[region] ? US_STATES[region].name : region) + " income tax", amount: regional, kind: "regional" });
       if (!none) notes.push("State income tax is a proxy: federal taxable income stands in for state taxable income and the single-filer schedule is used.");
     }
+    if (region) {
+      const name = US_STATES[region] ? US_STATES[region].name : region;
+      notes.push(`${name} is supported for state income tax estimates. Local city and county income taxes (such as New York City's) are not included.`);
+    }
     return {
       taxableIncome: taxable,
       incomeTax: federal,

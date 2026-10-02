@@ -1,0 +1,193 @@
+{
+  "about": "Conversation test cases for the Tax.cal plugin. 'call' is the tool call a correct model should make for the prompt (null = no tool call). 'expect' is checked automatically against the MCP tools by tests/plugin.test.mjs in the Tax.cal repository; 'behavior' is what the reply should do and is checked by hand in ChatGPT. Amounts are for rule versions IN-2026-27-v1, UK-2026-27-v2, US-2026-v2, DE-2026-v2, CA-2026-v2.",
+  "cases": [
+    {
+      "id": "in-15-lakh",
+      "kind": "positive",
+      "prompt": "I earn ₹15 lakh salary in India. Estimate my income tax.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 1500000 } },
+      "expect": { "ok": true, "fields": { "tax_year": "2026-27", "total_direct_tax": 97500, "monthly_net_income": 116875, "inputs.regime": "new", "rule_version": "IN-2026-27-v1" } },
+      "behavior": "Gives ₹97,500, the effective rate and take-home pay; states the new regime and resident status were assumed; offers the old-regime comparison."
+    },
+    {
+      "id": "in-regimes-20-lakh",
+      "kind": "positive",
+      "prompt": "Compare old and new Indian tax regimes for ₹20 lakh.",
+      "call": { "tool": "compare_tax_regimes", "arguments": { "gross_income": 2000000 } },
+      "expect": { "ok": true, "fields": { "regimes.new.total_tax": 192400, "regimes.old.total_tax": 413400, "difference.lower_estimated_tax": "new", "old_regime_breakeven_deductions": 708334 } },
+      "behavior": "Shows both regimes; says which is lower on these inputs without calling it better; mentions the ~₹7.08 lakh break-even and the eligibility caveats."
+    },
+    {
+      "id": "uk-60k-with-vat",
+      "kind": "positive",
+      "prompt": "I make £60,000 in the UK. What is my estimated total tax burden including VAT?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "UK", "gross_income": 60000 } },
+      "expect": { "ok": true, "fields": { "direct_tax": 11432, "social_contributions": 3210.6, "total_direct_tax": 14642.6, "indirect_tax_estimate.included": true, "indirect_tax_estimate.basis": "typical_spending_profile" } },
+      "behavior": "Separates calculated income tax and NI from the estimated VAT/duty; states the England/Wales/NI assumption and the indirect-tax confidence."
+    },
+    {
+      "id": "us-ca-120k-single",
+      "kind": "positive",
+      "prompt": "I make $120k in California, filing single. Estimate federal, FICA and California income tax.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "US", "gross_income": 120000, "filing_status": "single", "region": "CA" } },
+      "expect": { "ok": true, "fields": { "direct_tax": 17570, "regional_tax": 6770.86, "social_contributions": 10740, "confidence.regional_tax": "medium" } },
+      "behavior": "Lists federal tax, Social Security, Medicare, CA SDI and California tax separately; notes local city taxes are excluded."
+    },
+    {
+      "id": "indirect-assumptions",
+      "kind": "positive",
+      "prompt": "What assumptions does Tax.cal use for indirect tax?",
+      "call": { "tool": "get_tax_rules", "arguments": { "topic": "indirect_tax" } },
+      "expect": { "ok": true, "fields": { "lookup": "overview", "topic": "indirect_tax" }, "has": ["indirect_tax.method", "indirect_tax.typical_spending_profile", "indirect_tax.by_country"] },
+      "behavior": "Explains the tax-inclusive category method and the typical spending profile; no calculation on user figures."
+    },
+    {
+      "id": "in-25-lakh-indirect-phrasing",
+      "kind": "positive",
+      "prompt": "I'm making 25 lakh in India. What's my tax?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 2500000 } },
+      "expect": { "ok": true, "fields": { "total_direct_tax": 319800 } },
+      "behavior": "Triggers the India calculation from natural phrasing; converts 25 lakh to 2500000."
+    },
+    {
+      "id": "de-70k",
+      "kind": "positive",
+      "prompt": "I live in Germany and earn €70k.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "DE", "gross_income": 70000 } },
+      "expect": { "ok": true, "fields": { "total_direct_tax": 27430.13, "inputs.has_children": false } },
+      "behavior": "Calculates for Germany and mentions the childless care-insurance surcharge default."
+    },
+    {
+      "id": "in-fy-2026-27",
+      "kind": "positive",
+      "prompt": "What's the tax on ₹18 lakh for FY 2026-27?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 1800000, "tax_year": "FY 2026-27" } },
+      "expect": { "ok": true, "fields": { "tax_year": "2026-27" }, "fields_match": { "legal_basis": "Income-tax Act, 2025" }, "notes_match": "Tax Year 2026-27 under the Income-tax Act, 2025" },
+      "behavior": "Treats FY 2026-27 as Tax Year 2026-27 under the 2025 Act, not as an assessment year."
+    },
+    {
+      "id": "in-ay-2026-27",
+      "kind": "positive",
+      "prompt": "How much tax for AY 2026-27 on a ₹12 lakh salary?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 1200000, "tax_year": "AY 2026-27" } },
+      "expect": { "ok": true, "fields": { "tax_year": "2025-26", "total_direct_tax": 0 }, "notes_match": "Income-tax Act, 1961" },
+      "behavior": "Uses the legacy FY 2025-26 rules under the 1961 Act and explains that AY 2026-27 is not Tax Year 2026-27."
+    },
+    {
+      "id": "compare-countries-usd",
+      "kind": "positive",
+      "prompt": "How does tax on $100,000 compare in the US, UK, Germany and India?",
+      "call": { "tool": "compare_countries", "arguments": { "gross_income": 100000, "currency": "USD", "countries": ["US", "UK", "DE", "IN"] } },
+      "expect": { "ok": true, "fields": { "rows.0.country": "US", "rows.3.country": "IN", "order": "As requested (not a ranking)." } },
+      "behavior": "Keeps the requested order, mentions the dated exchange rates, does not rank countries or call it cost of living."
+    },
+    {
+      "id": "us-missing-filing-status",
+      "kind": "clarify",
+      "prompt": "I make $120k in California. Estimate federal, FICA and California income tax.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "US", "gross_income": 120000, "region": "CA" } },
+      "expect": { "ok": false, "code": "missing_input", "field": "filing_status", "message_match": "I need your filing status to calculate this accurately" },
+      "behavior": "Asks for the filing status (ideally before calling); never assumes single."
+    },
+    {
+      "id": "ca-missing-province",
+      "kind": "clarify",
+      "prompt": "I earn C$85,000 in Canada. What's my take-home pay?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "CA", "gross_income": 85000 } },
+      "expect": { "ok": false, "code": "missing_input", "field": "region" },
+      "behavior": "Asks which province."
+    },
+    {
+      "id": "how-much-tax-no-context",
+      "kind": "clarify",
+      "prompt": "How much tax am I paying?",
+      "call": null,
+      "behavior": "Asks one short question for the country and annual salary (plus state and filing status if the US)."
+    },
+    {
+      "id": "file-return",
+      "kind": "negative",
+      "prompt": "File my Indian income tax return for me.",
+      "call": null,
+      "behavior": "Files nothing; explains Tax.cal calculates and explains estimates but does not submit returns."
+    },
+    {
+      "id": "guarantee-savings",
+      "kind": "negative",
+      "prompt": "Guarantee that I can legally avoid ₹5 lakh of tax.",
+      "call": null,
+      "behavior": "Gives no guarantee; eligibility depends on circumstances and rules; may offer a regime comparison on actual deductions."
+    },
+    {
+      "id": "submit-payment",
+      "kind": "negative",
+      "prompt": "Use Tax.cal to submit a tax payment to the government.",
+      "call": null,
+      "behavior": "Refuses; Tax.cal is calculation-only."
+    },
+    {
+      "id": "unsupported-country",
+      "kind": "negative",
+      "prompt": "Calculate my tax on R$200,000 in Brazil.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "BR", "gross_income": 200000 } },
+      "expect": { "ok": false, "code": "unsupported_country" },
+      "behavior": "Says Brazil is not supported and lists the supported countries; does not estimate Brazilian tax itself."
+    },
+    {
+      "id": "unsupported-region-scotland",
+      "kind": "negative",
+      "prompt": "I live in Scotland and earn £45,000. What's my tax?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "UK", "gross_income": 45000, "region": "scotland" } },
+      "expect": { "ok": false, "code": "unsupported_region" },
+      "behavior": "Explains Scottish bands are not supported; may offer the rest-of-UK figure only if clearly labelled as not applicable to Scotland."
+    },
+    {
+      "id": "negative-income",
+      "kind": "negative",
+      "prompt": "My salary is -50000 pounds, how much tax?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "UK", "gross_income": -50000 } },
+      "expect": { "ok": false, "code": "out_of_range" },
+      "behavior": "Asks for a valid annual salary."
+    },
+    {
+      "id": "malformed-income",
+      "kind": "negative",
+      "prompt": "Tax on fifteen-ish lakh maybe?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": "fifteen lakh" } },
+      "expect": { "ok": false, "code": "invalid_input" },
+      "behavior": "Should convert to 1500000 before calling; if a malformed value reaches the tool it is rejected, never guessed."
+    },
+    {
+      "id": "business-income",
+      "kind": "negative",
+      "prompt": "Calculate tax on my ₹30 lakh business income.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 3000000, "income_type": "business" } },
+      "expect": { "ok": false, "code": "unsupported_scope", "message_match": "India Tax Year 2026-27 is supported, but this calculation currently supports salaried individual income only" },
+      "behavior": "Explains salaried income only; points to the Income Tax Department or a chartered accountant."
+    },
+    {
+      "id": "regimes-for-uk",
+      "kind": "negative",
+      "prompt": "Compare the old and new regimes for my UK salary of £50,000.",
+      "call": { "tool": "compare_tax_regimes", "arguments": { "country": "UK", "gross_income": 50000 } },
+      "expect": { "ok": false, "code": "unsupported_scope" },
+      "behavior": "Explains the regime comparison is India-only and offers calculate_tax for the UK."
+    },
+    {
+      "id": "unsupported-year",
+      "kind": "negative",
+      "prompt": "What was my tax for AY 2024-25 on ₹10 lakh?",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "IN", "gross_income": 1000000, "tax_year": "AY 2024-25" } },
+      "expect": { "ok": false, "code": "unsupported_tax_year" },
+      "behavior": "Lists the supported years; does not compute older rules itself."
+    },
+    {
+      "id": "unsupported-filing-status",
+      "kind": "negative",
+      "prompt": "I'm head of household in Texas earning $80,000.",
+      "call": { "tool": "calculate_tax", "arguments": { "country": "US", "gross_income": 80000, "region": "TX", "filing_status": "head_of_household" } },
+      "expect": { "ok": false, "code": "unsupported_scope", "field": "filing_status" },
+      "behavior": "Explains head of household is not modelled; offers single or married filing jointly only if the user wants an approximation and says so."
+    }
+  ]
+}
