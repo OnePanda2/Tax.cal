@@ -23,9 +23,9 @@ mcp/.wrangler/
 # Build output that is not served (the plugin ZIP is rebuilt on demand)
 dist/*.zip
 
-# Handover safety net. The owner keeps the live handover in the repo root as
-# `PROJECT-HANDOVER TaxCal.md` (tracked since 2 October 2026; tracked files are not
-# affected by these patterns). These patterns stop any OTHER stray handover copy or
-# draft from being added by accident. The repo is PUBLIC.
+# Handover safety net. The live handover is kept OUTSIDE this repo, in
+# F:\Projects\Handovers\ (it was briefly tracked here on 2 October 2026 and removed on
+# 3 October). These patterns stop any copy or draft landing in the repo by accident.
+# The repo is PUBLIC.
 *HANDOVER*.md
 *handover*.md
