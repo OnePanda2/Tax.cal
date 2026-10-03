@@ -1,0 +1,3 @@
+# Keep text files as LF in the working tree on every OS. Generated files (assets/tax-core.js,
+# docs/TAX_RULE_SOURCES.md, the plugin ZIP) are compared byte-for-byte by tests, so CRLF breaks them.
+* text=auto eol=lf
