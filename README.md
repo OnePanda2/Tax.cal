@@ -173,7 +173,7 @@ With no `--env`, Wrangler uses the top-level (production) settings and warns tha
 
 ## Submit the plugin
 
-Follow [docs/OPENAI_SUBMISSION.md](docs/OPENAI_SUBMISSION.md). It covers organization verification, deploying the server, domain verification, building the ZIP, the walkthrough video, the test cases and the reviewer notes. No reviewer account is needed, because the tools need no sign-in.
+Follow [docs/OPENAI_SUBMISSION.md](docs/OPENAI_SUBMISSION.md). It covers developer verification, deploying the server, domain verification, building the ZIP, the walkthrough video, the test cases and the reviewer notes. No reviewer account is needed, because the tools need no sign-in.
 
 ## Email capture (Formspree)
 

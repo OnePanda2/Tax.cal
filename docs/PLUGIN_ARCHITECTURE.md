@@ -36,7 +36,7 @@ The model never does tax arithmetic. The skill tells it to call a tool for every
 | `src/tools.js` | Tool descriptors (JSON Schema 2020-12 input and output schemas, annotations) and dispatch to `packages/tax-core/src/api.js` |
 | `dev-server.mjs` | Runs `app.js` on Node's `http`, for local use and the SDK tests |
 | `smoke.mjs` | End-to-end check against any URL. Used after deploys and every six hours by `.github/workflows/mcp-health.yml` |
-| `chatgpt-app-submission.json` | Import file for the OpenAI submission form: app info, tool hints with justifications, test cases |
+| `chatgpt-app-submission.json` | Written for OpenAI's previous submission form: app info, tool hints with justifications, test cases. The current flow takes the listing and cases from `taxcal-plugin/plugin.json` and scans the tools from the live server. Kept in step with both by `tests/plugin.test.mjs` |
 
 ### Protocol
 

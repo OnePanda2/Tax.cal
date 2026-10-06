@@ -71,7 +71,7 @@ With no `--env`, Wrangler uses the top-level (production) settings and warns tha
 
 Bump `SERVER_VERSION` in `mcp/src/app.js` when the server's behaviour changes.
 
-**OpenAI compares the live tool definitions with the published ones.** If the tool descriptions or schemas change (for example the tax-year text in `mcp/src/tools.js`), submit an update in the OpenAI Platform and keep the live server compatible with the published definition until it is approved. A data-only update (new numbers, same tools) needs no resubmission.
+**OpenAI rescans the live tool definitions.** After publication it scans the server daily, or when you select **Rescan** under MCPs in the OpenAI Platform. If the tool descriptions or schemas change (for example the tax-year text in `mcp/src/tools.js`), the change goes live only once it passes the automated checks. A flagged change is held while the approved definition stays live. Keep the live server compatible with the approved definition until the update is live. A data-only update (new numbers, same tools) changes no tool definition.
 
 ### 10. Verify the plugin output
 

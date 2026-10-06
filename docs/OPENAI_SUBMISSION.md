@@ -1,6 +1,6 @@
 # Submitting Tax.cal to OpenAI
 
-A step-by-step checklist for listing the Tax.cal plugin in ChatGPT. It is based on OpenAI's plugin documentation as checked on 2 October 2026: [Package your plugin](https://developers.openai.com/plugins/build/plugins), [Upload and submit your plugin](https://developers.openai.com/plugins/deploy/submission), [Remote MCP server review requirements](https://developers.openai.com/plugins/deploy/app-review), [Plugin submission errors](https://developers.openai.com/plugins/deploy/submission-errors) and [Connect and test your plugin](https://developers.openai.com/plugins/deploy/connect-chatgpt). Those pages are the source of truth. If anything below disagrees with them, follow OpenAI's page and update this file.
+A step-by-step checklist for listing the Tax.cal plugin in ChatGPT. It is based on OpenAI's plugin documentation as checked on 6 October 2026: [Package your plugin](https://developers.openai.com/plugins/build/plugins), [Upload and submit your plugin](https://developers.openai.com/plugins/deploy/submission), [Plugin guidelines](https://developers.openai.com/plugins/plugin-guidelines), [Remote MCP server review requirements](https://developers.openai.com/plugins/deploy/app-review), [Plugin submission errors](https://developers.openai.com/plugins/deploy/submission-errors), [Connect and test your plugin](https://developers.openai.com/plugins/deploy/connect-chatgpt) and the Help Center article [API Organization Verification](https://help.openai.com/en/articles/10910291-api-organization-verification). Those pages are the source of truth. If anything below disagrees with them, follow OpenAI's page and update this file.
 
 Everything that can be prepared in the repository is prepared. The steps marked **(owner)** need the owner's own accounts and cannot be done from code.
 
@@ -11,7 +11,7 @@ Everything that can be prepared in the repository is prepared. The steps marked 
 | Plugin package (manifest, MCP config, skill, logo, README) | `taxcal-plugin/` → `npm run plugin:zip` → `dist/taxcal-plugin.zip` |
 | Name, subtitle, description, category, capabilities, URLs, starter prompts, colours | `taxcal-plugin/plugin.json` → `extensions["com.openai"].interface` |
 | Five positive and three negative test cases | `plugin.json` → `review.test_cases` (also `mcp/chatgpt-app-submission.json`) |
-| Tool hints with justifications | `mcp/chatgpt-app-submission.json` (the submission form's import file) |
+| Tool annotations | Explicit `readOnlyHint`, `destructiveHint` and `openWorldHint` on every tool in `mcp/src/tools.js`. OpenAI scans them from the live server, and justifications are no longer required. `mcp/chatgpt-app-submission.json` was written for the previous submission form and is kept in step with `plugin.json` for reference |
 | Release notes | `plugin.json` → `publication.release_notes` |
 | Website, support, privacy and terms pages | https://taxcal.siddheshthapa.com/, `/support/`, `/privacy/`, `/terms/` |
 | MCP server code and config | `mcp/` (Cloudflare Worker), `mcp/wrangler.toml` |
@@ -22,8 +22,12 @@ Everything that can be prepared in the repository is prepared. The steps marked 
 
 ## 1. Prerequisites (owner)
 
-- [ ] An OpenAI Platform organization that has completed **organization verification**.
-- [ ] Your user has the **`api.apps.write`** permission (to create drafts and submit) and **`api.apps.read`** (to see review status). Organization owners have both.
+- [ ] **Individual verification**, done in the OpenAI Platform organization settings (platform.openai.com → Settings → Organization → General). Every submission must come from a verified individual or organization. Tax.cal is published under the owner's own name (`developerName` "Siddhesh Thapa"), so **individual** verification is the right kind: it needs an original, physical government photo ID and possibly a selfie. **Business** verification is for publishing under a company name and needs company records. At upload you choose this verified **Developer identity**, and the directory shows its name.
+  - One person can verify only one account or organization, so do it once, on the account that will own the plugin.
+  - Scans, photocopies, screenshots and digital IDs are rejected.
+  - If **Submit for review** later says individual verification is not complete although it shows as approved, check that the submission identity matches the verification type. That was OpenAI support's answer to the same error in the developer forum (April 2026).
+- [ ] You are an **organization owner**, or an owner has given you the **Apps Management Write** role.
+- [ ] **The listing's URLs identify the publisher.** OpenAI requires the public URLs to name the same publisher as the submission. Today only `/privacy/` names Siddhesh Thapa. Once verification shows the exact name of the Developer identity, put the same name on the home page, `/terms/` and `/support/`.
 - [ ] The Cloudflare account that runs `taxcal-plus-api` (workers.dev subdomain `onepanda2`).
 
 ## 2. Deploy the MCP server (owner)
@@ -49,13 +53,22 @@ If Wrangler prints a different URL, rebuild the ZIP with `npm run plugin:zip -- 
 
 ## 3. Try it in ChatGPT before submitting (owner)
 
-Follow OpenAI's [Connect and test your plugin](https://developers.openai.com/plugins/deploy/connect-chatgpt) to add `https://taxcal-mcp.onepanda2.workers.dev/mcp` as a developer connection. Run every prompt in §7 and check the answers against the expected results. Expect the model to:
+Follow OpenAI's [Connect and test your plugin](https://developers.openai.com/plugins/deploy/connect-chatgpt). There is no Developer-mode toggle any more:
+
+1. In ChatGPT, open **Plugins** and select the **plus** button → **Add custom MCP server**.
+2. Enter a name and description, the URL `https://taxcal-mcp.onepanda2.workers.dev/mcp` and no authentication.
+3. Select **Create as a plugin**.
+4. After every MCP deploy, open the connection, select **Refresh** and start a new conversation.
+
+Run every prompt in §7 in a Temporary chat and check the answers against the expected results. Run them at least once in the ChatGPT **mobile** app as well: OpenAI's guidelines require plugins to work on desktop and mobile. Expect the model to:
 
 - call a tool for every figure;
 - say so whenever it fills in an input itself. In testing on 5–6 October 2026, given no US filing status, ChatGPT assumed "single" and said so instead of asking. The review cases and the video therefore always state the filing status (P4);
 - keep VAT/GST estimates separate from direct tax;
 - show the tax year, rule version and a source;
 - include at most one link to Tax.cal.
+
+A custom connector loads only the tool descriptions and the server instructions. The plugin's skill is not loaded, and it is the skill that tells the model to ask for a missing filing status. OpenAI's guide also describes testing the complete plugin, skill included, by installing the packaged plugin from a local source before submitting. That has not been tried for Tax.cal yet.
 
 ## 4. Build the ZIP
 
@@ -67,30 +80,28 @@ The ZIP contains `plugin.json`, `mcp.json`, `README.md`, `skills/tax-cal-analysi
 
 ## 5. Record the walkthrough video (owner)
 
-MCP review needs a **reviewer-accessible video walkthrough**. In `plugin.json` this is `extensions["com.openai"].review.demo_recording_url`, which is left out until the video exists. Record about three minutes following the script in §8. Upload it somewhere a reviewer can open without signing in, such as an unlisted YouTube video. Then either add the URL to `plugin.json` and rebuild the ZIP, or paste it into the form.
+MCP review needs a **reviewer-accessible video walkthrough**. In `plugin.json` this is `extensions["com.openai"].review.demo_recording_url`, which is left out until the video exists. Record about three minutes following the script in §8. Upload it somewhere a reviewer can open without signing in, such as an unlisted YouTube video. Then either add the URL to `plugin.json` and rebuild the ZIP, or enter it in **Review details** in the dashboard. Set the ChatGPT personality to *Default* before recording, so the answers carry no asides from a personal setting.
 
 ## 6. Upload and submit (owner)
 
-In the OpenAI Platform dashboard, following [Upload and submit your plugin](https://developers.openai.com/plugins/deploy/submission):
+In the OpenAI Platform, following [Upload and submit your plugin](https://developers.openai.com/plugins/deploy/submission). The button names below are OpenAI's as of 6 October 2026. If the dashboard differs, follow the page.
 
-- [ ] Create the plugin and upload `dist/taxcal-plugin.zip`. The manifest imports the listing, the test cases and the release notes. If the form offers an import for `chatgpt-app-submission.json`, upload `mcp/chatgpt-app-submission.json` to fill in the tool-hint justifications.
-- [ ] **MCP server URL:** choose a **universal** URL (one endpoint for all users), `https://taxcal-mcp.onepanda2.workers.dev/mcp`. Not "Template".
-- [ ] **Authentication:** none.
-- [ ] **Domain verification:** copy the token the dashboard shows, then:
+- [ ] **Create the draft.** Select the organization and project that will own the plugin. Open **Plugins** → **Upload new or existing plugin**, choose your verified **Developer identity** (§1), then **Upload plugin** and pick `dist/taxcal-plugin.zip`. The manifest brings in the listing, the 8 test cases, the release notes and, once it is added, the video URL.
+- [ ] **Metadata & Skills.** Wait for the automated checks. Fix anything under *Issues detected* in the package, rebuild the ZIP and upload it again. The skill scan must finish before you can submit.
+- [ ] **MCPs → Connect.** MCP Server URL `https://taxcal-mcp.onepanda2.workers.dev/mcp`, authentication none. If asked whether the URL is universal or a template, choose **universal** (one endpoint for all users).
+- [ ] **Domain verification**, inside *Connect MCP server*. Copy the token the portal shows, then run:
 
   ```bash
   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml   # no --env: production
   curl https://taxcal-mcp.onepanda2.workers.dev/.well-known/openai-apps-challenge   # must print exactly the token
   ```
 
-  Then complete the challenge in the dashboard.
-- [ ] **Tools:** check that all four tools show `readOnlyHint: true`, `openWorldHint: false` and `destructiveHint: false`, each with its justification from `chatgpt-app-submission.json`.
-- [ ] **Test cases:** exactly 5 positive and 3 negative cases, already in the manifest. Uploads accept partial lists, so confirm all 8 imported.
-- [ ] **Walkthrough video URL** from §5.
-- [ ] **Release notes** imported from `publication.release_notes`.
-- [ ] **Availability:** `publication.countries` is left out, so OpenAI's default availability applies. Add an allow-list such as `["IN", "GB", "US"]` only to restrict it deliberately.
+  The endpoint returns the token as plain text, trimmed, which is what OpenAI requires. Then complete the challenge and connect.
+- [ ] **Tool scan.** Wait for it to finish. All four tools should show `readOnlyHint: true`, `destructiveHint: false` and `openWorldHint: false`. Read any *Issues* the scan reports.
+- [ ] **Review information → Review details.** Confirm that exactly 5 positive and 3 negative cases were imported (uploads accept partial lists), along with the video URL from §5 and the release notes. Leave reviewer credentials empty: Tax.cal has no sign-in. If there is a notes field, paste §9 into it. Reviewer instructions cannot go in the ZIP; the importer rejects them.
+- [ ] **Availability.** `publication.countries` is left out of the manifest. Per OpenAI's field reference, leaving it out keeps the dashboard's existing targeting, and `[]` removes restrictions. Check the setting in the dashboard.
 - [ ] **Commerce:** none (`commerce: false`). Tax.cal sells nothing in ChatGPT.
-- [ ] Submit. If the upload reports an error, see [Plugin submission errors](https://developers.openai.com/plugins/deploy/submission-errors).
+- [ ] **Submit for review**, and complete the policy attestations. Track progress under *Review status* on the Plugins page; the review team's feedback arrives by email. If something fails, see [Plugin submission errors](https://developers.openai.com/plugins/deploy/submission-errors).
 
 ## 7. Test cases (as submitted)
 
@@ -118,12 +129,15 @@ More cases, covering clarifications, malformed input and unsupported countries, 
 7. **Negatives.** Ask N1, N2 and N3 in turn. Show the refusals and that no tool runs.
 8. **Privacy (10 s).** Open https://taxcal.siddheshthapa.com/privacy/#chatgpt: "inputs are sent to calculate and are not retained".
 
-## 9. Instructions for reviewers (paste into the form's notes)
+## 9. Instructions for reviewers (for a notes field in Review details, if there is one)
 
 > Tax.cal needs no account, sign-in or credentials. All four tools are read-only and deterministic: the same inputs always return the same figures, with no side effects, and no outbound calls. Supported: salary income in the UK (not Scotland), US (filing status and state required), Canada (province required), Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India (Tax Year 2026-27 and the legacy FY 2025-26). Expected figures for the test prompts are in the test cases. Unsupported requests (other countries, business income, filing or paying tax) return a clear error or are declined. The server stores nothing and does not log tool arguments. Health: https://taxcal-mcp.onepanda2.workers.dev/health.
 
 ## 10. After approval
 
-- Publish when ready. Keep the production server compatible with the **published** tool definitions: OpenAI periodically fetches the tools and compares descriptions, schemas and annotations.
-- Data-only updates (new rule numbers, same tools) can be deployed directly. Changes to tool names, descriptions, schemas or annotations need a new submission, and the live server must stay compatible while the update is held. See `docs/UPDATING_TAX_RULES.md`, step 9.
+- Approval does not publish the plugin. Open the approved package version and select **Publish plugin** when ready.
+- **Tool changes are reviewed continuously, not resubmitted.** After publication OpenAI rescans the MCP server daily, or when you select **Rescan** under MCPs → Issues. A changed tool name, description, schema or annotation goes live once it passes the automated checks. A flagged change is held while the previously approved definition stays live, and a new tool stays unavailable until it is approved. Keep the server compatible with the approved definitions until an update is live. See `docs/UPDATING_TAX_RULES.md`, step 9.
+- Data-only updates (new rule numbers, same tools) change no tool definition and can be deployed directly.
+- **Anything in the ZIP needs a new package version:** the listing, the skill, the test cases or the release notes. Bump `version` in `plugin.json`, run `npm run plugin:zip`, upload it to the existing plugin, and go through review again.
+- Changing the MCP server's URL after publication needs OpenAI support.
 - Watch the health workflow and `npx wrangler@4 tail taxcal-mcp`.

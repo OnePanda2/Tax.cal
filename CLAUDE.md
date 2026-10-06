@@ -16,7 +16,7 @@ Read this first in every session.
 - **Privacy.** The website calculator sends nothing. The MCP server stores nothing and never logs arguments (`tests/mcp.test.mjs` enforces this). Never add salary, spending or any other tax detail to logs or analytics. Privacy-page claims must match the code (`tests/site.test.mjs` pins the wording).
 - **Asset versions.** When any website asset changes, bump `taxcal-vNN` in `sw.js` and every `?v=NN` together.
 - **No secrets in the repo or the plugin ZIP.** The OpenAI domain-verification token is a Wrangler secret (`OPENAI_APPS_CHALLENGE`).
-- **Tool definitions are reviewed by OpenAI.** Changing tool names, descriptions, schemas or annotations in `mcp/src/tools.js` requires a new submission once the plugin is live.
+- **Tool definitions are reviewed by OpenAI.** Once the plugin is live, OpenAI rescans the server daily. A changed tool name, description, schema or annotation in `mcp/src/tools.js` goes live only if it passes review; otherwise it is held while the approved version stays live. Keep the server compatible with the approved definitions. Changes to anything in the plugin ZIP (listing, skill, test cases) need a new package version and review. See `docs/OPENAI_SUBMISSION.md` §10.
 
 ## Commands
 
