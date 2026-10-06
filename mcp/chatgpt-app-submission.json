@@ -3,8 +3,8 @@
   "schema_version": 1,
   "app_info": {
     "display_name": "Tax.cal",
-    "subtitle": "Estimate tax in 11 countries",
-    "description": "Tax.cal calculates estimated tax on a salary in the UK, US, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India with deterministic, versioned rules, and explains each figure with its tax year, rule version, confidence for each part, assumptions and official sources. It compares India's new and old regimes for Tax Year 2026-27, estimates the VAT, GST or sales tax inside spending as a labelled estimate, compares one salary across countries, and looks up the rules behind any figure. It is calculation-only: it does not file returns, make payments or give personal advice.",
+    "subtitle": "Could you pay less tax?",
+    "description": "Could you pay less tax? Tax.cal calculates estimated tax on a salary in the UK, US, Canada, Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India with deterministic, versioned rules, and explains each figure with its tax year, rule version, confidence for each part, assumptions and official sources. It compares India's new and old regimes for Tax Year 2026-27, estimates the VAT, GST or sales tax inside spending as a labelled estimate, compares one salary across countries, and looks up the rules behind any figure. It is calculation-only: it does not file returns, make payments or give personal advice.",
     "category": "FINANCE"
   },
   "tools": {
