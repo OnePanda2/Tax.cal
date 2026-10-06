@@ -68,7 +68,7 @@ const CALCULATE_TAX = {
   description: [
     'Calculate one employee’s estimated tax for a supported country and tax year with Tax.cal’s deterministic rules: income tax, employee social contributions, state/provincial or regional income tax, and (optionally) an estimate of the VAT/GST/sales tax and fuel duty inside everyday spending.',
     'Returns amounts, effective rates, net and monthly take-home pay, a line-by-line breakdown, per-component confidence, the defaults it applied, assumptions, exclusions, official sources and the rule version. Use it for every tax figure instead of doing tax arithmetic yourself.',
-    'Salary/employment income only. Countries: UK (England, Wales, Northern Ireland), US (all states + DC — filing_status and region are required), CA (province required), AU, IE, DE, FR, NL, ES, IT, IN (Tax Year 2026-27; the new regime is the default).',
+    'Salary/employment income only. Countries: UK (England, Wales, Northern Ireland), US (all states + DC — filing_status and region are required; ask for them, never assume "single"), CA (province required), AU, IE, DE, FR, NL, ES, IT, IN (Tax Year 2026-27; the new regime is the default).',
     'If a required input is missing the tool returns a missing_input error naming the field — ask the user for it rather than guessing. Every total is returned ready to quote; do not add up or recompute figures yourself.'
   ].join(' '),
   inputSchema: {
@@ -145,7 +145,7 @@ const COMPARE_TAX_REGIMES = {
   title: 'Compare India’s tax regimes (Tax.cal)',
   description: [
     'Compare India’s new tax regime (section 202, the default) with the old regime for a salaried individual, side by side: taxable income, rebate, surcharge, cess, total tax, monthly tax and take-home pay for each, the difference, and the total old-regime deductions at which the two would cost the same.',
-    'Reports numbers only and does not recommend a regime. Pass the old-regime deductions the user says they have (80C, 80D, 80CCD(1B), home-loan interest, HRA exemption); without them the old regime is shown with the standard deduction only.',
+    'Reports numbers only. Say which regime gives the lower estimated tax on these inputs; never call it the winner or better, and never tell the user which regime to pick, because that depends on deductions they are actually eligible for. Use only the salary and deductions the user gave for this question; if earlier messages give different figures, ask which to use instead of combining them. Pass the old-regime deductions the user says they have (80C, 80D, 80CCD(1B), home-loan interest, HRA exemption); without them the old regime is shown with the standard deduction only.',
     'India only: other countries have a single regime (use calculate_tax).'
   ].join(' '),
   inputSchema: {

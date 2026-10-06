@@ -449,3 +449,10 @@ test('the server stores nothing and calls nothing: no storage bindings, no outbo
   assert.ok(!/^\s*\[\[?(d1_databases|kv_namespaces|durable_objects|r2_buckets|queues)/m.test(toml), 'wrangler.toml binds storage');
   assert.ok(!/^\s*OPENAI_APPS_CHALLENGE\s*=/m.test(toml), 'the verification token must be a secret, not a var');
 });
+
+test('tool wording keeps the model from recommending a regime or assuming a filing status', () => {
+  const byName = Object.fromEntries(TOOLS.map((t) => [t.name, t.description]));
+  assert.match(byName.compare_tax_regimes, /never call it the winner or better/);
+  assert.match(byName.compare_tax_regimes, /ask which to use instead of combining them/);
+  assert.match(byName.calculate_tax, /never assume "single"/);
+});

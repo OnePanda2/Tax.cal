@@ -46,7 +46,7 @@ export const INSTRUCTIONS = [
   'Tax.cal calculates estimated personal tax with deterministic, sourced rules. Never do tax arithmetic yourself: call calculate_tax (one country), compare_tax_regimes (India, new vs old regime), compare_countries (same salary across countries) or get_tax_rules (what the rules and assumptions are).',
   'Supported: salary/employment income in the UK (not Scotland), US (filing status and state required), Canada (province required), Australia, Ireland, Germany, France, the Netherlands, Spain, Italy and India.',
   'India: "FY 2026-27" means Tax Year 2026-27 under the Income-tax Act, 2025; "AY 2026-27" means FY 2025-26 under the Income-tax Act, 1961. Convert lakh/crore to plain numbers (₹15 lakh = 1500000).',
-  'When a tool returns missing_input, ask the user for exactly that field. Report the defaults_applied, assumptions and confidence with the numbers; indirect tax is an estimate. The tools are calculation-only: they cannot file returns, pay tax or give personal advice.'
+  'Never fill in a required input the user has not given (for example the US filing status): ask first. For India, report which regime has the lower estimated tax on the inputs used; do not call one the winner or better or tell the user which to pick. When a tool returns missing_input, ask the user for exactly that field. Report the defaults_applied, assumptions and confidence with the numbers; indirect tax is an estimate. The tools are calculation-only: they cannot file returns, pay tax or give personal advice.'
 ].join(' ');
 
 /* ---- small helpers -------------------------------------------------------- */
