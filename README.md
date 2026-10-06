@@ -89,7 +89,7 @@ Each result reports confidence **per component**, never as a single score.
 | `get_tax_rules` | The rules, assumptions, sources and versions (one country, or an overview) |
 | `compare_countries` | One salary across countries (tax rules, not cost of living) |
 
-All are annotated read-only, idempotent and closed-world, with output schemas. Inputs are strictly validated. Missing material inputs (a US filing status or state, a Canadian province) are asked for, never guessed. Details: [mcp/README.md](mcp/README.md) and [docs/PLUGIN_ARCHITECTURE.md](docs/PLUGIN_ARCHITECTURE.md).
+All are annotated read-only, idempotent and closed-world, with output schemas. Inputs are strictly validated. A missing material input (a US filing status or state, a Canadian province) returns a `missing_input` error naming the field; the tools never guess it. Details: [mcp/README.md](mcp/README.md) and [docs/PLUGIN_ARCHITECTURE.md](docs/PLUGIN_ARCHITECTURE.md).
 
 ## The plugin
 
