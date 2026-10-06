@@ -69,7 +69,7 @@ const CALCULATE_TAX = {
     'Calculate one employee’s estimated tax for a supported country and tax year with Tax.cal’s deterministic rules: income tax, employee social contributions, state/provincial or regional income tax, and (optionally) an estimate of the VAT/GST/sales tax and fuel duty inside everyday spending.',
     'Returns amounts, effective rates, net and monthly take-home pay, a line-by-line breakdown, per-component confidence, the defaults it applied, assumptions, exclusions, official sources and the rule version. Use it for every tax figure instead of doing tax arithmetic yourself.',
     'Salary/employment income only. Countries: UK (England, Wales, Northern Ireland), US (all states + DC — filing_status and region are required), CA (province required), AU, IE, DE, FR, NL, ES, IT, IN (Tax Year 2026-27; the new regime is the default).',
-    'If a required input is missing the tool returns a missing_input error naming the field — ask the user for it rather than guessing.'
+    'If a required input is missing the tool returns a missing_input error naming the field — ask the user for it rather than guessing. Every total is returned ready to quote; do not add up or recompute figures yourself.'
   ].join(' '),
   inputSchema: {
     type: 'object',
@@ -80,8 +80,8 @@ const CALCULATE_TAX = {
       gross_income: { type: 'number', minimum: 0, description: 'Annual gross salary before tax, in the country’s own currency (GBP, USD, CAD, AUD, EUR or INR). Convert lakh/crore to a plain number: ₹15 lakh = 1500000. Convert monthly pay to annual.' },
       tax_year: { type: 'string', description: TAX_YEAR_DESC },
       income_type: { type: 'string', enum: ['employment'], description: 'Only salary/employment income is supported.' },
-      filing_status: { type: 'string', enum: ['single', 'married_filing_jointly'], description: 'US only, and required there. Ask the user if they have not said.' },
-      region: { type: 'string', description: 'US: two-letter state code (e.g. CA, NY, TX) — required. Canada: province code (e.g. ON, BC, QC) — required. UK: optional "england", "wales" or "northern_ireland" (Scotland is not supported). Leave out for every other country.' },
+      filing_status: { type: 'string', enum: ['single', 'married_filing_jointly'], description: 'US only, and required there. Never assume or default it: if the user has not said "single" or "married filing jointly", ask them first, before calling this tool.' },
+      region: { type: 'string', description: 'US: two-letter state code (e.g. CA, NY, TX) — required; ask if not given. Canada: province code (e.g. ON, BC, QC) — required. UK: optional "england", "wales" or "northern_ireland" (Scotland is not supported). Leave out for every other country.' },
       regime: { type: 'string', enum: ['new', 'old'], description: 'India only. "new" (section 202) is the statutory default; use compare_tax_regimes to see both.' },
       residency: { type: 'string', enum: ['resident', 'non_resident'], description: 'India only. Defaults to resident; non-residents (NRIs) get no rebate.' },
       age_band: { type: 'string', enum: ['below_60', '60_to_79', '80_plus'], description: 'India only; changes the old-regime exemption limit for resident seniors.' },
@@ -107,7 +107,7 @@ const CALCULATE_TAX = {
         required: ['included'],
         properties: {
           included: { type: 'boolean' }, basis: { type: 'string', enum: ['typical_spending_profile', 'user_spending'] },
-          total: NUM, consumption_tax: NUM, fuel_tax: NUM, method: STR, reason: STR,
+          total: NUM, consumption_tax: NUM, fuel_tax: NUM, monthly_spend_total: { type: 'number', description: 'Sum of the monthly spending in by_category, so it can be quoted instead of added up.' }, method: STR, reason: STR,
           by_category: { type: 'array', items: { type: 'object', properties: { category: STR, label: STR, monthly_spend: NUM, effective_rate: NUM, nominal_rate: { type: ['number', 'null'] }, annual_tax: NUM, confidence: STR, reason: STR }, required: ['category', 'monthly_spend', 'effective_rate', 'annual_tax', 'confidence'] } }
         }
       },

@@ -127,6 +127,7 @@ export const calculateTax = wrap((args) => {
       included: true,
       basis: userSpend ? 'user_spending' : 'typical_spending_profile',
       total: r2(ind.total), consumption_tax: r2(ind.consumption), fuel_tax: r2(ind.fuel),
+      monthly_spend_total: r2(ind.byCat.reduce((a, b) => a + b.monthly, 0)),
       by_category: ind.byCat.map((b) => ({ category: b.id, label: b.label, monthly_spend: r2(b.monthly), effective_rate: r4(b.fraction), nominal_rate: b.nominalRate == null ? null : r4(b.nominalRate), annual_tax: r2(b.annual), confidence: b.conf === 'med' ? 'medium' : b.conf, reason: b.reason })),
       method: 'Tax-inclusive: tax = spending × rate ÷ (1 + rate) for a single rate, blended per category. 20% VAT inside a £10 purchase is £1.67, not £2.'
     };

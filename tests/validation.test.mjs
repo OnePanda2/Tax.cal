@@ -98,3 +98,11 @@ test('every supported country produces a complete, well-formed result', () => {
     assert.ok(Math.abs(x.net_income - (x.gross_income - x.total_direct_tax)) < 0.02, `${country} net`);
   }
 });
+
+test('the indirect estimate returns the monthly spending total, so a model never has to add the categories', () => {
+  for (const [k, g, extra] of [['UK', 60000, {}], ['IN', 1500000, {}], ['US', 120000, { filing_status: 'single', region: 'CA' }]]) {
+    const r = calculateTax({ country: k, gross_income: g, ...extra }).result.indirect_tax_estimate;
+    const sum = r.by_category.reduce((a, c) => a + c.monthly_spend, 0);
+    assert.ok(Math.abs(r.monthly_spend_total - sum) < 0.011, `${k}: ${r.monthly_spend_total} vs ${sum}`);
+  }
+});
