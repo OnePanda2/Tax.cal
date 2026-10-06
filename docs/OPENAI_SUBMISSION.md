@@ -50,7 +50,7 @@ If Wrangler prints a different URL, rebuild the ZIP with `npm run plugin:zip -- 
 Follow OpenAI's [Connect and test your plugin](https://developers.openai.com/plugins/deploy/connect-chatgpt) to add `https://taxcal-mcp.onepanda2.workers.dev/mcp` as a developer connection. Run every prompt in §7 and check the answers against the expected results. Expect the model to:
 
 - call a tool for every figure;
-- ask for the US filing status when it is missing;
+- say so whenever it fills in an input itself. In testing on 5–6 October 2026, given no US filing status, ChatGPT assumed "single" and said so instead of asking. The review cases and the video therefore always state the filing status (P4);
 - keep VAT/GST estimates separate from direct tax;
 - show the tax year, rule version and a source;
 - include at most one link to Tax.cal.
@@ -110,7 +110,7 @@ More cases, covering clarifications, malformed input and unsupported countries, 
 1. **Intro (10 s).** "Tax.cal estimates tax on a salary in 11 countries with deterministic rules. ChatGPT explains; Tax.cal calculates. No sign-in."
 2. **P1.** Ask the India ₹15 lakh prompt. Point out that the tool was called, the ₹97,500 result, the "new regime / resident" defaults, Tax Year 2026-27, `IN-2026-27-v1` and the Income Tax Department source.
 3. **P2.** Ask for the regime comparison at ₹20 lakh. Show both columns, the ~₹7.08 lakh break-even and the wording "lower estimated tax", not "better".
-4. **Missing input.** Ask "I make $120k in California. Estimate federal, FICA and California income tax." Show that it asks for the filing status. Answer "single" and show the result.
+4. **P4.** Ask "I make $120k in California, filing single. Estimate federal, FICA and California income tax." Show federal $17,570 and California $6,770.86, with Social Security, Medicare and SDI as separate lines, and that local city taxes are excluded.
 5. **P3.** Ask the UK prompt. Show income tax and NI as calculated figures, and VAT as a separate estimate with its confidence.
 6. **P5.** Ask about the indirect-tax assumptions. Show the overview from `get_tax_rules`.
 7. **Negatives.** Ask N1, N2 and N3 in turn. Show the refusals and that no tool runs.
