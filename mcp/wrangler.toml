@@ -1,6 +1,8 @@
 # Tax.cal MCP server (the ChatGPT plugin's backend) — Cloudflare Workers, free plan.
 #
-#   Deploy:  npx wrangler@4 deploy --config mcp/wrangler.toml --env=""   (production)
+#   Deploy:  npx wrangler@4 deploy --config mcp/wrangler.toml   (production: no --env;
+#            Wrangler warns that no environment was named, which is expected.
+#            Do not use --env="": Windows PowerShell mangles it.)
 #   URL:     https://taxcal-mcp.onepanda2.workers.dev/mcp
 #
 # Stateless and read-only: no D1, no KV, no Durable Objects, no outbound
@@ -27,7 +29,7 @@ simple = { limit = 300, period = 60 }
 # OPENAI_APPS_CHALLENGE (the domain-verification token shown in the OpenAI
 # Platform dashboard) is deliberately NOT declared here: a [vars] entry would
 # override the secret on every deploy. Set it only with
-#   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml --env=""
+#   npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml
 # Until it is set, /.well-known/openai-apps-challenge answers 404.
 
 # Staging: same code, separate Worker and rate-limit counters.

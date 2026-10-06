@@ -114,7 +114,7 @@ There is no embedded UI in v1. The plugin is conversation, tools, skill and stru
 | Piece | Host | Deploy | Cost |
 |---|---|---|---|
 | Website | GitHub Pages (`main`, repo root, `CNAME`) | push to `main` (IndexNow pings search engines) | free |
-| MCP server | Cloudflare Workers, free plan (`taxcal-mcp.onepanda2.workers.dev`) | `npx wrangler@4 deploy --config mcp/wrangler.toml --env=""` (staging: `--env staging`) | free at current scale |
+| MCP server | Cloudflare Workers, free plan (`taxcal-mcp.onepanda2.workers.dev`) | `npx wrangler@4 deploy --config mcp/wrangler.toml` (no `--env` = production; staging: `--env staging`) | free at current scale |
 | Plus API (existing) | Cloudflare Workers + D1 (`taxcal-plus-api`) | unchanged | free tier |
 | Health check | GitHub Actions cron (`mcp-health.yml`) | runs once `vars.MCP_URL` is set | free (public repository) |
 | CI | GitHub Actions (`ci.yml`) | every push and pull request | free (public repository) |

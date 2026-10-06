@@ -63,9 +63,11 @@ These are part of `build:all`. Check `country/<slug>/index.html` for the new yea
 ```bash
 npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
 npm run mcp:smoke -- https://taxcal-mcp-staging.onepanda2.workers.dev/mcp
-npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
+npx wrangler@4 deploy --config mcp/wrangler.toml                 # production: no --env
 npm run mcp:smoke -- https://taxcal-mcp.onepanda2.workers.dev/mcp
 ```
+
+With no `--env`, Wrangler uses the top-level (production) settings and warns that no environment was named; that warning is expected. Do not use `--env=""`: Windows PowerShell mangles it.
 
 Bump `SERVER_VERSION` in `mcp/src/app.js` when the server's behaviour changes.
 

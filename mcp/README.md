@@ -63,17 +63,19 @@ npx wrangler@4 login
 # staging first
 npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
 npm run mcp:smoke -- https://taxcal-mcp-staging.onepanda2.workers.dev/mcp
-# then production
-npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
+# then production (no --env)
+npx wrangler@4 deploy --config mcp/wrangler.toml
 npm run mcp:smoke -- https://taxcal-mcp.onepanda2.workers.dev/mcp
 ```
+
+With no `--env`, Wrangler uses the top-level (production) settings and warns that no environment was named; that warning is expected. Do not use `--env=""`: Windows PowerShell mangles it.
 
 If Wrangler prints a different URL, change `taxcal-plugin/mcp.json` to match it, or pass `--mcp-url` to `npm run plugin:zip`.
 
 **OpenAI domain verification.** The OpenAI Platform shows a token when you submit the app. Store it as a secret:
 
 ```bash
-npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml --env=""
+npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml   # no --env: production
 curl https://taxcal-mcp.onepanda2.workers.dev/.well-known/openai-apps-challenge   # prints the token
 ```
 

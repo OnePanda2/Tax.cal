@@ -35,9 +35,11 @@ npm ci && npm test                                   # everything green first
 npx wrangler@4 login
 npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
 npm run mcp:smoke -- https://taxcal-mcp-staging.onepanda2.workers.dev/mcp
-npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
+npx wrangler@4 deploy --config mcp/wrangler.toml                 # production: no --env
 npm run mcp:smoke -- https://taxcal-mcp.onepanda2.workers.dev/mcp
 ```
+
+With no `--env`, Wrangler uses the top-level (production) settings and warns that no environment was named; that warning is expected. Do not use `--env=""`: Windows PowerShell mangles it.
 
 - [ ] The smoke test passes against production.
 - [ ] `curl https://taxcal-mcp.onepanda2.workers.dev/health` shows 11 countries and the expected rule versions.
@@ -77,7 +79,7 @@ In the OpenAI Platform dashboard, following [Upload and submit your plugin](http
 - [ ] **Domain verification:** copy the token the dashboard shows, then:
 
   ```bash
-  npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml --env=""
+  npx wrangler@4 secret put OPENAI_APPS_CHALLENGE --config mcp/wrangler.toml   # no --env: production
   curl https://taxcal-mcp.onepanda2.workers.dev/.well-known/openai-apps-challenge   # must print exactly the token
   ```
 

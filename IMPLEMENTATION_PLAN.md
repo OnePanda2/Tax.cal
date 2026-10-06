@@ -234,7 +234,7 @@ model in `docs/INDIA_TAX_MODEL.md`).
 2. Website: push to `main` (GitHub Pages). CI (`.github/workflows/ci.yml`) runs the tests
    on every push and pull request.
 3. MCP: `npx wrangler@4 deploy --config mcp/wrangler.toml --env staging`, smoke-test with
-   `npm run mcp:smoke -- <url>`, then `--env=""` for production →
+   `npm run mcp:smoke -- <url>`, then the same command without `--env` for production →
    `https://taxcal-mcp.onepanda2.workers.dev/mcp` (Workers Free plan; no database).
    `.github/workflows/mcp-health.yml` re-runs the smoke test every six hours once the
    repository variable `MCP_URL` is set.

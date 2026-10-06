@@ -164,10 +164,10 @@ Follow [docs/UPDATING_TAX_RULES.md](docs/UPDATING_TAX_RULES.md). In short:
 
 ```bash
 npx wrangler@4 deploy --config mcp/wrangler.toml --env staging
-npx wrangler@4 deploy --config mcp/wrangler.toml --env=""
+npx wrangler@4 deploy --config mcp/wrangler.toml                 # production: no --env
 ```
 
-This deploys to `https://taxcal-mcp.onepanda2.workers.dev/mcp`. After deploying, run `npm run mcp:smoke -- <url>`, and set the repository variable `MCP_URL` to enable the six-hourly health check.
+With no `--env`, Wrangler uses the top-level (production) settings and warns that no environment was named; that warning is expected. Do not use `--env=""`: Windows PowerShell mangles it. This deploys to `https://taxcal-mcp.onepanda2.workers.dev/mcp`. After deploying, run `npm run mcp:smoke -- <url>`, and set the repository variable `MCP_URL` to enable the six-hourly health check.
 
 **Plus API.** See [api/README.md](api/README.md).
 
